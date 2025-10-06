@@ -40,7 +40,7 @@ AgentNexus is a revolutionary decentralized agent marketplace platform that brid
 ### 3. Smart Contracts (Solidity + Foundry)
 - **Escrow Contract**: Payment management with multi-token support
 - **Entitlements Contract**: ERC-1155 for access rights
-- **Deployment**: Multi-chain support (Ethereum, BNB Chain, Arbitrum, Solana via Neon)
+- **Deployment**: Base L2 (primary), with multi-chain expansion (Arbitrum, Solana, BNB Chain, Ethereum mainnet)
 
 **Tech Stack**:
 - Solidity ^0.8.28
@@ -84,9 +84,11 @@ AgentNexus is a revolutionary decentralized agent marketplace platform that brid
 ### Phase 2: Smart Contract Development (Week 1-2)
 1. Implement Escrow contract with tests
 2. Implement Entitlements ERC-1155 contract
-3. Deploy to testnets (Sepolia, BNB Testnet)
-4. Security audit preparation
-5. Contract verification and documentation
+3. Deploy to Base Sepolia testnet (primary)
+4. Apply for Base Build grants and support
+5. Security audit preparation
+6. Contract verification on BaseScan
+7. Prepare for multi-chain expansion (Arbitrum, Solana)
 
 ### Phase 3: Backend Core Services (Week 2-3)
 1. Database schema design and migrations
@@ -155,10 +157,13 @@ AgentNexus is a revolutionary decentralized agent marketplace platform that brid
 ## External Integrations
 
 ### Blockchain & DeFi
-- **Alchemy**: Account Abstraction SDK, RPC endpoints
+- **Base L2**: Primary deployment chain (Coinbase L2, EVM-compatible)
+- **Alchemy**: Account Abstraction SDK, Base RPC endpoints
+- **BaseScan**: Contract verification and analytics
 - **Hyperliquid**: Trading API for crypto agents
 - **Aster**: DEX integration for spot/perpetual trading
 - **ERC-4337**: Smart account infrastructure
+- **Future Chains**: Arbitrum, Solana, BNB Chain, Ethereum mainnet
 
 ### Infrastructure
 - **AWS/GCP**: Cloud hosting and services
