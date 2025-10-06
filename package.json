@@ -1,0 +1,38 @@
+{
+  "name": "agentnexus-v1",
+  "version": "1.0.0",
+  "description": "Decentralized Agent Marketplace Platform",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "smart-contracts",
+    "agent-runtime"
+  ],
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter frontend dev\" \"pnpm --filter backend dev\"",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "contracts:deploy": "pnpm --filter smart-contracts deploy",
+    "contracts:test": "pnpm --filter smart-contracts test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
+
