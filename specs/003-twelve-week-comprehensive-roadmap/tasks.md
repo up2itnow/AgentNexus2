@@ -392,6 +392,25 @@ Build the complete beta user onboarding flow from wallet creation to first agent
 - [ ] Mobile-responsive design
 - [ ] Analytics events tracked
 
+### Task 2-4b: Define Early Funnel KPIs (Signup→Wallet→Execution)
+**Category:** Backend
+**Story Points:** 2
+**Dependencies:** Task 2-4, Task 1-6
+**Assignee:** Product/Backend
+
+**Description:**
+Define and instrument funnel KPIs for Weeks 2–4 (signup→wallet and wallet→first execution), set targets, and add dashboards.
+
+**Acceptance Criteria:**
+- [ ] KPIs defined and documented
+- [ ] Targets set: signup→wallet ≥75%; wallet→first execution ≥60%
+- [ ] Dashboard created in analytics
+- [ ] Weekly report template prepared
+
+**Testing Requirements:**
+- [ ] Events fire and appear in analytics
+- [ ] Dashboard shows accurate conversion rates
+
 ### Task 2-5: Set Up Beta User Management
 **Category:** Backend
 **Story Points:** 2
@@ -499,6 +518,21 @@ Create beta launch announcement, user guide, and feedback collection system for 
 - [ ] Feedback collection working
 - [ ] Beta testing scenarios defined
 
+### Task 2-9: Privacy Review for Analytics (DPIA-lite)
+**Category:** DevOps
+**Story Points:** 1
+**Dependencies:** Task 1-6
+**Assignee:** DevOps/Legal
+
+**Description:**
+Run a lightweight privacy impact assessment for analytics (PostHog), ensure anonymization, and document data handling.
+
+**Acceptance Criteria:**
+- [ ] DPIA-lite checklist completed
+- [ ] Anonymization enabled where applicable
+- [ ] Privacy statement added to docs
+- [ ] Opt-out mechanism documented
+
 **Week 2 Story Points Total:** 26
 **Week 2 Deliverables:** 2 new agents, beta launch ready, multi-token payments, 50 users onboarded
 
@@ -594,6 +628,20 @@ Implement end-to-end gasless transaction flow using the sponsorship paymaster an
 - [ ] Session key transactions work
 - [ ] Paymaster balance management working
 - [ ] Fallback mechanisms operational
+
+### Task 3-9: NPS Instrumentation & Weekly Survey
+**Category:** Frontend
+**Story Points:** 1
+**Dependencies:** Task 2-4
+**Assignee:** Frontend
+
+**Description:**
+Instrument NPS collection in-app and create weekly NPS survey for beta cohort (>40 target by Week 4).
+
+**Acceptance Criteria:**
+- [ ] In-app NPS widget implemented
+- [ ] Weekly survey link distributed
+- [ ] NPS dashboard added to analytics
 
 ### Task 3-4: Create Multi-Token Payment UI
 **Category:** Frontend
@@ -1100,6 +1148,20 @@ Launch user growth campaign to scale from 50 to 100+ beta users with referral pr
 - [ ] Community channels active
 - [ ] Growth metrics tracked
 
+### Task 5-8: Disburse Bounty Pool (Wave 1)
+**Category:** Grant
+**Story Points:** 1
+**Dependencies:** Task 7-1 (SDK), Task 7-3 (Portal) — may shift to Week 7 if needed
+**Assignee:** Business/Grants
+
+**Description:**
+Launch first wave of bounties ($10K) to seed third‑party agent development.
+
+**Acceptance Criteria:**
+- [ ] Bounty briefs published
+- [ ] Disbursement workflow documented
+- [ ] Tracking sheet created
+
 **Week 5 Story Points Total:** 24
 **Week 5 Deliverables:** Hyperliquid + Aster integrated, Arbitrum deployment, 2 new agents, 100+ users
 
@@ -1443,6 +1505,20 @@ Launch developer Discord community, documentation portal, and support channels f
 - [ ] Documentation accessible
 - [ ] Support system working
 
+### Task 7-7: Disburse Hackathon Prizes ($10K)
+**Category:** Grant
+**Story Points:** 1
+**Dependencies:** Task 8-5 (Hackathon)
+**Assignee:** Business/Grants
+
+**Description:**
+Award and disburse hackathon prizes to top projects (3 winners integrated by Week 8).
+
+**Acceptance Criteria:**
+- [ ] Winners selected and announced
+- [ ] Prizes disbursed
+- [ ] Integration follow-up scheduled
+
 **Week 7 Story Points Total:** 21
 **Week 7 Deliverables:** SDKs released, developer portal, 2 new agents, 300+ users, $7K volume
 
@@ -1613,6 +1689,20 @@ Scale backend infrastructure to handle 500+ concurrent users with improved perfo
 - [ ] Load testing passes 500 users
 - [ ] Auto-scaling works correctly
 - [ ] Performance metrics meet targets
+
+### Task 8-7: Disburse Builder Grants ($10K)
+**Category:** Grant
+**Story Points:** 1
+**Dependencies:** Task 7-1, Task 7-2, Task 7-3
+**Assignee:** Business/Grants
+
+**Description:**
+Provide monthly grants to 10 teams to sustain development to Week 12.
+
+**Acceptance Criteria:**
+- [ ] Grant recipients selected
+- [ ] Agreements executed
+- [ ] Disbursements completed
 
 **Week 8 Story Points Total:** 19
 **Week 8 Deliverables:** First enterprise customer, 2 new agents, 500+ users, $10K volume, hackathon launched
@@ -1787,6 +1877,34 @@ Create comprehensive test suite for A2A protocol including unit tests, integrati
 - [ ] Performance benchmarks met
 - [ ] Security tests comprehensive
 
+### Task 9-7: Publish A2A Protocol RFC (Open Review)
+**Category:** Documentation
+**Story Points:** 1
+**Dependencies:** Task 9-1
+**Assignee:** Technical Writer
+
+**Description:**
+Publish the A2A Protocol RFC (GitHub Discussions), invite review, and track issues for Week 10–11 incorporation.
+
+**Acceptance Criteria:**
+- [ ] RFC published
+- [ ] Review period opened and announced
+- [ ] Feedback tracking board created
+
+### Task 9-8: Add Security CI (Contracts & Agents)
+**Category:** DevOps
+**Story Points:** 2
+**Dependencies:** None
+**Assignee:** DevOps
+
+**Description:**
+Add Slither/Foundry static analysis to CI for Solidity; add cosign image signing and SBOM (syft) for agent images.
+
+**Acceptance Criteria:**
+- [ ] Slither/Foundry jobs in CI
+- [ ] cosign signing pipeline active
+- [ ] SBOM artifacts generated
+
 **Week 9 Story Points Total:** 20
 **Week 9 Deliverables:** A2A protocol deployed, 3 new agents, pipeline builder, 1,000+ users, $30K volume
 
@@ -1956,6 +2074,19 @@ Launch the developer revenue sharing program with marketing materials, onboardin
 **Testing Requirements:**
 - [ ] Marketing materials effective
 - [ ] Onboarding process smooth
+
+### Task 10-7: Enforce Build Signing & SBOM on Release
+**Category:** DevOps
+**Story Points:** 1
+**Dependencies:** Task 9-8
+**Assignee:** DevOps
+
+**Description:**
+Gate production releases on signed images and SBOM presence for all agents.
+
+**Acceptance Criteria:**
+- [ ] CI fails on unsigned builds
+- [ ] SBOMs attached to releases
 
 **Week 10 Story Points Total:** 19
 **Week 10 Deliverables:** 3 new agents, developer revenue sharing, advanced dashboard, 2,000+ users, $80K volume

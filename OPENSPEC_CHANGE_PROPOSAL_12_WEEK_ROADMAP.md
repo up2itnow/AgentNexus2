@@ -206,6 +206,16 @@ Complete 100% of AgentNexus V1 technical specification while demonstrating measu
 
 ---
 
+## 🧾 Open-Source Commitment
+
+- **License:** Apache-2.0 for A2A protocol and developer SDKs (TS/Python)
+- **Governance:** Public RFC process for the A2A spec
+  - Week 9: Publish A2A Protocol RFC (GitHub Discussions) and invite community review
+  - Week 10–11: Incorporate feedback; finalize v1.0 spec
+  - Week 12: Open-source release with documentation, examples, and contribution guide
+- **Repos:** `agentnexus/a2a-protocol`, `agentnexus/sdk-ts`, `agentnexus/sdk-py`
+- **Docs:** CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md shipped with initial release
+
 ## 💰 Financial Projections
 
 ### Revenue Model
@@ -248,6 +258,12 @@ Complete 100% of AgentNexus V1 technical specification while demonstrating measu
 - Infrastructure scaling: $40K
 - Marketing campaign: $30K
 - Contingency: $30K
+
+#### Developer Incentive Plan (Ecosystem Growth)
+- Bounties: $30K (goal: 20 third‑party agents by Week 8)
+- Hackathon: $10K (goal: ≥50 qualified submissions; 3 winners integrated by Week 8)
+- Builder Grants: $10K (goal: 10 teams on monthly grants by Week 12)
+- Targets: 20 third‑party agents by Week 8; 50 by Week 12; 100+ developers in ecosystem
 
 ---
 
@@ -301,6 +317,7 @@ Complete 100% of AgentNexus V1 technical specification while demonstrating measu
 - [ ] 5 agents deployed (25% of V1 spec)
 - [ ] 50 beta users onboarded (NPS >40)
 - [ ] ERC-4337 AA operational (>95% wallet creation success)
+- [ ] Funnel conversions achieved (signup→wallet ≥75%, wallet→first execution ≥60%)
 - [ ] Base Ecosystem Fund application submitted
 - [ ] Demo video created (<2 min)
 
