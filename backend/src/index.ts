@@ -21,6 +21,10 @@ dotenv.config();
 // Initialize Prisma client
 export const prisma = new PrismaClient();
 
+// Initialize Analytics service
+import { AnalyticsService } from './services/AnalyticsService';
+export const analytics = new AnalyticsService();
+
 // Initialize Express app
 const app: Application = express();
 const httpServer = createServer(app);
@@ -48,6 +52,7 @@ import executionsRouter from './routes/executions';
 import usersRouter from './routes/users';
 import builderRouter from './routes/builder';
 import agentZeroRouter from './routes/agentZero';
+import walletRouter from './routes/wallet';
 
 /**
  * Register API routes
@@ -57,6 +62,7 @@ app.use('/api/executions', executionsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/builder', builderRouter);
 app.use('/api/agent-zero', agentZeroRouter);
+app.use('/api/wallet', walletRouter);
 
 /**
  * Health check endpoint
@@ -150,9 +156,17 @@ const gracefulShutdown = async (): Promise<void> => {
   console.log('\n🛑 Shutting down gracefully...');
   
   try {
+    // Flush analytics events
+    await analytics.flush();
+    console.log('✅ Analytics flushed');
+
     await prisma.$disconnect();
     console.log('✅ Database disconnected');
-    
+
+    // Shutdown analytics service
+    await analytics.shutdown();
+    console.log('✅ Analytics service shutdown');
+
     httpServer.close(() => {
       console.log('✅ Server closed');
       process.exit(0);

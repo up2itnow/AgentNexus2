@@ -30,6 +30,12 @@ model User {
   agentZeroInstances AgentZeroInstance[]
   agentZeroExecutions AgentZeroExecution[]
 
+  // Enhanced V1 relations
+  developerProfile      DeveloperProfile?
+  enterpriseProfile     EnterpriseProfile?
+  a2aPipelines          A2APipeline[]
+  grants                Grant[]
+
   @@map("users")
   @@index([walletAddress])
   @@index([email])
@@ -409,5 +415,182 @@ enum AgentZeroStatus {
 enum AgentZeroTier {
   BASIC   // Free tier with limitations
   PRO     // Paid tier with full features
+}
+
+// Enhanced models for V1 specification compliance
+
+// Developer profiles for agent publishers
+model DeveloperProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  publishedAgents   String[] @default([]) @map("published_agents")
+  totalRevenue      Decimal  @default(0) @db.Decimal(36, 18) @map("total_revenue")
+  monthlyRevenue    Decimal  @default(0) @db.Decimal(36, 18) @map("monthly_revenue")
+  waitlistPosition  Int?     @map("waitlist_position")
+  acceleratorParticipant Boolean @default(false) @map("accelerator_participant")
+  hackathonWinner   Boolean  @default(false) @map("hackathon_winner")
+  githubHandle      String?  @map("github_handle")
+  twitterHandle     String?  @map("twitter_handle")
+  website           String?  @map("website")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("developer_profiles")
+  @@index([userId])
+  @@index([waitlistPosition])
+}
+
+// Enterprise customer profiles
+model EnterpriseProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  companyName       String   @map("company_name")
+  contractValue     Decimal  @default(0) @db.Decimal(36, 18) @map("contract_value")
+  privateAgents     String[] @default([]) @map("private_agents")
+  customIntegrations String[] @default([]) @map("custom_integrations")
+  slaLevel          String   @default("STANDARD") @map("sla_level")
+  dedicatedSupport  Boolean  @default(false) @map("dedicated_support")
+  apiKeyLimit       Int      @default(100) @map("api_key_limit")
+  customDomain      String?  @map("custom_domain")
+  whitelabelEnabled Boolean  @default(false) @map("whitelabel_enabled")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("enterprise_profiles")
+  @@index([userId])
+}
+
+// Agent-to-Agent pipeline workflows
+model A2APipeline {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  name              String   @map("name")
+  agents            Json     @map("agents") // Array of A2APipelineStep
+  totalCost         Decimal  @db.Decimal(36, 18) @map("total_cost")
+  revenueShare      Int      @default(3000) @map("revenue_share") // Basis points
+  status            PipelineStatus @default(DRAFT) @map("status")
+  executionHistory  Json     @default("[]") @map("execution_history")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("a2a_pipelines")
+  @@index([userId])
+  @@index([status])
+}
+
+enum PipelineStatus {
+  DRAFT
+  ACTIVE
+  EXECUTING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+// Grant tracking and milestone management
+model Grant {
+  id                String   @id @default(cuid())
+  grantingOrganization String @map("granting_organization")
+  amount            Decimal  @db.Decimal(36, 18) @map("amount")
+  currency          String   @default("USD") @map("currency")
+  status            GrantStatus @default(APPLIED) @map("status")
+  applicationDate   DateTime @map("application_date")
+  decisionDate      DateTime? @map("decision_date")
+  disbursementDate  DateTime? @map("disbursement_date")
+  milestones        Json     @default("[]") @map("milestones") // Array of GrantMilestone
+  reportingRequirements String? @map("reporting_requirements")
+  publicAnnouncement Boolean @default(false) @map("public_announcement")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String   @map("user_id")
+
+  @@map("grants")
+  @@index([status])
+  @@index([grantingOrganization])
+  @@index([userId])
+}
+
+enum GrantStatus {
+  APPLIED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  DISBURSED
+  COMPLETED
+}
+
+// Partnership and ecosystem relationships
+model Partnership {
+  id                String   @id @default(cuid())
+  partnerName       String   @map("partner_name")
+  partnerType       PartnerType @map("partner_type")
+  integrationStatus IntegrationStatus @default(DISCUSSION) @map("integration_status")
+  integrationDate   DateTime? @map("integration_date")
+  valueProposition  String?  @map("value_proposition")
+  kpiTargets        Json     @default("{}") @map("kpi_targets")
+  contactPerson     String?  @map("contact_person")
+  contractUrl       String?  @map("contract_url")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("partnerships")
+  @@index([partnerType])
+  @@index([integrationStatus])
+}
+
+enum PartnerType {
+  DEFI_PROTOCOL
+  INFRASTRUCTURE
+  MEDIA
+  ECOSYSTEM
+  ENTERPRISE
+}
+
+enum IntegrationStatus {
+  DISCUSSION
+  LOI_SIGNED
+  IN_DEVELOPMENT
+  LIVE
+  PAUSED
+}
+
+// Analytics and KPI tracking
+model Metric {
+  id                String   @id @default(cuid())
+  metricType        MetricType @map("metric_type")
+  value             Decimal  @db.Decimal(36, 18) @map("value")
+  week              Int      @map("week")
+  phase             Int      @map("phase")
+  targetValue       Decimal  @db.Decimal(36, 18) @map("target_value")
+  percentOfTarget   Decimal  @db.Decimal(5, 4) @map("percent_of_target")
+  recordedAt        DateTime @default(now()) @map("recorded_at")
+
+  @@map("metrics")
+  @@index([metricType])
+  @@index([week])
+  @@index([phase])
+  @@index([recordedAt])
+}
+
+enum MetricType {
+  USER_COUNT
+  AGENT_COUNT
+  TRANSACTION_VOLUME
+  REVENUE
+  DEVELOPER_COUNT
+  NPS_SCORE
+  RETENTION_RATE
+  GRANT_FUNDING
+  MEDIA_MENTIONS
+  PARTNERSHIP_COUNT
 }
 
