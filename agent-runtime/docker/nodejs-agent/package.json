@@ -1,0 +1,16 @@
+{
+  "name": "agentnexus-nodejs-agent-template",
+  "version": "1.0.0",
+  "description": "Node.js agent template for AgentNexus",
+  "main": "agent.js",
+  "scripts": {
+    "start": "node agent.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
+

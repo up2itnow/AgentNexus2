@@ -1,0 +1,142 @@
+{
+  "comment": "AgentNexus Seccomp Profile - Restricts syscalls for agent containers",
+  "defaultAction": "SCMP_ACT_ERRNO",
+  "defaultErrnoRet": 1,
+  "archMap": [
+    {
+      "architecture": "SCMP_ARCH_X86_64",
+      "subArchitectures": [
+        "SCMP_ARCH_X86",
+        "SCMP_ARCH_X32"
+      ]
+    },
+    {
+      "architecture": "SCMP_ARCH_AARCH64",
+      "subArchitectures": [
+        "SCMP_ARCH_ARM"
+      ]
+    }
+  ],
+  "syscalls": [
+    {
+      "comment": "Essential file I/O operations",
+      "names": [
+        "read",
+        "write",
+        "open",
+        "openat",
+        "close",
+        "stat",
+        "fstat",
+        "lstat",
+        "poll",
+        "lseek",
+        "access",
+        "pipe",
+        "pipe2",
+        "dup",
+        "dup2",
+        "dup3",
+        "fcntl",
+        "flock",
+        "fsync",
+        "fdatasync",
+        "truncate",
+        "ftruncate",
+        "getcwd",
+        "chdir",
+        "fchdir",
+        "readlink",
+        "readlinkat"
+      ],
+      "action": "SCMP_ACT_ALLOW"
+    },
+    {
+      "comment": "Memory management (required for Python, Node.js)",
+      "names": [
+        "mmap",
+        "munmap",
+        "mprotect",
+        "madvise",
+        "brk",
+        "mremap"
+      ],
+      "action": "SCMP_ACT_ALLOW"
+    },
+    {
+      "comment": "Process lifecycle",
+      "names": [
+        "exit",
+        "exit_group",
+        "wait4",
+        "waitid",
+        "rt_sigreturn",
+        "rt_sigaction",
+        "rt_sigprocmask",
+        "sigaltstack",
+        "getpid",
+        "getppid",
+        "getuid",
+        "getgid",
+        "geteuid",
+        "getegid",
+        "getresuid",
+        "getresgid"
+      ],
+      "action": "SCMP_ACT_ALLOW"
+    },
+    {
+      "comment": "Time operations",
+      "names": [
+        "clock_gettime",
+        "clock_getres",
+        "gettimeofday",
+        "nanosleep",
+        "clock_nanosleep"
+      ],
+      "action": "SCMP_ACT_ALLOW"
+    },
+    {
+      "comment": "Threading (limited - for language runtimes)",
+      "names": [
+        "clone",
+        "futex",
+        "set_robust_list",
+        "get_robust_list"
+      ],
+      "action": "SCMP_ACT_ALLOW",
+      "args": []
+    },
+    {
+      "comment": "System information",
+      "names": [
+        "uname",
+        "getrlimit",
+        "getrusage",
+        "sysinfo",
+        "times",
+        "getrandom",
+        "getpagesize"
+      ],
+      "action": "SCMP_ACT_ALLOW"
+    },
+    {
+      "comment": "Environment variables",
+      "names": [
+        "getenv",
+        "arch_prctl",
+        "prctl"
+      ],
+      "action": "SCMP_ACT_ALLOW"
+    },
+    {
+      "comment": "Essential for executables",
+      "names": [
+        "execve",
+        "execveat"
+      ],
+      "action": "SCMP_ACT_ALLOW"
+    }
+  ]
+}
+

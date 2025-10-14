@@ -1,52 +1,61 @@
 /**
- * AgentNexus Homepage
+ * AgentNexus Homepage - Marketplace
  * 
- * Landing page with hero section and featured agents
+ * Main marketplace page with agent browsing, search, and filtering
  */
 
-export default function Home(): JSX.Element {
+'use client';
+
+import { useState } from 'react';
+import { CategoryNav } from '@/components/agents/CategoryNav';
+import { AgentFiltersBar } from '@/components/agents/AgentFilters';
+import { AgentGrid } from '@/components/agents/AgentGrid';
+import { useAgents } from '@/hooks/useAgents';
+import type { AgentFilters } from '@/types/agent';
+import { Sparkles } from 'lucide-react';
+
+export default function Home() {
+  const [filters, setFilters] = useState<AgentFilters>({
+    sortBy: 'newest',
+  });
+
+  const { agents, isLoading, isError, total } = useAgents(filters);
+
   return (
-    <main className="min-h-screen p-24">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-5xl font-bold mb-4 text-center">
-          Welcome to AgentNexus
-        </h1>
-        <p className="text-xl text-center text-gray-600 dark:text-gray-400 mb-8">
-          Decentralized AI Agent Marketplace on Base L2
+    <main className="container mx-auto px-4 py-8">
+      {/* Hero Section */}
+      <div className="mb-8 text-center">
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <Sparkles className="h-8 w-8 text-blue-600" />
+          <h1 className="text-4xl font-bold">AI Agent Marketplace</h1>
+        </div>
+        <p className="text-lg text-muted-foreground">
+          Discover, purchase, and execute AI agents on Base L2
         </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-            <h3 className="text-xl font-semibold mb-2">🤖 20+ AI Agents</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Browse curated AI agents for trading, analytics, DeFi, and more
-            </p>
-          </div>
-          
-          <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-            <h3 className="text-xl font-semibold mb-2">💳 Easy Payments</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Purchase with ETH, USDC, or USDT using Account Abstraction
-            </p>
-          </div>
-          
-          <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-            <h3 className="text-xl font-semibold mb-2">⚡ Instant Execution</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Execute agents in isolated Docker containers with real-time results
-            </p>
-          </div>
-        </div>
-        
-        <div className="mt-12 text-center">
-          <a
-            href="/marketplace"
-            className="inline-block px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            Browse Marketplace
-          </a>
-        </div>
+        {!isLoading && total > 0 && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {total} agent{total !== 1 ? 's' : ''} available
+          </p>
+        )}
       </div>
+
+      {/* Category Navigation */}
+      <div className="mb-6">
+        <CategoryNav
+          selectedCategory={filters.category}
+          onCategorySelect={(category) =>
+            setFilters({ ...filters, category })
+          }
+        />
+      </div>
+
+      {/* Filters */}
+      <div className="mb-8">
+        <AgentFiltersBar filters={filters} onFiltersChange={setFilters} />
+      </div>
+
+      {/* Agent Grid */}
+      <AgentGrid agents={agents} isLoading={isLoading} isError={isError} />
     </main>
   );
 }

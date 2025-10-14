@@ -1,0 +1,107 @@
+# Agent Zero Pro Tier Configuration
+# Custom configuration for persistent instances with full features
+
+# Agent settings
+agent:
+  name: "Agent Zero Pro"
+  role: "Full-featured autonomous AI agent"
+  mode: "persistent"
+  
+# Model configuration
+models:
+  chat:
+    provider: "openai"  # Can be overridden by env var
+    model: "gpt-4-turbo-preview"
+    temperature: 0.7
+    max_tokens: 4096
+    
+  tool:
+    provider: "openai"
+    model: "gpt-4-turbo-preview"
+    temperature: 0.3
+    max_tokens: 2048
+
+# Memory configuration
+memory:
+  enabled: true
+  path: "/app/memory"
+  max_history: 100
+  summarize_after: 50
+  
+# Knowledge base
+knowledge:
+  enabled: true
+  path: "/app/knowledge"
+  vector_store: "chroma"
+  
+# Tools configuration
+tools:
+  terminal:
+    enabled: true
+    timeout: 300
+    max_commands: 50
+    
+  code_execution:
+    enabled: true
+    timeout: 300
+    languages: ["python", "javascript", "bash"]
+    
+  web_browser:
+    enabled: true
+    timeout: 60
+    max_pages: 20
+    
+  file_system:
+    enabled: true
+    base_path: "/app/workspace"
+    max_file_size: 10485760  # 10MB
+    
+  subordinate_agents:
+    enabled: true
+    max_agents: 5
+    
+  mcp_servers:
+    enabled: true
+    
+# WebUI configuration
+webui:
+  enabled: true
+  host: "0.0.0.0"
+  port: 50001
+  title: "Agent Zero Pro - AgentNexus"
+  theme: "dark"
+  
+# Logging
+logging:
+  level: "INFO"
+  path: "/app/logs"
+  max_size: 52428800  # 50MB
+  max_files: 10
+  
+# Performance
+performance:
+  max_concurrent_tasks: 5
+  task_timeout: 1800  # 30 minutes
+  memory_limit: "4GB"
+  cpu_limit: 2.0
+  
+# Security
+security:
+  sandbox_mode: true
+  allowed_domains: []  # Empty means all allowed
+  blocked_commands: ["rm -rf /", "dd if=/dev/zero"]
+  
+# Features
+features:
+  streaming: true
+  real_time_updates: true
+  session_persistence: true
+  auto_save: true
+  
+# Limits (Pro tier)
+limits:
+  max_execution_time: 1800  # 30 minutes
+  max_memory_usage: 4294967296  # 4GB
+  max_storage: 10737418240  # 10GB
+  rate_limit: -1  # Unlimited
+

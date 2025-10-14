@@ -41,6 +41,24 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /**
+ * Import routes
+ */
+import agentsRouter from './routes/agents';
+import executionsRouter from './routes/executions';
+import usersRouter from './routes/users';
+import builderRouter from './routes/builder';
+import agentZeroRouter from './routes/agentZero';
+
+/**
+ * Register API routes
+ */
+app.use('/api/agents', agentsRouter);
+app.use('/api/executions', executionsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/builder', builderRouter);
+app.use('/api/agent-zero', agentZeroRouter);
+
+/**
  * Health check endpoint
  */
 app.get('/health', async (_req: Request, res: Response) => {

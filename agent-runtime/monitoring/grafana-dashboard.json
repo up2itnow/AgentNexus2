@@ -1,0 +1,445 @@
+{
+  "dashboard": {
+    "title": "AgentNexus - Agent Execution Metrics",
+    "tags": ["agentnexus", "agents", "execution"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total Executions",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(agentnexus_executions_total)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"}
+              ]
+            },
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Success Rate",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "sum(agentnexus_execution_status_total{status=\"COMPLETED\"}) / sum(agentnexus_execution_status_total) * 100",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 6,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "red"},
+                {"value": 80, "color": "yellow"},
+                {"value": 95, "color": "green"}
+              ]
+            },
+            "unit": "percent",
+            "max": 100,
+            "min": 0
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Average Execution Duration",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, sum(rate(agentnexus_execution_duration_seconds_bucket[5m])) by (le))",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"},
+                {"value": 10, "color": "yellow"},
+                {"value": 30, "color": "red"}
+              ]
+            },
+            "unit": "s"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Active WebSocket Connections",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "agentnexus_active_websocket_connections",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 18,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "blue"}
+              ]
+            },
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Executions per Minute",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(agentnexus_executions_total[1m])) * 60",
+            "refId": "A",
+            "legendFormat": "Executions/min"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 4,
+          "w": 12,
+          "h": 8
+        },
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": "Executions/min"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Execution Duration Percentiles",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(agentnexus_execution_duration_seconds_bucket[5m])) by (le))",
+            "refId": "A",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(agentnexus_execution_duration_seconds_bucket[5m])) by (le))",
+            "refId": "B",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(agentnexus_execution_duration_seconds_bucket[5m])) by (le))",
+            "refId": "C",
+            "legendFormat": "p99"
+          }
+        ],
+        "gridPos": {
+          "x": 12,
+          "y": 4,
+          "w": 12,
+          "h": 8
+        },
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Duration"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Execution Status Breakdown",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (status) (agentnexus_execution_status_total)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 12,
+          "w": 8,
+          "h": 8
+        }
+      },
+      {
+        "id": 8,
+        "title": "Top Agents by Execution Count",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, sum by (agent_name, agent_id) (agentnexus_executions_total))",
+            "refId": "A",
+            "format": "table"
+          }
+        ],
+        "gridPos": {
+          "x": 8,
+          "y": 12,
+          "w": 8,
+          "h": 8
+        }
+      },
+      {
+        "id": 9,
+        "title": "Total Revenue (Wei)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(agentnexus_agent_revenue_wei)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 16,
+          "y": 12,
+          "w": 8,
+          "h": 8
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "green"}
+              ]
+            },
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 10,
+        "title": "Container Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "agentnexus_container_memory_bytes",
+            "refId": "A",
+            "legendFormat": "{{execution_id}}"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 20,
+          "w": 12,
+          "h": 8
+        },
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "bytes",
+            "label": "Memory"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Container CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "agentnexus_container_cpu_percent",
+            "refId": "A",
+            "legendFormat": "{{execution_id}}"
+          }
+        ],
+        "gridPos": {
+          "x": 12,
+          "y": 20,
+          "w": 12,
+          "h": 8
+        },
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "percent",
+            "label": "CPU %",
+            "max": 100
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Docker Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "agentnexus_docker_healthy",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 28,
+          "w": 6,
+          "h": 4
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {"value": 0, "text": "Unhealthy", "color": "red"},
+              {"value": 1, "text": "Healthy", "color": "green"}
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": null, "color": "red"},
+                {"value": 1, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 13,
+        "title": "Node.js Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "nodejs_heap_size_used_bytes",
+            "refId": "A",
+            "legendFormat": "Heap Used"
+          },
+          {
+            "expr": "nodejs_heap_size_total_bytes",
+            "refId": "B",
+            "legendFormat": "Heap Total"
+          }
+        ],
+        "gridPos": {
+          "x": 6,
+          "y": 28,
+          "w": 9,
+          "h": 4
+        },
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "bytes",
+            "label": "Memory"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Event Loop Lag",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "nodejs_eventloop_lag_seconds",
+            "refId": "A",
+            "legendFormat": "Event Loop Lag"
+          }
+        ],
+        "gridPos": {
+          "x": 15,
+          "y": 28,
+          "w": 9,
+          "h": 4
+        },
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Lag"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      }
+    ]
+  }
+}
+

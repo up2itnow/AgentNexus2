@@ -13,7 +13,8 @@ datasource db {
 // User authentication and profile
 model User {
   id            String        @id @default(cuid())
-  walletAddress String        @unique @map("wallet_address")
+  walletAddress String?       @unique @map("wallet_address")
+  walletType    String?       @map("wallet_type") // e.g. LIGHT_ACCOUNT, EOA
   email         String?       @unique
   username      String?       @unique
   kycStatus     KycStatus     @default(NOT_VERIFIED) @map("kyc_status")
@@ -22,9 +23,12 @@ model User {
   updatedAt     DateTime      @updatedAt @map("updated_at")
   
   // Relations
-  purchases     Purchase[]
-  executions    Execution[]
-  entitlements  Entitlement[]
+  purchases        Purchase[]
+  executions       Execution[]
+  entitlements     Entitlement[]
+  customAgents     CustomAgent[]
+  agentZeroInstances AgentZeroInstance[]
+  agentZeroExecutions AgentZeroExecution[]
 
   @@map("users")
   @@index([walletAddress])
@@ -64,6 +68,7 @@ model Agent {
   purchases       Purchase[]
   executions      Execution[]
   entitlements    Entitlement[]
+  customAgent     CustomAgent?
 
   @@map("agents")
   @@index([category])
@@ -192,5 +197,217 @@ model SystemConfig {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("system_config")
+}
+
+// Agent Builder System
+// Templates for building custom agents
+model AgentTemplate {
+  id              String         @id @default(cuid())
+  name            String
+  description     String
+  category        AgentCategory
+  difficulty      TemplateDifficulty @default(BEGINNER)
+  basePrice       Decimal        @db.Decimal(18, 6)
+  complexity      Int            @default(1) // 1-5 rating
+  
+  // Template configuration
+  modules         Json           // Available modules/capabilities
+  configSchema    Json           // JSON Schema for configuration
+  defaultConfig   Json           // Default configuration values
+  exampleConfig   Json?          @map("example_config") // Example configuration
+  
+  // Metadata
+  icon            String?        // Icon/image URL
+  featured        Boolean        @default(false)
+  isActive        Boolean        @default(true) @map("is_active")
+  usageCount      Int            @default(0) @map("usage_count")
+  
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  
+  // Relations
+  customAgents    CustomAgent[]
+  
+  @@map("agent_templates")
+  @@index([category])
+  @@index([difficulty])
+  @@index([featured])
+}
+
+// Custom agents created by users
+model CustomAgent {
+  id              String         @id @default(cuid())
+  agentId         String         @unique @map("agent_id") // Links to Agent model
+  templateId      String?        @map("template_id") // Source template (null if built from scratch)
+  creatorId       String         @map("creator_id")
+  
+  // Build configuration
+  buildMethod     BuildMethod    @default(TEMPLATE) @map("build_method")
+  configuration   Json           // User's custom config
+  selectedModules Json           @map("selected_modules") // Selected modules/capabilities
+  customCode      String?        @db.Text @map("custom_code") // For advanced builder
+  
+  // Status
+  isPublic        Boolean        @default(true) @map("is_public")
+  isDeployed      Boolean        @default(false) @map("is_deployed")
+  deployedAt      DateTime?      @map("deployed_at")
+  
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  
+  // Relations
+  agent           Agent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  template        AgentTemplate? @relation(fields: [templateId], references: [id])
+  creator         User           @relation(fields: [creatorId], references: [id])
+  
+  @@map("custom_agents")
+  @@index([creatorId])
+  @@index([templateId])
+  @@index([buildMethod])
+}
+
+// Module definitions for agent builder
+model AgentModule {
+  id              String         @id @default(cuid())
+  name            String
+  displayName     String         @map("display_name")
+  description     String
+  category        ModuleCategory
+  
+  // Pricing
+  baseCost        Decimal        @db.Decimal(18, 6) @map("base_cost")
+  executionCost   Decimal        @default(0) @db.Decimal(18, 6) @map("execution_cost")
+  
+  // Configuration
+  configSchema    Json           @map("config_schema") // JSON Schema for module config
+  defaultConfig   Json           @map("default_config")
+  dependencies    String[]       // Required module IDs
+  
+  // Metadata
+  icon            String?
+  isActive        Boolean        @default(true) @map("is_active")
+  difficulty      Int            @default(1) // 1-5
+  
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  
+  @@map("agent_modules")
+  @@index([category])
+  @@index([isActive])
+}
+
+// Enums for agent builder
+enum TemplateDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum BuildMethod {
+  TEMPLATE      // Method 1: Pre-built template
+  HYBRID        // Method 2: Modular builder
+  CUSTOM        // Method 3: Full custom code
+}
+
+enum ModuleCategory {
+  DATA_SOURCE   // APIs, blockchain data, social media
+  ANALYSIS      // Sentiment, technical, fundamental
+  TRIGGER       // Time-based, event-based, threshold
+  ACTION        // Alerts, reports, trades
+  UTILITY       // Helpers, formatters, validators
+}
+
+// ==============================================================================
+// AGENT ZERO INTEGRATION
+// ==============================================================================
+
+// Persistent Agent Zero instances for Pro tier users
+model AgentZeroInstance {
+  id              String              @id @default(cuid())
+  userId          String              @map("user_id")
+  containerId     String              @unique @map("container_id")
+  status          AgentZeroStatus     @default(CREATING)
+  tier            AgentZeroTier       @default(BASIC)
+  
+  // Container configuration
+  tunnelUrl       String?             @map("tunnel_url") // Public URL to access WebUI
+  internalPort    Int                 @default(50001) @map("internal_port")
+  memoryPath      String?             @map("memory_path") // Path to persistent memory volume
+  
+  // Resource tracking
+  cpuLimit        String?             @map("cpu_limit") // e.g., "1.0" (1 CPU)
+  memoryLimit     String              @default("4GB") @map("memory_limit")
+  storageUsed     BigInt              @default(0) @map("storage_used") // bytes
+  
+  // Usage stats
+  totalExecutions Int                 @default(0) @map("total_executions")
+  lastAccessedAt  DateTime            @default(now()) @map("last_accessed_at")
+  expiresAt       DateTime?           @map("expires_at") // For subscription-based access
+  
+  // Timestamps
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  
+  // Relations
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  executions      AgentZeroExecution[]
+  
+  @@map("agent_zero_instances")
+  @@index([userId])
+  @@index([status])
+  @@index([tier])
+  @@index([expiresAt])
+}
+
+// Agent Zero execution records (for both Basic and Pro tiers)
+model AgentZeroExecution {
+  id              String              @id @default(cuid())
+  userId          String              @map("user_id")
+  instanceId      String?             @map("instance_id") // Null for Basic tier ephemeral executions
+  tier            AgentZeroTier
+  
+  // Execution details
+  prompt          String              @db.Text
+  response        String?             @db.Text
+  status          ExecutionStatus     @default(PENDING)
+  executionTime   Int?                @map("execution_time") // milliseconds
+  
+  // Metadata
+  toolsUsed       String[]            @default([]) @map("tools_used")
+  tokensUsed      Int?                @map("tokens_used")
+  errorMessage    String?             @db.Text @map("error_message")
+  
+  // Timestamps
+  createdAt       DateTime            @default(now()) @map("created_at")
+  completedAt     DateTime?           @map("completed_at")
+  
+  // Relations
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instance        AgentZeroInstance?  @relation(fields: [instanceId], references: [id], onDelete: SetNull)
+  
+  @@map("agent_zero_executions")
+  @@index([userId])
+  @@index([instanceId])
+  @@index([tier])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Agent Zero enums
+enum AgentZeroStatus {
+  CREATING
+  STARTING
+  RUNNING
+  STOPPING
+  STOPPED
+  PAUSED
+  ERROR
+  DELETED
+}
+
+enum AgentZeroTier {
+  BASIC   // Free tier with limitations
+  PRO     // Paid tier with full features
 }
 

@@ -12,7 +12,7 @@ import "../src/AgentNexusEntitlements.sol";
  */
 contract DeployScript is Script {
     // Configuration
-    address public constant PLATFORM_FEE_RECIPIENT = 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1; // Replace with actual
+    address public constant PLATFORM_FEE_RECIPIENT = 0x742d35cC6634c0532925A3b844bc9E7595F0beB1; // Replace with actual
     uint256 public constant PLATFORM_FEE_BPS = 250; // 2.5%
     string public constant BASE_URI = "https://api.agentnexus.io/metadata/";
     
@@ -79,7 +79,7 @@ contract DeployScript is Script {
  * @notice Deployment script for Base Sepolia testnet with mock tokens
  */
 contract TestnetDeployScript is Script {
-    address public constant PLATFORM_FEE_RECIPIENT = 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1; // Replace
+    address public constant PLATFORM_FEE_RECIPIENT = 0x742d35cC6634c0532925A3b844bc9E7595F0beB1; // Replace
     uint256 public constant PLATFORM_FEE_BPS = 250; // 2.5%
     string public constant BASE_URI = "https://testnet-api.agentnexus.io/metadata/";
     

@@ -1,0 +1,13 @@
+# Python Agent Dependencies
+# Keep minimal for faster container startup
+
+# Core dependencies (always included)
+requests==2.31.0
+python-dotenv==1.0.0
+
+# Optional: Uncomment based on agent needs
+# numpy==1.26.0
+# pandas==2.1.3
+# web3==6.11.3
+# openai==1.3.7
+
