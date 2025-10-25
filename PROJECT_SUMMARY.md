@@ -455,7 +455,7 @@ AgentNexus is a decentralized marketplace for AI agents built on Base L2. It ena
 - Security auditors (TBD)
 
 **Special Thanks:**
-- AstraForge AI for development assistance
+-  AI for development assistance
 - OpenZeppelin for contract libraries
 - Base team for ecosystem support
 

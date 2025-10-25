@@ -326,7 +326,7 @@ Time: 107.23ms CPU time
 
 ---
 
-## 🔄 AstraForge Supervision Summary
+## 🔄  Supervision Summary
 
 ### Errors Caught & Fixed in Real-Time
 

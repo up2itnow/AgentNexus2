@@ -268,7 +268,7 @@ We've transformed the AgentNexus codebase with **world-class documentation** tha
 4. **"Developer-Friendly"** - Easy for others to contribute
 5. **"Future-Proof"** - Enhancement roadmaps included
 6. **"Educational"** - The codebase teaches good patterns
-7. **"AstraForge-Built"** - Leverages 5-LLM collaboration for quality
+7. **"-Built"** - Leverages 5-LLM collaboration for quality
 
 ---
 

@@ -243,7 +243,7 @@
 ✅ **Type-safe, error-free compilation**
 
 ### Technical Differentiators
-- **5-LLM Consensus Development**: Built with AstraForge collaborative AI system
+- **5-LLM Consensus Development**: Built with  collaborative AI system
 - **Base-First Strategy**: Optimized for Base ecosystem from day one
 - **Account Abstraction**: Best-in-class UX with gasless transactions
 - **Enterprise Architecture**: Scalable, maintainable, professional patterns
