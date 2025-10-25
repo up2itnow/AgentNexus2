@@ -301,6 +301,6 @@ If agents need additional syscalls (e.g., for specific libraries):
 
 ---
 
-*Seccomp profile created with AstraForge 5-LLM Security Expert*  
+*Seccomp profile created with  Security Expert*  
 *AgentNexus Team - October 2025*
 

@@ -67,7 +67,7 @@
  * - Retry failed transactions
  * - Multi-token payment support (USDC, USDT)
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 'use client';

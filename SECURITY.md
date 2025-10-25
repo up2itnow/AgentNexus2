@@ -484,7 +484,7 @@ Total Test Suites:  All passing ✅
 
 ---
 
-*Security implementation by AstraForge 5-LLM Security Expert*  
+*Security implementation by  Security Expert*  
 *AgentNexus Team - October 2025*  
 *"Security is not a feature, it's a foundation"*
 

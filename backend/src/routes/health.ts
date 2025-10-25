@@ -8,7 +8,7 @@
  * - GET /health/ready - Readiness probe (can service handle traffic?)
  * - GET /metrics - Prometheus metrics endpoint
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 import { Router, Request, Response } from 'express';

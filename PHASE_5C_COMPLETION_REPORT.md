@@ -498,6 +498,6 @@ This observability implementation demonstrates:
 
 **Phase 5C: Observability - COMPLETE** ✅
 
-*Built with AstraForge 5-LLM Observability Expert*  
+* Observability Expert*  
 *AgentNexus Team - October 2025*
 

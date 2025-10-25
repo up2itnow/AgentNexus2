@@ -3,7 +3,7 @@
  * 
  * Comprehensive TypeScript types for the entire backend system
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 import { z } from 'zod';

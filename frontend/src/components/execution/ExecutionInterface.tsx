@@ -58,7 +58,7 @@
  * <ExecutionInterface agent={myAgent} />
  * ```
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 'use client';

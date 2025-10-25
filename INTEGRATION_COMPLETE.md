@@ -344,7 +344,7 @@ You now have a fully functional Web3 AI agent marketplace with:
 
 ---
 
-**Built with:** AstraForge 5-LLM Collaboration System  
+**Built with:**   
 **Date:** October 9, 2025  
 **Version:** 1.0.0
 

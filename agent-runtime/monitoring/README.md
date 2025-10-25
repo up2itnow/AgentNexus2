@@ -555,6 +555,6 @@ artillery quick --count 10 --num 100 http://localhost:3001/health
 
 ---
 
-*Monitoring system built with AstraForge 5-LLM Observability Expert*  
+*Monitoring system built with  Observability Expert*  
 *AgentNexus Team - October 2025*
 

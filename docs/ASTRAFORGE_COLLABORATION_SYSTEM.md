@@ -1,4 +1,4 @@
-# AstraForge 5-LLM Collaborative System for AgentNexus
+#  Collaborative System for AgentNexus
 
 ## Overview
 

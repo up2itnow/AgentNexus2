@@ -4,7 +4,7 @@
  * Initializes Express server with all middleware, routes, and services.
  * Connects to PostgreSQL database and starts health monitoring.
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  * @version 1.0.0
  */
 

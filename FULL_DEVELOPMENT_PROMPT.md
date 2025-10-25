@@ -1,4 +1,4 @@
-# AgentNexus V1 - Complete Development Prompt for AstraForge 5-LLM Panel
+# AgentNexus V1 - Complete Development Prompt for  Panel
 
 ## 🎯 PROJECT MISSION
 

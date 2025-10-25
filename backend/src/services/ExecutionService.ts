@@ -7,7 +7,7 @@
  * Design: 5-LLM Collaborative Consensus (85% agreement)
  * Architecture: Layered service with clear separation of concerns
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 import { PrismaClient, Execution, Agent } from '@prisma/client';

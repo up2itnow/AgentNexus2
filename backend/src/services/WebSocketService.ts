@@ -11,7 +11,7 @@
  * - Connection management (authentication, cleanup)
  * - Automatic reconnection support
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 import { Server as HTTPServer } from 'http';

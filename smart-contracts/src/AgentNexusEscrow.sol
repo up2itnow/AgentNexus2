@@ -70,7 +70,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
  * - Appeal period before refunds
  * - Reputation-based fee discounts
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  * @custom:security-contact security@agentnexus.xyz
  */
 contract AgentNexusEscrow is ReentrancyGuard, AccessControl {

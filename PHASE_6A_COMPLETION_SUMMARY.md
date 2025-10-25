@@ -321,7 +321,7 @@ Once all tests are implemented and passing, Phase 6A will be **100% COMPLETE** a
 
 ---
 
-*Phase 6A Framework Setup completed by AstraForge 5-LLM Collaboration*  
+*Phase 6A Framework Setup completed by *  
 *AgentNexus Team - October 2025*  
 *Testing is the foundation of quality software!* 🧪
 

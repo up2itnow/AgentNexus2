@@ -3,7 +3,7 @@
  * 
  * Configures Viem clients for interacting with Base L2 and smart contracts
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 import { createPublicClient, createWalletClient, http, type PublicClient, type WalletClient, type Address } from 'viem';

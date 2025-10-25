@@ -504,6 +504,6 @@ For questions about Phase 5B implementation:
 
 **Phase 5B: Security Hardening - COMPLETE** ✅
 
-*Built with AstraForge 5-LLM Security Expert*  
+* Security Expert*  
 *AgentNexus Team - October 2025*
 

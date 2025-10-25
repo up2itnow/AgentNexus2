@@ -15,7 +15,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
  * Users who own these tokens can execute the corresponding agent.
  * Supports batch operations, metadata URIs, and expiration.
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 contract AgentNexusEntitlements is ERC1155, AccessControl, ReentrancyGuard {
     using Strings for uint256;

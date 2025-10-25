@@ -131,7 +131,7 @@ Every critical file has a comprehensive header explaining:
  * =========
  * Security considerations and mitigations.
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 ```
 
@@ -387,6 +387,6 @@ Every critical file now has professional-grade documentation that:
 
 ---
 
-*Documentation completed by AgentNexus Team using AstraForge 5-LLM Collaboration*
+*Documentation completed by AgentNexus Team using *
 *Last updated: October 7, 2025*
 

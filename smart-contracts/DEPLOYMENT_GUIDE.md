@@ -223,5 +223,5 @@ After successful deployment:
 
 ---
 
-**Deployed with ❤️ by AgentNexus Team using AstraForge 5-LLM Collaboration**
+**Deployed with ❤️ by AgentNexus Team using **
 

@@ -58,7 +58,7 @@
  * - Rating/review system
  * - Agent versioning
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 import { PrismaClient, Agent, AgentStatus } from '@prisma/client';

@@ -1,4 +1,4 @@
-# Phase 3: Backend Core Services - AstraForge Development Prompt
+# Phase 3: Backend Core Services - Development Prompt
 
 ## 🎯 Objective
 

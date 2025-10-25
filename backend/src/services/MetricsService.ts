@@ -10,7 +10,7 @@
  * - System health (active connections, Docker status)
  * - Business metrics (revenue, agent popularity)
  * 
- * @author AgentNexus Team (Built with AstraForge 5-LLM Collaboration)
+ * @author AgentNexus Team ()
  */
 
 import { 
