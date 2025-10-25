@@ -12,7 +12,7 @@
 - [x] Git repository initialized with `main` branch
 - [x] Project directory structure created
 - [x] Monorepo workspace configuration (pnpm)
-- [x] Comprehensive documentation (README, PROJECT_SPEC, ASTRAFORGE_PROMPT)
+- [x] Comprehensive documentation (README, PROJECT_SPEC)
 - [x] Docker Compose development environment
 - [x] Environment configuration templates
 
@@ -87,7 +87,6 @@ AgentNexus-V1/
 ├── docker-compose.yml       ✅ Complete
 ├── package.json             ✅ Root workspace
 ├── PROJECT_SPEC.md          ✅ Complete
-├── ASTRAFORGE_PROMPT.md     ✅ Complete
 └── README.md                ✅ Complete
 ```
 
@@ -155,7 +154,6 @@ AgentNexus-V1/
 
 3. **Use Project Ignition Panel**
    - Open "Project Ignition" view in VS Code sidebar
-   - Paste the content from `ASTRAFORGE_PROMPT.md`
    - Select "Let the panel decide" option
    - Click Submit
 
