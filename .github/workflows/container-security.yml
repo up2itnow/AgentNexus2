@@ -1,0 +1,55 @@
+name: Container Security
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main, develop, refactor/* ]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build backend image
+        if: exists('backend/Dockerfile')
+        run: docker build -t agentnexus/backend:scan ./backend
+      - name: Build frontend image
+        if: exists('frontend/Dockerfile')
+        run: docker build -t agentnexus/frontend:scan ./frontend
+      - name: Trivy backend
+        uses: aquasecurity/trivy-action@master
+        if: success()
+        with:
+          image-ref: 'agentnexus/backend:scan'
+          format: 'sarif'
+          output: 'trivy-backend.sarif'
+          severity: 'CRITICAL,HIGH'
+      - name: Trivy frontend
+        uses: aquasecurity/trivy-action@master
+        if: success()
+        with:
+          image-ref: 'agentnexus/frontend:scan'
+          format: 'sarif'
+          output: 'trivy-frontend.sarif'
+          severity: 'CRITICAL,HIGH'
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-backend.sarif'
+      - name: Upload Trivy frontend results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-frontend.sarif'
+      - name: Hadolint backend
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: backend/Dockerfile
+          failure-threshold: error
+      - name: Hadolint frontend
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: frontend/Dockerfile
+          failure-threshold: error
