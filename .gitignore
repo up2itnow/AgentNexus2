@@ -59,3 +59,4 @@ smart-contracts/broadcast/
 temp/
 *.tmp
 
+smart-contracts/.env
