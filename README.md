@@ -543,3 +543,26 @@ Built with support from:
 *For detailed 12-week roadmap and grant strategy, see [GRANT_STRATEGY_5_PANEL_REVIEW.md](./GRANT_STRATEGY_5_PANEL_REVIEW.md)*
 
 Primary network: Base chain (Base.org). Project remains multi-chain (Arbitrum, Optimism, Ethereum, etc.).
+
+## Deployed Contracts
+
+Base is the primary network. Test deployments use Base Sepolia. Final mainnet addresses will be added upon production deploy.
+
+- EntryPoint (ERC-4337): [0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789](https://sepolia.basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
+- Paymaster Policy ID (Gas Manager): 
+  
+  32141e62-65b5-4187-9286-2852dda849d8
+
+### Base Sepolia (Testnet)
+
+| Contract | Address | Explorer |
+|---|---|---|
+| AgentNexusEscrow | TBD | TBD |
+| AgentNexusEntitlements | TBD | TBD |
+
+Notes:
+- This section auto-updates after successful deploys via the deployment report at reports/DEPLOYED_CONTRACTS_BASE_SEPOLIA.md.
+- For setup and deployment steps, see:
+  - 
+  - 
+  - 

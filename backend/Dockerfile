@@ -51,3 +51,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start server
 CMD ["pnpm", "start"]
+
+# Security hardening
+RUN addgroup -g 1001 -S nodejs && adduser -S app -u 1001 -G nodejs
+USER app
+# Consider read-only rootfs and fs perms at runtime (compose/k8s)
