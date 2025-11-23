@@ -25,13 +25,8 @@ contract DeployAccountFactory is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        // Deploy account implementation first
-        AgentNexusAccount accountImplementation = new AgentNexusAccount(ENTRY_POINT, address(0));
-        console.log("Account implementation deployed at:", address(accountImplementation));
-
         // Deploy account factory
         AgentNexusAccountFactory factory = new AgentNexusAccountFactory(
-            address(accountImplementation),
             ENTRY_POINT
         );
         console.log("Account factory deployed at:", address(factory));
@@ -40,7 +35,7 @@ contract DeployAccountFactory is Script {
 
         // Verify deployment
         console.log("\n=== Deployment Summary ===");
-        console.log("Account Implementation:", address(accountImplementation));
+
         console.log("Account Factory:", address(factory));
         console.log("Entry Point:", ENTRY_POINT);
         console.log("Owner:", factory.owner());

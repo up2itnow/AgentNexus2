@@ -14,6 +14,9 @@ module.exports = {
   verbose: true,
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'
-  }
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@alchemy|@wagmi|wagmi|viem)/)'
+  ]
 };
 

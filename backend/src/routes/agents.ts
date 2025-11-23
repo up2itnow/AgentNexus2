@@ -10,8 +10,9 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../index';
 import { AgentCategory, AgentStatus } from '@prisma/client';
+import { authenticate } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/agents
@@ -101,7 +102,7 @@ router.get('/', async (req: Request, res: Response) => {
       prisma.agent.count({ where }),
     ]);
 
-    res.json({
+    return res.json({
       agents,
       total,
       page: pageNum,
@@ -110,7 +111,7 @@ router.get('/', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error fetching agents:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch agents',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -147,10 +148,10 @@ router.get('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json(agent);
+    return res.json(agent);
   } catch (error) {
     console.error('Error fetching agent:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch agent',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -161,7 +162,7 @@ router.get('/:id', async (req: Request, res: Response) => {
  * POST /api/agents
  * Create a new agent (requires authentication)
  */
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', authenticate, async (req: Request, res: Response) => {
   try {
     const {
       name,
@@ -196,22 +197,20 @@ router.post('/', async (req: Request, res: Response) => {
         name,
         description,
         category: category as AgentCategory,
-        price: price ? parseFloat(price) : 0,
+        price: parseFloat(price),
+        developer: req.user!.id, // Pass ID directly as string
         developerWallet,
         dockerImage,
         inputSchema: inputSchema || {},
         outputSchema: outputSchema || {},
-        status: AgentStatus.UNDER_REVIEW, // New agents start under review
+        status: 'UNDER_REVIEW',
       },
     });
 
-    res.status(201).json(agent);
+    return res.status(201).json(agent);
   } catch (error) {
     console.error('Error creating agent:', error);
-    res.status(500).json({
-      error: 'Failed to create agent',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return res.status(500).json({ error: 'Failed to create agent' });
   }
 });
 
@@ -219,7 +218,7 @@ router.post('/', async (req: Request, res: Response) => {
  * PATCH /api/agents/:id
  * Update agent (requires authentication and ownership)
  */
-router.patch('/:id', async (req: Request, res: Response) => {
+router.patch('/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, description, price, dockerImage, inputSchema, outputSchema } = req.body;
@@ -233,10 +232,10 @@ router.patch('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    // TODO: Add authentication check - verify user owns this agent
-    // if (existingAgent.developerWallet !== req.user.walletAddress) {
-    //   return res.status(403).json({ error: 'Unauthorized' });
-    // }
+    // Verify ownership
+    if (existingAgent.developer !== req.user!.id) {
+      return res.status(403).json({ error: 'Unauthorized: You do not own this agent' });
+    }
 
     // Update agent
     const updatedAgent = await prisma.agent.update({
@@ -251,10 +250,10 @@ router.patch('/:id', async (req: Request, res: Response) => {
       },
     });
 
-    res.json(updatedAgent);
+    return res.json(updatedAgent);
   } catch (error) {
     console.error('Error updating agent:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to update agent',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -265,7 +264,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
  * DELETE /api/agents/:id
  * Delete/deactivate agent (requires authentication and ownership)
  */
-router.delete('/:id', async (req: Request, res: Response) => {
+router.delete('/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -278,10 +277,10 @@ router.delete('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    // TODO: Add authentication check
-    // if (existingAgent.developerWallet !== req.user.walletAddress) {
-    //   return res.status(403).json({ error: 'Unauthorized' });
-    // }
+    // Verify ownership
+    if (existingAgent.developer !== req.user!.id) {
+      return res.status(403).json({ error: 'Unauthorized: You do not own this agent' });
+    }
 
     // Soft delete by setting status to INACTIVE
     await prisma.agent.update({
@@ -289,10 +288,10 @@ router.delete('/:id', async (req: Request, res: Response) => {
       data: { status: AgentStatus.INACTIVE },
     });
 
-    res.json({ message: 'Agent deactivated successfully' });
+    return res.json({ message: 'Agent deactivated successfully' });
   } catch (error) {
     console.error('Error deleting agent:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to delete agent',
       message: error instanceof Error ? error.message : 'Unknown error',
     });

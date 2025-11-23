@@ -13,13 +13,13 @@ import { ArrowLeft, Edit, Plus, Search, Trash2 } from 'lucide-react';
 import { useMyCustomAgents } from '@/hooks/useBuilder';
 import type { CustomAgent, BuildMethod } from '@/types/builder';
 import DeployAgentModal from '@/components/builder/DeployAgentModal';
-
-// Mock user ID for now (in production, get from auth context)
-const MOCK_USER_ID = 'user_123';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function MyAgentsPage() {
-  const router = useRouter();
-  const { customAgents, isLoading, mutate } = useMyCustomAgents(MOCK_USER_ID);
+  // const router = useRouter();
+  const { address: userId } = useAccount();
+  const { customAgents, isLoading, mutate } = useMyCustomAgents(userId || null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [buildMethodFilter, setBuildMethodFilter] = useState<BuildMethod | 'ALL'>('ALL');
@@ -112,99 +112,113 @@ export default function MyAgentsPage() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search agents..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+        {/* Wallet Connection Check */}
+        {!userId ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="text-6xl mb-4">🔐</div>
+            <h2 className="text-2xl font-bold mb-2">Connect Wallet</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Please connect your wallet to view your custom agents
+            </p>
+            <ConnectButton />
+          </div>
+        ) : (
+          <>
+            {/* Filters */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-8">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Search */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search agents..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Status Filter */}
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'DEPLOYED' | 'DRAFT')}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="DEPLOYED">Deployed</option>
+                  <option value="DRAFT">Draft</option>
+                </select>
+
+                {/* Build Method Filter */}
+                <select
+                  value={buildMethodFilter}
+                  onChange={(e) => setBuildMethodFilter(e.target.value as BuildMethod | 'ALL')}
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="ALL">All Methods</option>
+                  <option value="TEMPLATE">Template</option>
+                  <option value="HYBRID">Hybrid</option>
+                  <option value="CUSTOM">Custom</option>
+                </select>
+              </div>
             </div>
 
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'DEPLOYED' | 'DRAFT')}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="ALL">All Status</option>
-              <option value="DEPLOYED">Deployed</option>
-              <option value="DRAFT">Draft</option>
-            </select>
+            {/* Loading State */}
+            {isLoading && (
+              <div className="text-center py-12">
+                <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-gray-400">Loading your agents...</p>
+              </div>
+            )}
 
-            {/* Build Method Filter */}
-            <select
-              value={buildMethodFilter}
-              onChange={(e) => setBuildMethodFilter(e.target.value as BuildMethod | 'ALL')}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="ALL">All Methods</option>
-              <option value="TEMPLATE">Template</option>
-              <option value="HYBRID">Hybrid</option>
-              <option value="CUSTOM">Custom</option>
-            </select>
-          </div>
-        </div>
+            {/* Empty State */}
+            {!isLoading && filteredAgents.length === 0 && (
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-12 text-center">
+                <div className="text-6xl mb-4">🤖</div>
+                <h3 className="text-xl font-bold mb-2">No custom agents yet</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Create your first custom agent to get started
+                </p>
+                <Link
+                  href="/builder"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Agent
+                </Link>
+              </div>
+            )}
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="text-center py-12">
-            <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Loading your agents...</p>
-          </div>
-        )}
+            {/* Agents List */}
+            {!isLoading && filteredAgents.length > 0 && (
+              <div className="space-y-4">
+                {filteredAgents.map((agent) => (
+                  <AgentCard
+                    key={agent.id}
+                    agent={agent}
+                    onDelete={handleDelete}
+                    onDeploy={() => handleDeploy(agent)}
+                  />
+                ))}
+              </div>
+            )}
 
-        {/* Empty State */}
-        {!isLoading && filteredAgents.length === 0 && (
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-12 text-center">
-            <div className="text-6xl mb-4">🤖</div>
-            <h3 className="text-xl font-bold mb-2">No custom agents yet</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Create your first custom agent to get started
-            </p>
-            <Link
-              href="/builder"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Create Agent
-            </Link>
-          </div>
-        )}
-
-        {/* Agents List */}
-        {!isLoading && filteredAgents.length > 0 && (
-          <div className="space-y-4">
-            {filteredAgents.map((agent) => (
-              <AgentCard
-                key={agent.id}
-                agent={agent}
-                onDelete={handleDelete}
-                onDeploy={() => handleDeploy(agent)}
+            {/* Deploy Modal */}
+            {selectedAgentForDeploy && (
+              <DeployAgentModal
+                isOpen={deployModalOpen}
+                onClose={() => {
+                  setDeployModalOpen(false);
+                  setSelectedAgentForDeploy(null);
+                }}
+                agentId={selectedAgentForDeploy.id}
+                agentName={`Custom Agent #${selectedAgentForDeploy.id.slice(0, 8)}`}
+                agentPrice={10.0} // You can calculate this based on build method
+                onSuccess={handleDeploySuccess}
               />
-            ))}
-          </div>
-        )}
-
-        {/* Deploy Modal */}
-        {selectedAgentForDeploy && (
-          <DeployAgentModal
-            isOpen={deployModalOpen}
-            onClose={() => {
-              setDeployModalOpen(false);
-              setSelectedAgentForDeploy(null);
-            }}
-            agentId={selectedAgentForDeploy.id}
-            agentName={`Custom Agent #${selectedAgentForDeploy.id.slice(0, 8)}`}
-            agentPrice={10.0} // You can calculate this based on build method
-            onSuccess={handleDeploySuccess}
-          />
+            )}
+          </>
         )}
       </div>
     </div>
@@ -325,4 +339,3 @@ function AgentCard({ agent, onDelete, onDeploy }: AgentCardProps) {
     </div>
   );
 }
-

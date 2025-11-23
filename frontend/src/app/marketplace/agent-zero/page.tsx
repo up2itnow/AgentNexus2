@@ -8,33 +8,39 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TierComparison from '@/components/agentZero/TierComparison';
-import { 
-  Bot, 
-  Zap, 
-  Shield, 
-  Code, 
-  MessageSquare, 
+import {
+  Bot,
+  Zap,
+  Shield,
+  Code,
+  MessageSquare,
   Sparkles,
   ArrowRight,
   Play,
   CheckCircle2
 } from 'lucide-react';
 import { agentZeroAPI, AgentZeroTier } from '@/lib/api/agentZero';
+import { useAccount } from 'wagmi';
 
 export default function AgentZeroMarketplacePage() {
   const router = useRouter();
   const [currentTier, setCurrentTier] = useState<AgentZeroTier | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock user ID - in production, get from auth context
-  const userId = 'user_mock_123';
+  // Get user ID from wallet connection
+  const { address: userId } = useAccount();
 
   useEffect(() => {
-    loadUserTier();
-  }, []);
+    if (userId) {
+      loadUserTier();
+    } else {
+      setLoading(false);
+    }
+  }, [userId]);
 
   async function loadUserTier() {
     try {
+      if (!userId) return;
       const tierInfo = await agentZeroAPI.getUserTier(userId);
       setCurrentTier(tierInfo.tier);
     } catch (error) {
@@ -67,7 +73,7 @@ export default function AgentZeroMarketplacePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             {/* Badge */}
@@ -99,7 +105,7 @@ export default function AgentZeroMarketplacePage() {
                 <Play className="w-5 h-5" />
                 Try Free Now
               </button>
-              
+
               <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                 className="px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
@@ -146,31 +152,31 @@ export default function AgentZeroMarketplacePage() {
               title="Truly Autonomous"
               description="Agent Zero can plan, execute, and iterate on complex tasks without constant supervision."
             />
-            
+
             <FeatureCard
               icon={<Zap className="w-8 h-8" />}
               title="Tool Integration"
               description="Access to terminal, code execution, web browsing, and file operations out of the box."
             />
-            
+
             <FeatureCard
               icon={<MessageSquare className="w-8 h-8" />}
               title="Conversational Interface"
               description="Natural language interaction with context-aware responses and memory."
             />
-            
+
             <FeatureCard
               icon={<Code className="w-8 h-8" />}
               title="Code Generation"
               description="Generate, execute, and debug code in multiple programming languages."
             />
-            
+
             <FeatureCard
               icon={<Shield className="w-8 h-8" />}
               title="Secure Execution"
               description="Sandboxed Docker containers ensure security and isolation."
             />
-            
+
             <FeatureCard
               icon={<Sparkles className="w-8 h-8" />}
               title="Subordinate Agents"
@@ -207,19 +213,19 @@ export default function AgentZeroMarketplacePage() {
               description="Gather information, analyze data, and summarize recent AI papers about CoT prompting"
               example="Gather and summarize five recent AI papers about CoT prompting"
             />
-            
+
             <UseCaseCard
               title="Code Development"
               description="Create full applications, debug issues, and optimize performance"
               example="Create a web server monitoring system with alerts"
             />
-            
+
             <UseCaseCard
               title="Data Processing"
               description="Clean, transform, and analyze large datasets automatically"
               example="Process sales data and generate quarterly reports"
             />
-            
+
             <UseCaseCard
               title="System Administration"
               description="Automate DevOps tasks, manage servers, and handle deployments"
@@ -238,7 +244,7 @@ export default function AgentZeroMarketplacePage() {
           <p className="text-xl mb-8 text-purple-100">
             Try Agent Zero free today, no credit card required
           </p>
-          
+
           <button
             onClick={handleTryBasic}
             className="px-8 py-4 bg-white text-purple-600 hover:bg-gray-100 rounded-lg font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
@@ -273,7 +279,7 @@ function UseCaseCard({ title, description, example }: { title: string; descripti
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{title}</h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{description}</p>
           <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <p className="text-sm font-mono text-purple-600 dark:text-purple-400">"{example}"</p>
+            <p className="text-sm font-mono text-purple-600 dark:text-purple-400">&quot;{example}&quot;</p>
           </div>
         </div>
       </div>

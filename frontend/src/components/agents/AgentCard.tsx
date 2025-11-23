@@ -7,7 +7,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Bot, TrendingUp, Zap } from 'lucide-react';
+import { formatEther } from 'viem';
 import type { Agent } from '@/types/agent';
 import { CATEGORY_LABELS } from '@/types/agent';
 
@@ -17,75 +19,78 @@ interface AgentCardProps {
 
 export function AgentCard({ agent }: AgentCardProps) {
   // Convert price to ETH display format
-  // Price from API is a number/string in USD, not wei
-  const priceDisplay = typeof agent.price === 'number' 
-    ? agent.price.toFixed(2)
-    : parseFloat(agent.price).toFixed(2);
+  // Price from API is in Wei
+  const priceDisplay = formatEther(BigInt(agent.price));
 
   return (
     <Link
       href={`/agents/${agent.id}`}
-      className="group block rounded-lg border bg-card p-6 transition-all hover:border-blue-500 hover:shadow-lg"
+      className="group relative block overflow-hidden rounded-xl border border-white/10 bg-background/40 p-6 backdrop-blur-md transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20"
     >
-      {/* Agent Icon/Image */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
-          {agent.imageUrl ? (
-            <img
-              src={agent.imageUrl}
-              alt={agent.name}
-              className="h-12 w-12 rounded-lg object-cover"
-            />
-          ) : (
-            <Bot className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+
+      <div className="relative z-10">
+        {/* Agent Icon/Image */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20 transition-all group-hover:scale-110 group-hover:bg-primary/20">
+            {agent.imageUrl ? (
+              <Image
+                src={agent.imageUrl}
+                alt={agent.name}
+                width={48}
+                height={48}
+                className="rounded-xl object-cover"
+              />
+            ) : (
+              <Bot className="h-6 w-6" />
+            )}
+          </div>
+
+          {/* Category Badge */}
+          <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent ring-1 ring-accent/20">
+            {CATEGORY_LABELS[agent.category]}
+          </span>
+        </div>
+
+        {/* Agent Name */}
+        <h3 className="mb-2 text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
+          {agent.name}
+        </h3>
+
+        {/* Description */}
+        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
+          {agent.description}
+        </p>
+
+        {/* Stats Row */}
+        <div className="mb-4 flex items-center gap-4 text-xs text-muted-foreground">
+          {agent.purchaseCount !== undefined && (
+            <div className="flex items-center gap-1">
+              <TrendingUp className="h-3 w-3 text-accent" />
+              <span>{agent.purchaseCount} purchases</span>
+            </div>
+          )}
+          {agent.executionCount !== undefined && (
+            <div className="flex items-center gap-1">
+              <Zap className="h-3 w-3 text-yellow-500" />
+              <span>{agent.executionCount} runs</span>
+            </div>
           )}
         </div>
-        
-        {/* Category Badge */}
-        <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-          {CATEGORY_LABELS[agent.category]}
-        </span>
-      </div>
 
-      {/* Agent Name */}
-      <h3 className="mb-2 text-lg font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400">
-        {agent.name}
-      </h3>
-
-      {/* Description */}
-      <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-        {agent.description}
-      </p>
-
-      {/* Stats Row */}
-      <div className="mb-4 flex items-center gap-4 text-xs text-muted-foreground">
-        {agent.purchaseCount !== undefined && (
-          <div className="flex items-center gap-1">
-            <TrendingUp className="h-3 w-3" />
-            <span>{agent.purchaseCount} purchases</span>
+        {/* Price and CTA */}
+        <div className="flex items-center justify-between border-t border-white/10 pt-4">
+          <div>
+            <div className="text-xs text-muted-foreground">Price</div>
+            <div className="text-lg font-bold text-foreground">
+              {priceDisplay} ETH
+            </div>
           </div>
-        )}
-        {agent.executionCount !== undefined && (
-          <div className="flex items-center gap-1">
-            <Zap className="h-3 w-3" />
-            <span>{agent.executionCount} runs</span>
-          </div>
-        )}
-      </div>
-
-      {/* Price and CTA */}
-      <div className="flex items-center justify-between border-t pt-4">
-        <div>
-          <div className="text-xs text-muted-foreground">Price</div>
-          <div className="text-lg font-bold">
-            ${priceDisplay}
-          </div>
+          <span className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 hover:shadow-primary/40 hover:scale-105 active:scale-95">
+            View Details
+          </span>
         </div>
-        <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
-          View Details
-        </button>
       </div>
     </Link>
   );
 }
-

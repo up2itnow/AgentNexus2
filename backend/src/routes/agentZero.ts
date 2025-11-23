@@ -11,29 +11,16 @@ import { AgentZeroAdapter } from '../services/agentZero/AgentZeroAdapter';
 import { AgentZeroInstanceManager } from '../services/agentZero/AgentZeroInstanceManager';
 import { AgentZeroTierService } from '../services/agentZero/AgentZeroTierService';
 import { WalletService } from '../services/WalletService';
-import { AgentZeroConfig } from '../types/agentZero';
+import { agentZeroConfig } from '../config/agentZero';
 
-const router = Router();
+const router: Router = Router();
 
 // Initialize services
 const prisma = new PrismaClient();
 const docker = new Docker();
-const walletService = new WalletService(prisma);
+const walletService = new WalletService();
 
-// Agent Zero configuration from environment
-const agentZeroConfig: AgentZeroConfig = {
-  basicTokenId: process.env.AGENT_ZERO_BASIC_TOKEN_ID || '',
-  proTokenId: process.env.AGENT_ZERO_PRO_TOKEN_ID || '',
-  proPrice: BigInt(process.env.AGENT_ZERO_PRO_PRICE || '50000000'),
-  proPriceToken: 'USDC',
-  quickImage: process.env.AGENT_ZERO_QUICK_IMAGE || 'agentnexus/agent-zero-quick:latest',
-  fullImage: process.env.AGENT_ZERO_FULL_IMAGE || 'agentnexus/agent-zero-full:latest',
-  basicRateLimit: parseInt(process.env.AGENT_ZERO_BASIC_RATE_LIMIT || '10'),
-  basicTimeout: parseInt(process.env.AGENT_ZERO_BASIC_TIMEOUT || '300000'),
-  proTimeout: parseInt(process.env.AGENT_ZERO_PRO_TIMEOUT || '1800000'),
-  proMaxMemory: process.env.AGENT_ZERO_PRO_MAX_MEMORY || '4GB',
-  proCpuLimit: '2.0',
-};
+// Agent Zero configuration is now imported from ../config/agentZero
 
 // Initialize Agent Zero services
 const tierService = new AgentZeroTierService(prisma, walletService, agentZeroConfig);
@@ -57,7 +44,8 @@ router.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
 
     try {
@@ -66,6 +54,7 @@ router.post(
       // Execute via adapter
       const result = await adapter.execute({
         userId,
+        agentId: 'agent-zero',
         prompt,
         tier: AgentZeroTier.BASIC,
       });
@@ -90,7 +79,8 @@ router.get(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
 
     try {
@@ -120,7 +110,8 @@ router.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
 
     try {
@@ -151,15 +142,17 @@ router.get(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
 
     try {
       const { userId } = req.query as { userId: string };
       const status = await instanceManager.getInstanceStatus(userId);
-      
+
       if (!status) {
-        return res.status(404).json({ error: 'No instance found' });
+        res.status(404).json({ error: 'No instance found' });
+        return;
       }
 
       res.json(status);
@@ -182,7 +175,8 @@ router.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
 
     try {
@@ -208,7 +202,8 @@ router.post(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
 
     try {
@@ -234,7 +229,8 @@ router.delete(
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      res.status(400).json({ errors: errors.array() });
+      return;
     }
 
     try {

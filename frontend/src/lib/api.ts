@@ -7,15 +7,26 @@
 import axios, { AxiosError } from 'axios';
 import type { Agent, AgentFilters, AgentListResponse } from '@/types/agent';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8200';
-
 // Create axios instance
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('api_url') || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8200';
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8200';
+};
+
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${getBaseUrl()}/api`,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Update baseURL before each request to ensure it captures any changes
+api.interceptors.request.use((config) => {
+  config.baseURL = `${getBaseUrl()}/api`;
+  return config;
 });
 
 // Request interceptor for auth tokens
@@ -54,13 +65,13 @@ export const agentsAPI = {
    */
   async list(filters?: AgentFilters): Promise<AgentListResponse> {
     const params = new URLSearchParams();
-    
+
     if (filters?.search) params.append('search', filters.search);
     if (filters?.category) params.append('category', filters.category);
     if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
     if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
-    
+
     const { data } = await api.get<AgentListResponse>(`/agents?${params.toString()}`);
     return data;
   },

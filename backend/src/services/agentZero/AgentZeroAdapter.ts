@@ -8,15 +8,13 @@ import Docker from 'dockerode';
 import { PrismaClient, AgentZeroTier, ExecutionStatus } from '@prisma/client';
 import axios, { AxiosInstance } from 'axios';
 import {
-  AgentZeroExecuteRequest,
-  AgentZeroExecuteResponse,
   AgentZeroConfig,
-  AgentZeroMessage,
   AgentZeroRequest,
 } from '../../types/agentZero';
+import { AgentAdapter, AgentExecutionRequest, AgentExecutionResponse } from '../../types/agent';
 import { AgentZeroTierService } from './AgentZeroTierService';
 
-export class AgentZeroAdapter {
+export class AgentZeroAdapter implements AgentAdapter {
   private docker: Docker;
   private prisma: PrismaClient;
   private tierService: AgentZeroTierService;
@@ -38,12 +36,13 @@ export class AgentZeroAdapter {
   /**
    * Execute Agent Zero task (quick execution for Basic tier)
    */
-  async execute(request: AgentZeroExecuteRequest): Promise<AgentZeroExecuteResponse> {
-    const { userId, prompt, tier = AgentZeroTier.BASIC } = request;
-    
+  async execute(request: AgentExecutionRequest): Promise<AgentExecutionResponse> {
+    const { userId, prompt, tier: requestedTier } = request;
+    const tier = (requestedTier as AgentZeroTier) || AgentZeroTier.BASIC;
+
     // Verify tier access
     const tierVerification = await this.tierService.verifyTierAccess(userId, tier);
-    
+
     if (!tierVerification.hasAccess) {
       throw new Error(tierVerification.reason || 'Access denied');
     }
@@ -67,11 +66,11 @@ export class AgentZeroAdapter {
 
       // Spin up ephemeral container
       const container = await this.createQuickExecutionContainer(userId, tier);
-      
+
       // Execute prompt
       const startTime = Date.now();
       const timeout = tier === AgentZeroTier.BASIC ? this.config.basicTimeout : this.config.proTimeout;
-      
+
       const result = await this.sendPromptToContainer(container, prompt, timeout);
       const executionTime = Date.now() - startTime;
 
@@ -113,6 +112,47 @@ export class AgentZeroAdapter {
 
       throw error;
     }
+  }
+
+  /**
+   * Get status of an execution
+   */
+  async getStatus(executionId: string): Promise<AgentExecutionResponse> {
+    const execution = await this.prisma.agentZeroExecution.findUnique({
+      where: { id: executionId },
+    });
+
+    if (!execution) {
+      throw new Error('Execution not found');
+    }
+
+    let status: 'pending' | 'running' | 'completed' | 'failed' = 'pending';
+    switch (execution.status) {
+      case ExecutionStatus.PENDING: status = 'pending'; break;
+      case ExecutionStatus.RUNNING: status = 'running'; break;
+      case ExecutionStatus.COMPLETED: status = 'completed'; break;
+      case ExecutionStatus.FAILED: status = 'failed'; break;
+    }
+
+    return {
+      executionId: execution.id,
+      status,
+      response: execution.response || undefined,
+      toolsUsed: execution.toolsUsed,
+      tokensUsed: execution.tokensUsed || undefined,
+      executionTime: execution.executionTime || undefined,
+      error: execution.errorMessage || undefined,
+    };
+  }
+
+  /**
+   * Cancel an execution
+   */
+  async cancel(_executionId: string): Promise<boolean> {
+    // For ephemeral containers, we can't easily cancel mid-flight without
+    // tracking the container ID with the execution ID more closely.
+    // This is a placeholder for now.
+    return false;
   }
 
   /**
@@ -191,7 +231,7 @@ export class AgentZeroAdapter {
       };
 
       this.activeContainers.set(container.id, result);
-      
+
       return result;
 
     } catch (error) {
@@ -265,13 +305,13 @@ export class AgentZeroAdapter {
   private async cleanupContainer(containerId: string): Promise<void> {
     try {
       const container = this.docker.getContainer(containerId);
-      
+
       try {
         await container.stop({ t: 5 });
       } catch (stopError) {
         console.log('Container already stopped or error stopping:', stopError);
       }
-      
+
       try {
         await container.remove({ force: true });
       } catch (removeError) {
@@ -299,7 +339,7 @@ export class AgentZeroAdapter {
             reject(err);
             return;
           }
-          this.docker.modem.followProgress(stream, (err: Error | null, output: any[]) => {
+          this.docker.modem.followProgress(stream, (err: Error | null, output: unknown[]) => {
             if (err) {
               reject(err);
             } else {
@@ -329,7 +369,7 @@ export class AgentZeroAdapter {
 
     const value = parseFloat(match[1]);
     const unit = match[2].toUpperCase();
-    
+
     return Math.floor(value * units[unit]);
   }
 
@@ -338,11 +378,11 @@ export class AgentZeroAdapter {
    */
   async cleanup(): Promise<void> {
     console.log(`Cleaning up ${this.activeContainers.size} active containers`);
-    
+
     const cleanupPromises = Array.from(this.activeContainers.keys()).map(
       containerId => this.cleanupContainer(containerId)
     );
-    
+
     await Promise.all(cleanupPromises);
   }
 }

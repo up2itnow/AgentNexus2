@@ -11,6 +11,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { createServer } from 'http';
@@ -44,6 +45,16 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+});
+app.use('/api', limiter);
+
 /**
  * Import routes
  */
@@ -53,6 +64,7 @@ import usersRouter from './routes/users';
 import builderRouter from './routes/builder';
 import agentZeroRouter from './routes/agentZero';
 import walletRouter from './routes/wallet';
+import socialRouter from './routes/social';
 
 /**
  * Register API routes
@@ -63,6 +75,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/builder', builderRouter);
 app.use('/api/agent-zero', agentZeroRouter);
 app.use('/api/wallet', walletRouter);
+app.use('/api/social', socialRouter);
 
 /**
  * Health check endpoint
@@ -71,7 +84,7 @@ app.get('/health', async (_req: Request, res: Response) => {
   try {
     // Check database connection
     await prisma.$queryRaw`SELECT 1`;
-    
+
     res.status(200).json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -121,7 +134,7 @@ app.use((_req: Request, res: Response) => {
  */
 app.use((err: Error, _req: Request, res: Response) => {
   console.error('Global error handler:', err);
-  
+
   res.status(500).json({
     error: 'Internal Server Error',
     message: NODE_ENV === 'development' ? err.message : 'Something went wrong',
@@ -136,7 +149,7 @@ const startServer = async (): Promise<void> => {
     // Test database connection
     await prisma.$connect();
     console.log('✅ Database connected successfully');
-    
+
     // Start HTTP server
     httpServer.listen(PORT, () => {
       console.log(`🚀 AgentNexus Backend running on port ${PORT}`);
@@ -154,7 +167,7 @@ const startServer = async (): Promise<void> => {
  */
 const gracefulShutdown = async (): Promise<void> => {
   console.log('\n🛑 Shutting down gracefully...');
-  
+
   try {
     // Flush analytics events
     await analytics.flush();

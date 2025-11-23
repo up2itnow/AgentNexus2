@@ -13,7 +13,8 @@ describe('HyperliquidService', () => {
         '1000', // account balance
         2,      // 2% risk
         '50000', // entry price
-        '45000'  // stop loss
+        '45000', // stop loss
+        'ETH'
       );
 
       // Risk amount = 1000 * 0.02 = $20
@@ -27,7 +28,8 @@ describe('HyperliquidService', () => {
         '1000',  // account balance
         2,       // 2% risk
         '45000', // entry price (short)
-        '50000'  // stop loss (short)
+        '50000', // stop loss (short)
+        'ETH'
       );
 
       // Risk amount = 1000 * 0.02 = $20
@@ -67,7 +69,7 @@ describe('HyperliquidService', () => {
     it('should return safe for position far from liquidation', () => {
       const result = service.checkLiquidationRisk(
         '50000',    // entry price
-        '51000',    // current price (long position)
+        '55000',    // current price (long position)
         '49975',    // liquidation price
         true        // long position
       );

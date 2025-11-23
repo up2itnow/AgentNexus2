@@ -54,7 +54,7 @@ export default function ModularBuilderPage() {
       (sum, mod) => sum + mod.baseCost + mod.executionCost,
       0
     );
-    
+
     // Complexity multiplier
     let multiplier = 1.0;
     if (selectedModules.length >= 10) multiplier = 1.4;
@@ -74,13 +74,13 @@ export default function ModularBuilderPage() {
     setActiveId(null);
 
     if (over && over.id === 'canvas-drop-zone') {
-      const module = modules.find((m) => m.id === active.id);
-      if (module && !selectedModules.find((m) => m.id === module.id)) {
-        setSelectedModules((prev) => [...prev, module]);
+      const agentModule = modules.find((m) => m.id === active.id);
+      if (agentModule && !selectedModules.find((m) => m.id === agentModule.id)) {
+        setSelectedModules((prev) => [...prev, agentModule]);
         // Initialize config with defaults
         setModuleConfigs((prev) => ({
           ...prev,
-          [module.id]: module.defaultConfig,
+          [agentModule.id]: agentModule.defaultConfig,
         }));
       }
     }
@@ -350,7 +350,7 @@ interface ModuleLibraryProps {
 
 function ModuleLibrary({ modules, isLoading }: ModuleLibraryProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<ModuleCategory | 'ALL'>('ALL');
+  const [categoryFilter] = useState<ModuleCategory | 'ALL'>('ALL');
 
   const filteredModules = useMemo(() => {
     return modules.filter((module) => {
@@ -448,8 +448,8 @@ function ModuleCard({ module }: ModuleCardProps) {
 
   const style = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
     : undefined;
 
   return (
@@ -458,9 +458,8 @@ function ModuleCard({ module }: ModuleCardProps) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow ${
-        isDragging ? 'opacity-50' : ''
-      }`}
+      className={`bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow ${isDragging ? 'opacity-50' : ''
+        }`}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
@@ -566,11 +565,10 @@ function ModuleNode({ module, index, isSelected, onClick, onRemove }: ModuleNode
   return (
     <div
       onClick={onClick}
-      className={`relative bg-white dark:bg-gray-900 border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-lg ${
-        isSelected
+      className={`relative bg-white dark:bg-gray-900 border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-lg ${isSelected
           ? 'border-blue-500 shadow-lg'
           : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
-      }`}
+        }`}
     >
       {/* Remove button */}
       <button
@@ -653,7 +651,7 @@ function ConfigPanel({ module, config, onConfigChange, onClose }: ConfigPanelPro
               <label className="block text-sm font-medium mb-2">
                 {fieldSchema.title || key}
               </label>
-              
+
               {fieldSchema.type === 'string' && fieldSchema.enum ? (
                 <select
                   value={value || ''}
@@ -689,7 +687,7 @@ function ConfigPanel({ module, config, onConfigChange, onClose }: ConfigPanelPro
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 text-sm"
                 />
               )}
-              
+
               {fieldSchema.description && (
                 <p className="text-xs text-gray-500 mt-1">{fieldSchema.description}</p>
               )}

@@ -1,12 +1,15 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Outfit } from 'next/font/google';
 import './globals.css';
 import { Web3Provider } from '@/providers/Web3Provider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { Toaster } from 'sonner';
 import { Navbar } from '@/components/layout/Navbar';
+import { StarfieldBackground } from '@/components/ui/StarfieldBackground';
+import { PageTransition } from '@/components/layout/PageTransition';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
   title: 'AgentNexus - Decentralized AI Agent Marketplace',
@@ -27,12 +30,15 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans`}>
         <ThemeProvider>
           <Web3Provider>
-            <div className="min-h-screen bg-background">
+            <StarfieldBackground />
+            <div className="min-h-screen bg-transparent">
               <Navbar />
-              <main>{children}</main>
+              <main>
+                <PageTransition>{children}</PageTransition>
+              </main>
             </div>
             <Toaster position="bottom-right" richColors />
           </Web3Provider>

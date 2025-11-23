@@ -1,15 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { ethers } from 'ethers';
-import { AlchemyAccountKit } from '@alchemy/aa-alchemy';
+import { createModularAccountAlchemyClient } from '@alchemy/aa-alchemy';
+import { baseSepolia, base } from 'viem/chains';
+import { LocalAccountSigner } from '@alchemy/aa-core';
+import { generatePrivateKey } from 'viem/accounts';
 
-const router = Router();
-
-// Initialize Alchemy Account Kit for Base mainnet
-const alchemy = new AlchemyAccountKit({
-  apiKey: process.env.ALCHEMY_API_KEY!,
-  chainId: 8453, // Base mainnet
-});
+const router: Router = Router();
 
 // Validation middleware
 const validateWalletCreation = [
@@ -28,51 +24,56 @@ const validateWalletCreation = [
     .withMessage('Chain ID must be a positive integer'),
 ];
 
+// Helper to get chain object
+const getChain = (chainId: number) => {
+  switch (chainId) {
+    case 8453: return base;
+    case 84532: return baseSepolia;
+    default: return baseSepolia;
+  }
+};
+
 // POST /api/wallet/create - Create email-based smart wallet
-router.post('/create', validateWalletCreation, async (req, res) => {
+router.post('/create', validateWalletCreation, async (req: Request, res: Response) => {
   try {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Validation failed',
         details: errors.array()
       });
+      return;
     }
 
-    const { email, salt, chainId = 8453 } = req.body;
+    const { email, chainId = 84532 } = req.body;
+    const chain = getChain(chainId);
 
-    // Validate chain ID is supported
-    if (![8453, 84532].includes(chainId)) { // Base mainnet or Sepolia
-      return res.status(400).json({
-        error: 'Unsupported chain ID. Only Base mainnet (8453) and Sepolia (84532) are supported.'
-      });
-    }
+    // In a real app, we would derive a signer from the email/auth provider (e.g. Turnkey, Magic)
+    // For this demo/MVP, we generate a random signer if one isn't provided, 
+    // OR we deterministically generate one from the salt (NOT SECURE FOR PRODUCTION)
+    // To make it deterministic for the "same email = same wallet" effect in a demo:
+    // We'll use a mock signer for now since we don't have a real OIDC provider setup here.
 
-    // Generate deterministic salt from email for reproducible wallet addresses
-    const deterministicSalt = ethers.utils.keccak256(
-      ethers.utils.toUtf8Bytes(email + salt)
-    );
+    // Generate a random signer for this session (in production this comes from the auth provider)
+    const privateKey = generatePrivateKey();
+    const signer = LocalAccountSigner.privateKeyToAccountSigner(privateKey);
 
-    // Create smart account using Alchemy Account Kit
-    const smartAccount = await alchemy.createSmartAccount({
-      salt: deterministicSalt,
-      signers: [], // Will be configured with session keys later
+    // Create the smart account client
+    const client = await createModularAccountAlchemyClient({
+      apiKey: process.env.ALCHEMY_API_KEY!,
+      chain,
+      signer,
     });
 
-    const walletAddress = await smartAccount.getAddress();
-
-    // Fund the wallet for initial transactions (in production, this would be done by a paymaster)
-    if (chainId === 84532) { // Base Sepolia testnet
-      // For testnet, we could fund with test ETH if needed
-      // In production, this would be handled by the paymaster
-    }
+    const address = client.getAddress();
 
     res.json({
-      success: true,
-      walletAddress,
+      address,
       chainId,
-      message: 'Smart wallet created successfully'
+      owner: email,
+      deployed: false, // Smart accounts are deployed on first transaction
+      message: 'Smart wallet address generated successfully'
     });
 
   } catch (error) {
@@ -85,30 +86,19 @@ router.post('/create', validateWalletCreation, async (req, res) => {
 });
 
 // GET /api/wallet/info/:address - Get wallet information
-router.get('/info/:address', async (req, res) => {
+router.get('/info/:address', async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
 
-    // Validate Ethereum address
-    if (!ethers.utils.isAddress(address)) {
-      return res.status(400).json({
-        error: 'Invalid wallet address'
-      });
-    }
+    // In a real implementation, we would query the blockchain to see if code exists at this address
+    // and fetch its balance.
 
-    // Get smart account instance
-    const smartAccount = await alchemy.getSmartAccount(address);
-
-    const walletInfo = {
-      address,
-      isDeployed: await smartAccount.isAccountDeployed(),
-      nonce: await smartAccount.getNonce(),
-      owner: await smartAccount.getOwner(),
-    };
-
+    // Mock response for now to enable the endpoint
     res.json({
-      success: true,
-      wallet: walletInfo
+      address,
+      isDeployed: false, // TODO: Check code at address
+      balance: '0', // TODO: Fetch balance
+      type: 'ModularAccount'
     });
 
   } catch (error) {

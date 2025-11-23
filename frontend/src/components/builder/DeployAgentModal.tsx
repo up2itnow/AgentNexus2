@@ -36,8 +36,8 @@ export default function DeployAgentModal({
   const [error, setError] = useState<string | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const { writeContract, data: hash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { data: hash, isPending } = useWriteContract();
+  useWaitForTransactionReceipt({
     hash,
   });
 
@@ -80,7 +80,7 @@ export default function DeployAgentModal({
       // For now, this is a placeholder
       if (data.requiresBlockchainRegistration) {
         setDeploymentStep('confirming');
-        
+
         // Example contract call (adjust based on your actual contract)
         // writeContract({
         //   address: data.contractAddress,
@@ -88,13 +88,13 @@ export default function DeployAgentModal({
         //   functionName: 'registerAgent',
         //   args: [data.agentTokenId, agentPrice],
         // });
-        
+
         // Simulate for now
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
       setDeploymentStep('success');
-      
+
       // Call success callback after short delay
       setTimeout(() => {
         onSuccess?.();

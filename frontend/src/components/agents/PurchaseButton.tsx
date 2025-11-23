@@ -106,20 +106,18 @@ interface PurchaseButtonProps {
 export function PurchaseButton({ agent, onPurchaseSuccess }: PurchaseButtonProps) {
   // Get connected wallet address from wagmi
   const { address, isConnected } = useAccount();
-  
+
   // Custom hooks for smart contract interactions
   const { purchaseAgent } = usePurchaseAgent();
   const { checkEntitlement } = useCheckEntitlement(agent.id);
-  
+
   // Component state
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(false);
 
-  // Convert price for display (price is in USD from API)
-  const priceDisplay = typeof agent.price === 'number' 
-    ? agent.price.toFixed(2)
-    : parseFloat(agent.price).toFixed(2);
+  // Convert price for display (price is in Wei from API)
+  const priceDisplay = formatEther(BigInt(agent.price));
 
   /**
    * Check if user already owns this agent on mount and when wallet changes
@@ -150,16 +148,19 @@ export function PurchaseButton({ agent, onPurchaseSuccess }: PurchaseButtonProps
    */
   const handlePurchase = async () => {
     setIsPurchasing(true);
-    
+
     try {
       // Execute purchase transaction (may take 5-30 seconds on Base L2)
       const result = await purchaseAgent(agent.id, agent.price);
-      
+
       if (result) {
         // Purchase successful! Update UI and notify parent
         setHasAccess(true);
         onPurchaseSuccess?.();
       }
+    } catch (error) {
+      console.error('Purchase failed:', error);
+      // Toast is handled in usePurchaseAgent, but we can add extra safety here
     } finally {
       // Always clear loading state (even if user rejected tx)
       setIsPurchasing(false);
@@ -227,7 +228,7 @@ export function PurchaseButton({ agent, onPurchaseSuccess }: PurchaseButtonProps
         <div className="flex items-baseline justify-between">
           <span className="text-sm text-muted-foreground">Price</span>
           <div className="text-right">
-            <div className="text-3xl font-bold">${priceDisplay}</div>
+            <div className="text-3xl font-bold">{priceDisplay} ETH</div>
             <div className="text-xs text-muted-foreground">
               One-time purchase
             </div>

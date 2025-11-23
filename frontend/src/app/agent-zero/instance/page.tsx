@@ -6,14 +6,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import {
   Play,
   Square,
   Trash2,
   ExternalLink,
   Activity,
-  Clock,
   HardDrive,
   Cpu,
   Loader2,
@@ -22,26 +21,31 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { agentZeroAPI, InstanceStatus, AgentZeroStatus } from '@/lib/api/agentZero';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function AgentZeroInstancePage() {
-  const router = useRouter();
+  // const router = useRouter();
   const [instance, setInstance] = useState<InstanceStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Mock user ID - in production, get from auth context
-  const userId = 'user_mock_123';
+  // Get user ID from wallet connection
+  const { address: userId } = useAccount();
 
   useEffect(() => {
-    loadInstanceStatus();
-    // Refresh every 30 seconds
-    const interval = setInterval(loadInstanceStatus, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    if (userId) {
+      loadInstanceStatus();
+      // Refresh every 30 seconds
+      const interval = setInterval(loadInstanceStatus, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [userId]);
 
   async function loadInstanceStatus() {
     try {
+      if (!userId) return;
       const status = await agentZeroAPI.getInstanceStatus(userId);
       setInstance(status);
       setError('');
@@ -56,8 +60,9 @@ export default function AgentZeroInstancePage() {
   async function handleCreateInstance() {
     setActionLoading(true);
     setError('');
-    
+
     try {
+      if (!userId) throw new Error('User not connected');
       await agentZeroAPI.createInstance(userId);
       await loadInstanceStatus();
     } catch (err) {
@@ -70,8 +75,9 @@ export default function AgentZeroInstancePage() {
   async function handleStartInstance() {
     setActionLoading(true);
     setError('');
-    
+
     try {
+      if (!userId) throw new Error('User not connected');
       await agentZeroAPI.startInstance(userId);
       await loadInstanceStatus();
     } catch (err) {
@@ -84,8 +90,9 @@ export default function AgentZeroInstancePage() {
   async function handleStopInstance() {
     setActionLoading(true);
     setError('');
-    
+
     try {
+      if (!userId) throw new Error('User not connected');
       await agentZeroAPI.stopInstance(userId);
       await loadInstanceStatus();
     } catch (err) {
@@ -102,8 +109,9 @@ export default function AgentZeroInstancePage() {
 
     setActionLoading(true);
     setError('');
-    
+
     try {
+      if (!userId) throw new Error('User not connected');
       await agentZeroAPI.deleteInstance(userId);
       setInstance(null);
     } catch (err) {
@@ -113,12 +121,33 @@ export default function AgentZeroInstancePage() {
     }
   }
 
-  if (loading) {
+  if (loading && userId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
           <p className="text-gray-600 dark:text-gray-400">Loading instance...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="flex flex-col items-center gap-6 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700">
+          <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-full">
+            <Sparkles className="w-12 h-12 text-purple-500" />
+          </div>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Connect Your Wallet
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 max-w-md">
+              Please connect your wallet to manage your Agent Zero instance.
+            </p>
+          </div>
+          <ConnectButton />
         </div>
       </div>
     );
@@ -165,7 +194,7 @@ export default function AgentZeroInstancePage() {
 
             <div className="mt-12 p-6 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-                What you'll get:
+                What you&apos;ll get:
               </h3>
               <ul className="text-left space-y-3">
                 <li className="flex items-start gap-3">
@@ -223,11 +252,10 @@ export default function AgentZeroInstancePage() {
             </div>
 
             {/* Status Badge */}
-            <div className={`px-4 py-2 rounded-full font-semibold flex items-center gap-2 ${
-              isRunning
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-            }`}>
+            <div className={`px-4 py-2 rounded-full font-semibold flex items-center gap-2 ${isRunning
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+              }`}>
               <Activity className={`w-4 h-4 ${isRunning ? 'animate-pulse' : ''}`} />
               {instance.status}
             </div>

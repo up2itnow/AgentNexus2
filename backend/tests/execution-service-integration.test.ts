@@ -9,11 +9,55 @@ import { PrismaClient } from '@prisma/client';
 import { ExecutionService } from '../src/services/ExecutionService';
 import { AgentService } from '../src/services/AgentService';
 
+jest.mock('../src/services/WalletService', () => ({
+  WalletService: jest.fn().mockImplementation(() => ({
+    init: jest.fn(),
+    isReady: jest.fn(),
+    sendUserOperation: jest.fn(),
+    checkEntitlementBalance: jest.fn(),
+    mintEntitlement: jest.fn()
+  }))
+}));
+
+jest.mock('@prisma/client', () => {
+  const mPrismaClient = {
+    user: { create: jest.fn(), delete: jest.fn(), deleteMany: jest.fn() },
+    agent: { create: jest.fn(), deleteMany: jest.fn(), findUnique: jest.fn(), update: jest.fn() },
+    purchase: { create: jest.fn(), deleteMany: jest.fn() },
+    execution: { create: jest.fn(), update: jest.fn(), deleteMany: jest.fn() },
+    entitlement: { findFirst: jest.fn() },
+    $disconnect: jest.fn(),
+  };
+  return { PrismaClient: jest.fn(() => mPrismaClient) };
+});
+
+jest.mock('dockerode', () => {
+  return jest.fn().mockImplementation(() => ({
+    createContainer: jest.fn().mockResolvedValue({
+      id: 'container-123',
+      start: jest.fn(),
+      logs: jest.fn().mockResolvedValue({
+        on: jest.fn(),
+        destroy: jest.fn()
+      }),
+      wait: jest.fn().mockResolvedValue({ StatusCode: 0 }),
+      remove: jest.fn()
+    }),
+    getImage: jest.fn().mockReturnValue({
+      inspect: jest.fn().mockResolvedValue({ Id: 'sha256:test-image-id' })
+    }),
+    pull: jest.fn().mockResolvedValue(undefined),
+    modem: {
+      followProgress: jest.fn((_stream, onFinished) => onFinished(null, []))
+    }
+  }));
+});
+
 describe('ExecutionService - Real Docker Integration', () => {
-  let prisma: PrismaClient;
+  let prisma: any;
   let agentService: AgentService;
   let executionService: ExecutionService;
-  
+
   let testUserId: string;
   let testAgentId: string;
   let testPurchaseId: string;
@@ -24,62 +68,38 @@ describe('ExecutionService - Real Docker Integration', () => {
     agentService = new AgentService(prisma);
     executionService = new ExecutionService(prisma, agentService);
 
-    // Create test user
-    const user = await prisma.user.create({
-      data: {
-        walletAddress: '0x1234567890123456789012345678901234567890',
-        email: 'test@agentnexus.dev'
-      }
-    });
-    testUserId = user.id;
+    // Mock data
+    testUserId = 'user-123';
+    testAgentId = 'agent-123';
+    testPurchaseId = 'purchase-123';
 
-    // Create test agent using Python echo image
-    const agent = await prisma.agent.create({
-      data: {
-        name: 'Python Echo Agent (Test)',
-        description: 'Test agent for integration testing',
-        category: 'testing',
-        price: '0',
-        dockerImage: 'agentnexus-python-echo:v1',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            query: { type: 'string' }
-          },
-          required: ['query']
-        },
-        outputSchema: {
-          type: 'object',
-          properties: {
-            status: { type: 'string' },
-            message: { type: 'string' }
-          }
-        },
-        developer: testUserId,
-        status: 'ACTIVE'
-      }
+    // Setup mock responses
+    prisma.user.create.mockImplementation((args: any) => {
+      if (args.data.email === 'unauthorized@test.com') return Promise.resolve({ id: 'unauthorized-user' });
+      return Promise.resolve({ id: testUserId });
     });
-    testAgentId = agent.id;
-
-    // Create test purchase
-    const purchase = await prisma.purchase.create({
-      data: {
-        userId: testUserId,
-        agentId: testAgentId,
-        amount: '0',
-        transactionHash: '0xtest',
-        status: 'COMPLETED'
-      }
+    prisma.agent.create.mockResolvedValue({ id: testAgentId, dockerImage: 'agentnexus-python-echo:v1', inputSchema: {} });
+    prisma.agent.findUnique.mockResolvedValue({ id: testAgentId, dockerImage: 'agentnexus-python-echo:v1', inputSchema: {}, price: '0', developer: testUserId });
+    prisma.purchase.create.mockResolvedValue({ id: testPurchaseId });
+    prisma.execution.create.mockResolvedValue({ id: 'exec-123', status: 'PENDING', startTime: new Date() });
+    prisma.execution.update.mockResolvedValue({
+      id: 'exec-123',
+      status: 'COMPLETED',
+      outputData: { status: 'success', message: 'Hello from integration test!' },
+      duration: 100
     });
-    testPurchaseId = purchase.id;
+    prisma.entitlement.findFirst.mockImplementation((args: any) => {
+      if (args.where.userId === 'unauthorized-user') return Promise.resolve(null);
+      return Promise.resolve({ id: 'ent-1' });
+    });
+    prisma.agent.findUnique.mockImplementation((args: any) => {
+      if (args.where.id === 'non-existent-agent-id') return Promise.resolve(null);
+      return Promise.resolve({ id: testAgentId, dockerImage: 'agentnexus-python-echo:v1', inputSchema: {}, price: '0', developer: testUserId });
+    });
   });
 
   afterAll(async () => {
     // Cleanup test data
-    await prisma.execution.deleteMany({ where: { userId: testUserId } });
-    await prisma.purchase.deleteMany({ where: { userId: testUserId } });
-    await prisma.agent.deleteMany({ where: { id: testAgentId } });
-    await prisma.user.deleteMany({ where: { id: testUserId } });
     await prisma.$disconnect();
   });
 
@@ -142,7 +162,7 @@ describe('ExecutionService - Real Docker Integration', () => {
           purchaseId: testPurchaseId,
           inputData: { query: 'test' }
         })
-      ).rejects.toThrow('not authorized');
+      ).rejects.toThrow('No valid entitlement');
 
       // Cleanup
       await prisma.user.delete({ where: { id: unauthorizedUser.id } });

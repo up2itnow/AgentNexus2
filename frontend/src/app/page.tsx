@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { CategoryNav } from '@/components/agents/CategoryNav';
 import { AgentFiltersBar } from '@/components/agents/AgentFilters';
 import { AgentGrid } from '@/components/agents/AgentGrid';
+import { FeaturedAgents } from '@/components/agents/FeaturedAgents';
 import { useAgents } from '@/hooks/useAgents';
 import type { AgentFilters } from '@/types/agent';
 import { Sparkles } from 'lucide-react';
@@ -37,6 +38,11 @@ export default function Home() {
             {total} agent{total !== 1 ? 's' : ''} available
           </p>
         )}
+      </div>
+
+      {/* Featured Agents */}
+      <div className="mb-12">
+        <FeaturedAgents />
       </div>
 
       {/* Category Navigation */}

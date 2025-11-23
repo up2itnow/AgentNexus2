@@ -17,45 +17,45 @@ const SENSITIVE_PATTERNS = [
   // API Keys
   /api[_-]?key[_-]?[:=]\s*['"]?([a-zA-Z0-9_-]{20,})/gi,
   /[a-z0-9]{32,}/gi,  // Generic 32+ char hex strings
-  
+
   // AWS Credentials
   /AKIA[0-9A-Z]{16}/gi,
   /aws[_-]?secret[_-]?access[_-]?key[_-]?[:=]\s*['"]?([a-zA-Z0-9+/]{40})/gi,
-  
+
   // Private Keys
   /-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----/gi,
   /-----BEGIN\s+OPENSSH\s+PRIVATE\s+KEY-----/gi,
-  
+
   // JWT Tokens
   /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/gi,
-  
+
   // GitHub Tokens
   /gh[ps]_[a-zA-Z0-9]{36,}/gi,
-  
+
   // Database URLs
   /postgres:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+/gi,
   /mongodb(\+srv)?:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+/gi,
-  
+
   // Credit Cards (basic pattern)
   /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/gi,
-  
+
   // Email addresses (can be PII)
   /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi,
-  
+
   // IP Addresses (internal networks)
   /\b(?:10|172\.(?:1[6-9]|2[0-9]|3[01])|192\.168)\.\d{1,3}\.\d{1,3}\b/gi,
-  
+
   // Ethereum Private Keys
   /0x[a-fA-F0-9]{64}/gi,
-  
+
   // Bearer Tokens
   /Bearer\s+[a-zA-Z0-9_-]{20,}/gi,
-  
+
   // Generic password patterns
   /password[_-]?[:=]\s*['"]?([^\s'"]+)/gi,
   /pwd[_-]?[:=]\s*['"]?([^\s'"]+)/gi,
   /secret[_-]?[:=]\s*['"]?([^\s'"]+)/gi,
-  
+
   // JSON keys with sensitive names (camelCase)
   /"(apiKey|secretKey|privateKey|accessToken|refreshToken|password|secret)":\s*"([^"]+)"/gi
 ];
@@ -70,11 +70,11 @@ export function sanitizeInput(input: any): any {
   if (typeof input === 'string') {
     return sanitizeString(input);
   }
-  
+
   if (Array.isArray(input)) {
     return input.map(sanitizeInput);
   }
-  
+
   if (typeof input === 'object' && input !== null) {
     const sanitized: any = {};
     for (const [key, value] of Object.entries(input)) {
@@ -84,7 +84,7 @@ export function sanitizeInput(input: any): any {
     }
     return sanitized;
   }
-  
+
   // Numbers, booleans, null, undefined pass through
   return input;
 }
@@ -99,19 +99,19 @@ function sanitizeString(str: string): string {
   if (typeof str !== 'string') {
     return str;
   }
-  
+
   // Remove null bytes (can cause issues in C-based programs)
   let sanitized = str.replace(/\0/g, '');
-  
+
   // Remove control characters except newline and tab
   sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-  
+
   // Limit length to prevent DoS
   const MAX_INPUT_LENGTH = 100000; // 100KB
   if (sanitized.length > MAX_INPUT_LENGTH) {
     sanitized = sanitized.substring(0, MAX_INPUT_LENGTH);
   }
-  
+
   return sanitized;
 }
 
@@ -135,20 +135,20 @@ export function sanitizeLogs(logText: string): string {
   if (typeof logText !== 'string') {
     return String(logText);
   }
-  
+
   let sanitized = logText;
-  
+
   // Apply all sensitive patterns
   for (const pattern of SENSITIVE_PATTERNS) {
     sanitized = sanitized.replace(pattern, '***REDACTED***');
   }
-  
+
   // Redact common environment variable patterns (more comprehensive)
   sanitized = sanitized.replace(
     /\b([A-Z_]*(?:KEY|SECRET|TOKEN|PASSWORD|PWD)[A-Z_]*)=([^\s]+)/gi,
     '$1=***REDACTED***'
   );
-  
+
   return sanitized;
 }
 
@@ -164,14 +164,14 @@ export function validateInput(
   schema: any
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   // Basic type checking based on schema
   if (schema.type === 'object') {
     if (typeof input !== 'object' || input === null || Array.isArray(input)) {
       errors.push(`Expected object, got ${typeof input}`);
       return { valid: false, errors };
     }
-    
+
     // Check required fields
     if (schema.required && Array.isArray(schema.required)) {
       for (const field of schema.required) {
@@ -180,7 +180,7 @@ export function validateInput(
         }
       }
     }
-    
+
     // Validate properties
     if (schema.properties) {
       for (const [key, value] of Object.entries(input)) {
@@ -193,19 +193,19 @@ export function validateInput(
       }
     }
   }
-  
+
   if (schema.type === 'string' && typeof input !== 'string') {
     errors.push(`Expected string, got ${typeof input}`);
   }
-  
+
   if (schema.type === 'number' && typeof input !== 'number') {
     errors.push(`Expected number, got ${typeof input}`);
   }
-  
+
   if (schema.type === 'boolean' && typeof input !== 'boolean') {
     errors.push(`Expected boolean, got ${typeof input}`);
   }
-  
+
   if (schema.type === 'array') {
     if (!Array.isArray(input)) {
       errors.push(`Expected array, got ${typeof input}`);
@@ -218,7 +218,7 @@ export function validateInput(
       });
     }
   }
-  
+
   // Check string length limits
   if (schema.type === 'string' && typeof input === 'string') {
     if (schema.minLength && input.length < schema.minLength) {
@@ -234,7 +234,7 @@ export function validateInput(
       }
     }
   }
-  
+
   // Check number ranges
   if (schema.type === 'number' && typeof input === 'number') {
     if (schema.minimum !== undefined && input < schema.minimum) {
@@ -244,7 +244,7 @@ export function validateInput(
       errors.push(`Number too large (max: ${schema.maximum})`);
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     errors
@@ -261,10 +261,10 @@ export function detectInjection(input: string): boolean {
   if (typeof input !== 'string') {
     return false;
   }
-  
+
   // Dangerous shell metacharacters
   const dangerousPatterns = [
-    /[;&|`$(){}[\]<>]/,  // Shell metacharacters
+    /[;&|`$()<>]/,  // Shell metacharacters (excluding JSON chars {}, [])
     /\$\(/,              // Command substitution
     /\${/,               // Variable expansion
     /\.\.\//,            // Path traversal
@@ -273,7 +273,7 @@ export function detectInjection(input: string): boolean {
     /eval\s*\(/i,        // Code evaluation
     /exec\s*\(/i,        // Code execution
   ];
-  
+
   return dangerousPatterns.some(pattern => pattern.test(input));
 }
 

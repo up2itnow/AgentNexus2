@@ -34,8 +34,8 @@ export default function TemplateConfigPage({ params }: PageProps) {
     defaultValues: template?.defaultConfig || {},
   });
 
-  const { register, handleSubmit, watch, formState: { errors } } = form;
-  const formValues = watch();
+  const { register, handleSubmit, formState: { errors } } = form;
+  // const formValues = watch();
 
   // Calculate estimated price
   const estimatedPrice = useMemo(() => {
@@ -209,7 +209,7 @@ export default function TemplateConfigPage({ params }: PageProps) {
               {/* Basic Info Card */}
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                 <h3 className="text-xl font-bold mb-4">Basic Information</h3>
-                
+
                 {/* Agent Name */}
                 <div className="mb-4">
                   <label htmlFor="name" className="block text-sm font-medium mb-2">
@@ -248,7 +248,7 @@ export default function TemplateConfigPage({ params }: PageProps) {
               {/* Dynamic Configuration Card */}
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                 <h3 className="text-xl font-bold mb-4">Configuration</h3>
-                
+
                 {/* Render dynamic fields based on configSchema */}
                 <DynamicFormFields
                   schema={template.configSchema}
@@ -397,7 +397,7 @@ function DynamicFormFields({ schema, register, errors }: DynamicFormFieldsProps)
                   id={key}
                   type="number"
                   step={fieldSchema.type === 'number' ? '0.01' : '1'}
-                  {...register(key, { 
+                  {...register(key, {
                     required: isRequired,
                     valueAsNumber: true,
                     min: fieldSchema.minimum,

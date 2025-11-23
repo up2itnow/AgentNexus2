@@ -30,6 +30,11 @@ import {
 } from '../utils/sanitization';
 import { webSocketService } from './WebSocketService';
 import { metricsService } from './MetricsService';
+import { AgentAdapter, AgentExecutionRequest } from '../types/agent';
+import { AgentZeroAdapter } from './agentZero/AgentZeroAdapter';
+import { AgentZeroTierService } from './agentZero/AgentZeroTierService';
+import { WalletService } from './WalletService';
+import { agentZeroConfig } from '../config/agentZero';
 
 export class ExecutionService {
   private docker: Docker | null = null;
@@ -37,11 +42,26 @@ export class ExecutionService {
   private readonly maxMemory: number = 512 * 1024 * 1024; // 512MB
   private readonly maxCpuQuota: number = 50000; // 50% of one CPU core
 
+  private adapters: Map<string, AgentAdapter> = new Map();
+  private activeContainers: Map<string, string> = new Map(); // executionId -> containerId
+
   constructor(
     private prisma: PrismaClient,
     private agentService: AgentService
   ) {
     this.initializeDocker();
+    this.initializeAdapters();
+  }
+
+  private initializeAdapters() {
+    if (this.docker) {
+      // Initialize Agent Zero Adapter
+      const walletService = new WalletService();
+      const tierService = new AgentZeroTierService(this.prisma, walletService, agentZeroConfig);
+      const agentZeroAdapter = new AgentZeroAdapter(this.docker, this.prisma, tierService, agentZeroConfig);
+
+      this.adapters.set('agent-zero', agentZeroAdapter);
+    }
   }
 
   /**
@@ -149,18 +169,51 @@ export class ExecutionService {
       metricsService.recordExecution(agent.id, agent.name, userId);
       metricsService.setRunningExecutions(agent.id, agent.name, 1);
 
-      // 8. Execute in Docker container
-      const { output, logs } = await this.runInDocker(
-        execution,
-        agent,
-        dto.inputData
-      );
+      // 8. Execute
+      let output: any;
+      let logs: string[] = [];
+      let duration = 0;
+
+      // Check if we have a specific adapter for this agent
+      const adapter = this.adapters.get(agent.id);
+
+      if (adapter) {
+        // Use adapter
+        const request: AgentExecutionRequest = {
+          userId,
+          agentId: agent.id,
+          prompt: JSON.stringify(dto.inputData), // Adapter expects prompt string
+          inputData: dto.inputData,
+          tier: 'BASIC', // Default to basic, entitlement check handles upgrades
+        };
+
+        const result = await adapter.execute(request);
+
+        output = result.response ? { message: result.response } : {};
+        logs = result.toolsUsed ? [`Tools used: ${result.toolsUsed.join(', ')}`] : [];
+        duration = result.executionTime || 0;
+
+        // Add any error to logs if present
+        if (result.error) {
+          logs.push(`Error: ${result.error}`);
+        }
+      } else {
+        // Fallback to default Docker execution
+        const result = await this.runInDocker(
+          execution,
+          agent,
+          dto.inputData
+        );
+        output = result.output;
+        logs = result.logs;
+        duration = Date.now() - execution.startTime.getTime();
+      }
 
       // 7. Validate output against agent's schema
       this.validateOutput(agent, output);
 
       // 8. Calculate execution duration
-      const duration = Date.now() - execution.startTime.getTime();
+      // duration is already calculated above
 
       // 9. Security: Sanitize logs to remove secrets before storing
       const sanitizedLogs = logs.map(log => sanitizeLogs(log));
@@ -201,7 +254,7 @@ export class ExecutionService {
     } catch (error: any) {
       // Handle execution failure
       const duration = Date.now() - execution.startTime.getTime();
-      
+
       await this.prisma.execution.update({
         where: { id: execution.id },
         data: {
@@ -250,9 +303,9 @@ export class ExecutionService {
         executionId: execution.id,
         log: `Pulling image: ${agent.dockerImage}`
       });
-      
+
       await this.ensureImage(agent.dockerImage);
-      
+
       logs.push(`Image ready: ${agent.dockerImage}`);
       webSocketService.broadcast({
         executionId: execution.id,
@@ -263,14 +316,14 @@ export class ExecutionService {
       // Based on 5-LLM Security Expert recommendations
       const container = await this.docker.createContainer({
         Image: agent.dockerImage,
-        
+
         // Environment variables for agent input
         Env: [
           `INPUT_DATA=${JSON.stringify(inputData)}`,
           `EXECUTION_ID=${execution.id}`,
           `AGENT_ID=${agent.id}`
         ],
-        
+
         // Host configuration with security hardening
         HostConfig: {
           // RESOURCE LIMITS
@@ -279,26 +332,26 @@ export class ExecutionService {
           CpuQuota: this.maxCpuQuota,                // 50% CPU limit
           CpuPeriod: 100000,                         // CPU quota period (100ms)
           PidsLimit: 100,                            // Prevent fork bombs
-          
+
           // NETWORK ISOLATION
           NetworkMode: 'none',                       // No network access (security)
-          
+
           // FILESYSTEM SECURITY
-          ReadonlyRootfs: false,                     // Set to true in production
+          ReadonlyRootfs: true,                      // Enforce read-only root filesystem
           Tmpfs: {
             '/tmp': 'rw,noexec,nosuid,size=100m'    // Temp dir with restrictions
           },
-          
+
           // LINUX SECURITY
           SecurityOpt: [
             'no-new-privileges:true',                // Prevent privilege escalation
             `seccomp=${path.join(__dirname, '../../../agent-runtime/security/seccomp-profile.json')}`
           ],
           CapDrop: ['ALL'],                          // Drop all Linux capabilities
-          
+
           // CLEANUP
           AutoRemove: true,                          // Automatic container cleanup
-          
+
           // LOGGING
           LogConfig: {
             Type: 'json-file',
@@ -308,18 +361,18 @@ export class ExecutionService {
             }
           }
         },
-        
+
         // USER SECURITY
         User: '1000:1000',                           // Run as non-root (uid:gid)
-        
+
         // LABELS FOR TRACKING
         Labels: {
           'com.agentnexus.execution': execution.id,
           'com.agentnexus.agent': agent.id,
-          'com.agentnexus.user': userId,
+          'com.agentnexus.user': execution.userId,
           'com.agentnexus.created': new Date().toISOString()
         },
-        
+
         // I/O CONFIGURATION
         Tty: false,
         AttachStdout: true,
@@ -328,6 +381,7 @@ export class ExecutionService {
       });
 
       logs.push(`Container created: ${container.id.substring(0, 12)}`);
+      this.activeContainers.set(execution.id, container.id);
 
       // 3. Start container
       await container.start();
@@ -343,6 +397,7 @@ export class ExecutionService {
       // 6. Cleanup (AutoRemove handles this, but be explicit)
       try {
         await container.remove({ force: true });
+        this.activeContainers.delete(execution.id);
         logs.push('Container cleaned up');
       } catch (e) {
         // Already auto-removed, that's fine
@@ -373,7 +428,7 @@ export class ExecutionService {
       await new Promise((resolve, reject) => {
         this.docker!.pull(imageName, (err: any, stream: any) => {
           if (err) return reject(err);
-          
+
           // Follow pull progress
           this.docker!.modem.followProgress(
             stream,
@@ -396,7 +451,7 @@ export class ExecutionService {
     return new Promise(async (resolve, reject) => {
       // Set timeout
       const timer = setTimeout(() => {
-        container.kill().catch(() => {});
+        container.kill().catch(() => { });
         reject(new DockerError(`Execution timeout after ${timeout / 1000}s`));
       }, timeout);
 
@@ -448,16 +503,16 @@ export class ExecutionService {
     // Start from the end since output is usually the last line
     for (let i = logs.length - 1; i >= 0; i--) {
       const log = logs[i].trim();
-      
+
       // Skip empty lines and obvious non-JSON logs (stderr messages)
       if (!log || log.startsWith('🤖') || log.startsWith('✅') || log.startsWith('❌')) {
         continue;
       }
-      
+
       try {
         // Try to parse as JSON
         const output = JSON.parse(log);
-        
+
         // Validate it's an object (not just a number or string)
         if (typeof output === 'object' && output !== null) {
           return output;
@@ -467,7 +522,7 @@ export class ExecutionService {
         continue;
       }
     }
-    
+
     // Fallback: No valid JSON found, return logs as output
     return {
       status: 'completed',
@@ -541,7 +596,7 @@ export class ExecutionService {
    */
   private sanitizeErrorMessage(error: any): string {
     let message = '';
-    
+
     if (typeof error === 'string') {
       message = error;
     } else if (error.message) {
@@ -549,7 +604,7 @@ export class ExecutionService {
     } else {
       message = 'Unknown execution error';
     }
-    
+
     // Use our comprehensive log sanitization to remove secrets
     return sanitizeLogs(message);
   }
@@ -588,8 +643,8 @@ export class ExecutionService {
       const logs = JSON.parse(execution.logs) as string[];
       return logs.map((message, index) => ({
         timestamp: new Date(execution.startTime.getTime() + index * 1000),
-        level: message.includes('❌') || message.includes('Error') ? 'error' : 
-               message.includes('⚠️') || message.includes('Warning') ? 'warn' : 'info',
+        level: message.includes('❌') || message.includes('Error') ? 'error' :
+          message.includes('⚠️') || message.includes('Warning') ? 'warn' : 'info',
         message
       }));
     } catch (error) {
@@ -620,8 +675,9 @@ export class ExecutionService {
       throw new ValidationError(`Execution already ${execution.status.toLowerCase()}`);
     }
 
-    // TODO: Track running containers and stop them
-    // For now, mark as failed
+    // Stop running container if exists
+    await this.stopContainer(executionId);
+
     await this.prisma.execution.update({
       where: { id: executionId },
       data: {
@@ -630,6 +686,24 @@ export class ExecutionService {
         endTime: new Date()
       }
     });
+  }
+
+  /**
+   * Stop a running container for an execution
+   */
+  private async stopContainer(executionId: string): Promise<void> {
+    const containerId = this.activeContainers.get(executionId);
+    if (!containerId || !this.docker) return;
+
+    try {
+      const container = this.docker.getContainer(containerId);
+      await container.stop();
+      await container.remove({ force: true });
+      this.activeContainers.delete(executionId);
+      console.log(`Stopped container ${containerId} for execution ${executionId}`);
+    } catch (error) {
+      console.warn(`Failed to stop container for execution ${executionId}:`, error);
+    }
   }
 
   /**

@@ -8,12 +8,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  ArrowLeft, 
-  Bot, 
-  User, 
-  Calendar, 
-  TrendingUp, 
+import {
+  ArrowLeft,
+  Bot,
+  User,
+  Calendar,
+  TrendingUp,
   Zap,
   FileText,
   Shield,
@@ -21,6 +21,7 @@ import {
   Info,
   Play
 } from 'lucide-react';
+import Image from 'next/image';
 import type { Agent } from '@/types/agent';
 import { CATEGORY_LABELS, CATEGORY_DESCRIPTIONS } from '@/types/agent';
 import { PurchaseButton } from './PurchaseButton';
@@ -34,7 +35,7 @@ type Tab = 'overview' | 'execute';
 
 export function AgentDetail({ agent }: AgentDetailProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
-  
+
   const createdDate = new Date(agent.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -59,10 +60,12 @@ export function AgentDetail({ agent }: AgentDetailProps) {
           <div className="mb-6 flex items-start gap-6">
             <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900">
               {agent.imageUrl ? (
-                <img
+                <Image
                   src={agent.imageUrl}
                   alt={agent.name}
-                  className="h-20 w-20 rounded-xl object-cover"
+                  width={80}
+                  height={80}
+                  className="rounded-xl object-cover"
                 />
               ) : (
                 <Bot className="h-10 w-10 text-blue-600 dark:text-blue-400" />
@@ -125,22 +128,20 @@ export function AgentDetail({ agent }: AgentDetailProps) {
           <div className="mb-6 flex gap-2 border-b">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors ${
-                activeTab === 'overview'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors ${activeTab === 'overview'
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-muted-foreground hover:text-foreground'
+                }`}
             >
               <Info className="h-4 w-4" />
               Overview
             </button>
             <button
               onClick={() => setActiveTab('execute')}
-              className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors ${
-                activeTab === 'execute'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors ${activeTab === 'execute'
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-muted-foreground hover:text-foreground'
+                }`}
             >
               <Play className="h-4 w-4" />
               Execute
@@ -152,67 +153,67 @@ export function AgentDetail({ agent }: AgentDetailProps) {
             <>
               {/* About Section */}
               <div className="mb-8 rounded-lg border bg-card p-6">
-            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
-              <FileText className="h-5 w-5" />
-              About This Agent
-            </h2>
-            <div className="space-y-4 text-muted-foreground">
-              <p>{agent.description}</p>
-              <div className="rounded-lg bg-secondary p-4">
-                <h3 className="mb-2 font-semibold text-foreground">
-                  Category: {CATEGORY_LABELS[agent.category]}
-                </h3>
-                <p className="text-sm">
-                  {CATEGORY_DESCRIPTIONS[agent.category]}
-                </p>
+                <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                  <FileText className="h-5 w-5" />
+                  About This Agent
+                </h2>
+                <div className="space-y-4 text-muted-foreground">
+                  <p>{agent.description}</p>
+                  <div className="rounded-lg bg-secondary p-4">
+                    <h3 className="mb-2 font-semibold text-foreground">
+                      Category: {CATEGORY_LABELS[agent.category]}
+                    </h3>
+                    <p className="text-sm">
+                      {CATEGORY_DESCRIPTIONS[agent.category]}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Features Section */}
-          <div className="mb-8 rounded-lg border bg-card p-6">
-            <h2 className="mb-4 text-xl font-bold">Features</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
-                <div>
-                  <h3 className="font-medium">Unlimited Executions</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Run as many times as you need
-                  </p>
+              {/* Features Section */}
+              <div className="mb-8 rounded-lg border bg-card p-6">
+                <h2 className="mb-4 text-xl font-bold">Features</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                    <div>
+                      <h3 className="font-medium">Unlimited Executions</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Run as many times as you need
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                    <div>
+                      <h3 className="font-medium">Isolated Execution</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Runs in secure Docker containers
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                    <div>
+                      <h3 className="font-medium">Smart Contract Escrow</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Your funds are protected on Base L2
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
+                    <div>
+                      <h3 className="font-medium">ERC-1155 Access Token</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Permanent access via NFT
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
-                <div>
-                  <h3 className="font-medium">Isolated Execution</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Runs in secure Docker containers
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
-                <div>
-                  <h3 className="font-medium">Smart Contract Escrow</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Your funds are protected on Base L2
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
-                <div>
-                  <h3 className="font-medium">ERC-1155 Access Token</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Permanent access via NFT
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Creator Info */}
+              {/* Creator Info */}
               <div className="rounded-lg border bg-card p-6">
                 <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
                   <User className="h-5 w-5" />

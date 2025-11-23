@@ -11,8 +11,9 @@
 import { Router, Request, Response } from 'express';
 import { AgentGeneratorService } from '../services/AgentGeneratorService';
 import { AgentCategory, BuildMethod } from '@prisma/client';
+import { authenticate } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const generatorService = new AgentGeneratorService();
 
 /**
@@ -57,10 +58,10 @@ router.get('/templates/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json(template);
+    return res.json(template);
   } catch (error) {
     console.error('Error fetching template:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch template',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -148,17 +149,15 @@ router.post('/generate', async (req: Request, res: Response) => {
       developerWallet,
     });
 
-    res.status(201).json({
-      success: true,
+    // Assuming result contains agent and imageTag properties
+    return res.status(201).json({
+      agentId: result.agent.id,
+      dockerImage: result.agent.dockerImage,
       message: 'Agent generated successfully',
-      ...result,
     });
   } catch (error) {
     console.error('Error generating agent:', error);
-    res.status(500).json({
-      error: 'Failed to generate agent',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
+    return res.status(500).json({ error: 'Failed to generate agent' });
   }
 });
 
@@ -189,23 +188,31 @@ router.get('/my-agents/:userId', async (req: Request, res: Response) => {
  * PATCH /api/builder/agents/:id
  * Update a custom agent
  */
-router.patch('/agents/:id', async (req: Request, res: Response) => {
+router.patch('/agents/:id', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const updates = req.body;
 
-    // TODO: Add authentication check to ensure user owns this agent
+    // Verify ownership
+    const agent = await generatorService.getCustomAgent(id);
+    if (!agent) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    if (agent.creatorId !== req.user!.id) {
+      return res.status(403).json({ error: 'Unauthorized: You do not own this agent' });
+    }
 
     const customAgents = await generatorService.updateCustomAgent(id, updates);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Agent updated successfully',
       customAgents,
     });
   } catch (error) {
     console.error('Error updating agent:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to update agent',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -216,18 +223,26 @@ router.patch('/agents/:id', async (req: Request, res: Response) => {
  * POST /api/builder/agents/:id/deploy
  * Deploy a custom agent to the marketplace
  */
-router.post('/agents/:id/deploy', async (req: Request, res: Response) => {
+router.post('/agents/:id/deploy', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // TODO: Add authentication check to ensure user owns this agent
+    // Verify ownership
+    const agent = await generatorService.getCustomAgent(id);
+    if (!agent) {
+      return res.status(404).json({ error: 'Agent not found' });
+    }
+
+    if (agent.creatorId !== req.user!.id) {
+      return res.status(403).json({ error: 'Unauthorized: You do not own this agent' });
+    }
 
     const result = await generatorService.deployAgent(id);
 
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     console.error('Error deploying agent:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to deploy agent',
       message: error instanceof Error ? error.message : 'Unknown error',
     });

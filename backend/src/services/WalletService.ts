@@ -37,11 +37,9 @@ export class WalletService {
 
   public async init(): Promise<void> {
     if (this.client) return;
-    if (!this.cfg.apiKey || !this.cfg.entryPointAddress) return; // not fully configured
+    if (!this.cfg.apiKey || !this.cfg.entryPointAddress || !this.cfg.privateKey) return; // not fully configured
 
-    const signer = this.cfg.privateKey
-      ? LocalAccountSigner.privateKeyToAccountSigner(this.cfg.privateKey as Hex)
-      : undefined;
+    const signer = LocalAccountSigner.privateKeyToAccountSigner(this.cfg.privateKey as Hex);
 
     this.client = await createLightAccountAlchemyClient({
       apiKey: this.cfg.apiKey,
@@ -49,7 +47,7 @@ export class WalletService {
       entryPointAddress: this.cfg.entryPointAddress as Hex,
       signer,
       gasManagerConfig: this.cfg.gasPolicyId ? { policyId: this.cfg.gasPolicyId } : undefined,
-    });
+    } as any);
   }
 
   public isReady(): boolean {
@@ -57,7 +55,7 @@ export class WalletService {
   }
 
   // Example AA call wrapper (placeholder: no-op without addresses/ABIs)
-  public async sendUserOperation(opts: { target: string; data: string; value?: bigint; }): Promise<{ hash: string }>{
+  public async sendUserOperation(opts: { target: string; data: string; value?: bigint; }): Promise<{ hash: string }> {
     if (!this.client) throw new Error('AA client not initialized');
     const { hash } = await this.client.sendUserOperation({
       uo: {
@@ -67,5 +65,16 @@ export class WalletService {
       },
     });
     return { hash };
+  }
+
+  public async checkEntitlementBalance(address: string, tokenId: string): Promise<bigint> {
+    // Placeholder: In real implementation, read from Entitlements contract
+    console.log(`Checking balance of ${tokenId} for ${address}`);
+    return 0n;
+  }
+
+  public async mintEntitlement(address: string, tokenId: string, amount: number): Promise<void> {
+    // Placeholder: In real implementation, send UserOperation to mint
+    console.log(`Minting ${amount} of ${tokenId} to ${address}`);
   }
 }

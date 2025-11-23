@@ -167,13 +167,13 @@ export class AgentGeneratorService {
       const modules = await prisma.agentModule.findMany({
         where: { id: { in: moduleIds } },
       });
-      
+
       const moduleCosts = modules.reduce((total, module) => {
         return total + parseFloat(module.baseCost.toString());
       }, 0);
-      
+
       basePrice += moduleCosts;
-      
+
       // Complexity multiplier (more modules = higher cost)
       if (modules.length > 5) {
         basePrice *= 1.2;
@@ -198,7 +198,7 @@ export class AgentGeneratorService {
     buildMethod: BuildMethod,
     templateId?: string,
     moduleIds?: string[],
-    configuration?: Record<string, any>
+    _configuration?: Record<string, any>
   ): Promise<{ inputSchema: any; outputSchema: any }> {
     // Template-based: use template schemas
     if (buildMethod === BuildMethod.TEMPLATE && templateId) {
@@ -218,10 +218,10 @@ export class AgentGeneratorService {
       const modules = await prisma.agentModule.findMany({
         where: { id: { in: moduleIds } },
       });
-      
+
       const inputSchema = this.combineModuleSchemas(modules);
       const outputSchema = this.generateOutputSchemaFromModules(modules);
-      
+
       return { inputSchema, outputSchema };
     }
 
@@ -275,7 +275,7 @@ export class AgentGeneratorService {
   /**
    * Generate output schema from modules
    */
-  private generateOutputSchemaFromModules(modules: any[]): any {
+  private generateOutputSchemaFromModules(_modules: any[]): any {
     return {
       type: 'object',
       properties: {
@@ -299,7 +299,7 @@ export class AgentGeneratorService {
   /**
    * Generate output schema from template modules
    */
-  private generateOutputSchema(templateModules: any): any {
+  private generateOutputSchema(_templateModules: any): any {
     return {
       type: 'object',
       properties: {
@@ -348,7 +348,7 @@ export class AgentGeneratorService {
    */
   async getTemplates(difficulty?: string, category?: AgentCategory) {
     const where: any = { isActive: true };
-    
+
     if (difficulty) where.difficulty = difficulty;
     if (category) where.category = category;
 
@@ -367,7 +367,7 @@ export class AgentGeneratorService {
    */
   async getModules(category?: string) {
     const where: any = { isActive: true };
-    
+
     if (category) where.category = category;
 
     return prisma.agentModule.findMany({
@@ -403,6 +403,16 @@ export class AgentGeneratorService {
   }
 
   /**
+   * Get a single custom agent by ID
+   */
+  async getCustomAgent(id: string) {
+    return prisma.customAgent.findUnique({
+      where: { id },
+      include: { agent: true },
+    });
+  }
+
+  /**
    * Update custom agent configuration
    */
   async updateCustomAgent(id: string, updates: Partial<GenerateAgentOptions>) {
@@ -420,8 +430,8 @@ export class AgentGeneratorService {
       await prisma.customAgent.update({
         where: { id },
         data: {
-          configuration: updates.configuration || customAgent.configuration,
-          selectedModules: updates.selectedModules || customAgent.selectedModules,
+          configuration: (updates.configuration || customAgent.configuration) as any,
+          selectedModules: (updates.selectedModules || customAgent.selectedModules) as any,
           customCode: updates.customCode || customAgent.customCode,
         },
       });

@@ -11,7 +11,7 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '../index';
 import { PurchaseStatus, ExecutionStatus } from '@prisma/client';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/users/:id/purchases
@@ -132,7 +132,7 @@ router.get('/:id/executions', async (req: Request, res: Response) => {
       prisma.execution.count({ where }),
     ]);
 
-    res.json({
+    return res.json({
       executions,
       total,
       page: pageNum,
@@ -141,7 +141,7 @@ router.get('/:id/executions', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error fetching user executions:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch executions',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -186,10 +186,10 @@ router.get('/:id/stats', async (req: Request, res: Response) => {
       totalExecutions: executions.length,
       successfulExecutions: executions.filter(e => e.status === ExecutionStatus.COMPLETED).length,
       failedExecutions: executions.filter(e => e.status === ExecutionStatus.FAILED).length,
-      runningExecutions: executions.filter(e => 
+      runningExecutions: executions.filter(e =>
         e.status === ExecutionStatus.RUNNING || e.status === ExecutionStatus.PENDING
       ).length,
-      lastExecutionAt: executions.length > 0 
+      lastExecutionAt: executions.length > 0
         ? executions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0].createdAt
         : null,
     };
@@ -232,10 +232,10 @@ router.get('/:id/profile', async (req: Request, res: Response) => {
       });
     }
 
-    res.json(user);
+    return res.json(user);
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch user profile',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -272,10 +272,10 @@ router.post('/', async (req: Request, res: Response) => {
       });
     }
 
-    res.json(user);
+    return res.json(user);
   } catch (error) {
     console.error('Error creating/getting user:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to create/get user',
       message: error instanceof Error ? error.message : 'Unknown error',
     });

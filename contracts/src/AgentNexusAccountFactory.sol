@@ -11,7 +11,6 @@ import "./AgentNexusAccount.sol";
  * @notice This contract creates ERC-4337 compatible smart accounts for users
  */
 contract AgentNexusAccountFactory is Ownable {
-    address public immutable accountImplementation;
     address public immutable entryPoint;
 
     mapping(bytes32 => address) public accounts;
@@ -23,18 +22,13 @@ contract AgentNexusAccountFactory is Ownable {
         address indexed owner
     );
 
-    event AccountImplementationUpdated(address oldImplementation, address newImplementation);
-
     /**
-     * @dev Constructor sets the account implementation and entry point
-     * @param _accountImplementation Address of the account implementation contract
+     * @dev Constructor sets the entry point
      * @param _entryPoint Address of the ERC-4337 EntryPoint contract
      */
-    constructor(address _accountImplementation, address _entryPoint) Ownable(msg.sender) {
-        require(_accountImplementation != address(0), "Invalid account implementation");
+    constructor(address _entryPoint) Ownable(msg.sender) {
         require(_entryPoint != address(0), "Invalid entry point");
 
-        accountImplementation = _accountImplementation;
         entryPoint = _entryPoint;
     }
 
@@ -85,20 +79,7 @@ contract AgentNexusAccountFactory is Ownable {
         return accounts[accountSalt];
     }
 
-    /**
-     * @dev Updates the account implementation (only owner)
-     * @param newImplementation Address of the new account implementation
-     */
-    function updateAccountImplementation(address newImplementation) external onlyOwner {
-        require(newImplementation != address(0), "Invalid implementation");
-        require(newImplementation != accountImplementation, "Same implementation");
 
-        address oldImplementation = accountImplementation;
-        // Note: In a production system, you would need to handle migration of existing accounts
-        // For now, this is just a placeholder for potential future upgrades
-
-        emit AccountImplementationUpdated(oldImplementation, newImplementation);
-    }
 
     /**
      * @dev Returns the salt used to create a given account

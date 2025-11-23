@@ -188,6 +188,9 @@ contract AgentNexusEscrow is ReentrancyGuard, AccessControl {
     /// @notice Emitted when token whitelist is updated
     event TokenSupportUpdated(address indexed token, bool supported);
 
+    /// @notice Emitted when platform fee recipient is updated
+    event PlatformFeeRecipientUpdated(address indexed newRecipient);
+
     /*//////////////////////////////////////////////////////////////
                             CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
@@ -363,6 +366,18 @@ contract AgentNexusEscrow is ReentrancyGuard, AccessControl {
         require(_platformFeePercentage <= MAX_PLATFORM_FEE, "Fee too high");
         platformFeePercentage = _platformFeePercentage;
         emit PlatformFeeUpdated(_platformFeePercentage);
+    }
+
+    /**
+     * @notice Update platform fee recipient
+     * @param _platformFeeRecipient New fee recipient address
+     */
+    function setPlatformFeeRecipient(
+        address _platformFeeRecipient
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_platformFeeRecipient != address(0), "Invalid fee recipient");
+        platformFeeRecipient = _platformFeeRecipient;
+        emit PlatformFeeRecipientUpdated(_platformFeeRecipient);
     }
 
     /**

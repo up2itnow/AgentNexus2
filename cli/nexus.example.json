@@ -1,0 +1,15 @@
+{
+    "name": "MyCustomAgent",
+    "description": "A powerful agent that does X",
+    "dockerImage": "my-registry/my-agent:latest",
+    "price": "0.01",
+    "category": "UTILITY",
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "prompt": {
+                "type": "string"
+            }
+        }
+    }
+}

@@ -82,11 +82,11 @@ export class WebSocketService {
    * @param path - WebSocket endpoint path (default: /ws)
    */
   initialize(server: HTTPServer, path: string = '/ws'): void {
-    this.wss = new WebSocketServer({ 
+    this.wss = new WebSocketServer({
       server,
       path,
       // Verify origin in production
-      verifyClient: (info) => {
+      verifyClient: (_info: any) => {
         // TODO: Add proper origin verification in production
         return true;
       }
@@ -105,9 +105,9 @@ export class WebSocketService {
   /**
    * Handle new WebSocket connection
    */
-  private handleConnection(ws: WebSocket, request: any): void {
+  private handleConnection(ws: WebSocket, _request: any): void {
     const clientId = this.generateClientId();
-    
+
     const client: ClientConnection = {
       ws,
       subscriptions: new Set(),
@@ -120,9 +120,9 @@ export class WebSocketService {
     // Send welcome message
     this.sendMessage(ws, {
       type: WSMessageType.STATUS,
-      data: { 
+      data: {
         message: 'Connected to AgentNexus WebSocket',
-        clientId 
+        clientId
       },
       timestamp: Date.now()
     });
@@ -166,7 +166,7 @@ export class WebSocketService {
           if (message.executionId) {
             client.subscriptions.add(message.executionId);
             console.log(`📺 Client ${clientId} subscribed to execution ${message.executionId}`);
-            
+
             this.sendMessage(client.ws, {
               type: WSMessageType.STATUS,
               executionId: message.executionId,
@@ -224,7 +224,7 @@ export class WebSocketService {
     // Find all clients subscribed to this execution
     let broadcastCount = 0;
 
-    for (const [clientId, client] of this.clients.entries()) {
+    for (const [_clientId, client] of this.clients.entries()) {
       if (client.subscriptions.has(executionId)) {
         if (client.ws.readyState === WebSocket.OPEN) {
           // Send log message
@@ -346,7 +346,7 @@ export class WebSocketService {
     }
 
     // Close all client connections
-    for (const [clientId, client] of this.clients.entries()) {
+    for (const [_clientId, client] of this.clients.entries()) {
       this.sendMessage(client.ws, {
         type: WSMessageType.STATUS,
         data: { message: 'Server shutting down' },

@@ -17,7 +17,7 @@ import Docker from 'dockerode';
 import { metricsService } from '../services/MetricsService';
 import { webSocketService } from '../services/WebSocketService';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * Health check response interface
@@ -114,7 +114,7 @@ router.get('/health/ready', async (req: Request, res: Response) => {
   // Check 3: Memory usage
   const memUsage = process.memoryUsage();
   const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
-  
+
   if (heapUsedPercent < 90) {
     checks.memory = {
       status: 'ok',
@@ -157,8 +157,8 @@ router.get('/health/ready', async (req: Request, res: Response) => {
   };
 
   // Return appropriate status code
-  const statusCode = overallStatus === 'healthy' ? 200 : 
-                    overallStatus === 'degraded' ? 200 : 503;
+  const statusCode = overallStatus === 'healthy' ? 200 :
+    overallStatus === 'degraded' ? 200 : 503;
 
   res.status(statusCode).json(response);
 });

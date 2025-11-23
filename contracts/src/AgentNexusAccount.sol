@@ -4,13 +4,14 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title AgentNexusAccount
  * @dev ERC-4337 compatible smart account implementation
  * @notice This contract serves as a smart wallet that can be controlled by an external owner
  */
-contract AgentNexusAccount is Ownable {
+contract AgentNexusAccount is Ownable, ReentrancyGuard {
     using ECDSA for bytes32;
     using MessageHashUtils for bytes32;
 
@@ -19,6 +20,14 @@ contract AgentNexusAccount is Ownable {
 
     // ERC-4337 UserOperation nonce tracking
     uint256 public nonce;
+
+    struct SessionConfig {
+        uint256 limit;      // Max ETH value per transaction
+        uint256 expiry;     // Timestamp when key expires
+        bool isActive;
+    }
+
+    mapping(address => SessionConfig) public sessionKeys;
 
     event AccountExecuted(
         address indexed target,
@@ -41,6 +50,33 @@ contract AgentNexusAccount is Ownable {
         entryPoint = _entryPoint;
         factory = msg.sender;
         nonce = 0;
+    }
+
+    /**
+     * @dev Adds a session key with specific permissions
+     * @param key Address of the session key
+     * @param limit Max ETH value per transaction
+     * @param expiry Timestamp when key expires
+     */
+    function addSessionKey(address key, uint256 limit, uint256 expiry) external onlyOwner {
+        sessionKeys[key] = SessionConfig(limit, expiry, true);
+    }
+
+    /**
+     * @dev Revokes a session key
+     * @param key Address of the session key
+     */
+    function revokeSessionKey(address key) external onlyOwner {
+        delete sessionKeys[key];
+    }
+
+    function _checkAuthorization(uint256 value) internal view {
+        if (msg.sender != owner()) {
+            SessionConfig memory config = sessionKeys[msg.sender];
+            require(config.isActive, "Not authorized");
+            require(block.timestamp < config.expiry, "Session expired");
+            require(value <= config.limit, "Limit exceeded");
+        }
     }
 
     /**
@@ -80,7 +116,8 @@ contract AgentNexusAccount is Ownable {
         address target,
         uint256 value,
         bytes calldata data
-    ) external onlyOwner returns (bytes memory result) {
+    ) external nonReentrant returns (bytes memory result) {
+        _checkAuthorization(value);
         require(target != address(0), "Invalid target");
 
         // Execute the call
@@ -112,7 +149,12 @@ contract AgentNexusAccount is Ownable {
         address[] calldata targets,
         uint256[] calldata values,
         bytes[] calldata datas
-    ) external onlyOwner returns (bytes[] memory results) {
+    ) external nonReentrant returns (bytes[] memory results) {
+        uint256 totalValue = 0;
+        for (uint256 i = 0; i < values.length; i++) {
+            totalValue += values[i];
+        }
+        _checkAuthorization(totalValue);
         require(targets.length == values.length && targets.length == datas.length, "Array length mismatch");
         require(targets.length > 0, "Empty batch");
 

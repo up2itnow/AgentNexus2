@@ -1,0 +1,24 @@
+{
+    "name": "autonomous-freelancer",
+    "version": "1.0.0",
+    "description": "AI Agent that performs tasks and generates AP2 invoices",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "ethers": "^6.11.1",
+        "dotenv": "^16.4.5",
+        "uuid": "^9.0.1"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/node": "^20.11.24",
+        "@types/uuid": "^9.0.8",
+        "typescript": "^5.3.3",
+        "ts-node": "^10.9.2"
+    }
+}

@@ -34,6 +34,22 @@ export function AgentFiltersBar({ filters, onFiltersChange }: AgentFiltersProps)
     });
   };
 
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value ? Number(e.target.value) : undefined;
+    onFiltersChange({ ...filters, minPrice: val });
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value ? Number(e.target.value) : undefined;
+    onFiltersChange({ ...filters, maxPrice: val });
+  };
+
+  const clearFilters = () => {
+    onFiltersChange({ sortBy: 'newest' });
+  };
+
+  const hasActiveFilters = filters.search || filters.category || filters.minPrice || filters.maxPrice;
+
   return (
     <div className="space-y-4">
       {/* Search Bar */}
@@ -50,9 +66,9 @@ export function AgentFiltersBar({ filters, onFiltersChange }: AgentFiltersProps)
       </div>
 
       {/* Filters Row */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 items-end">
         {/* Category Filter */}
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[150px]">
           <label className="mb-1 block text-xs font-medium text-muted-foreground">
             Category
           </label>
@@ -70,8 +86,38 @@ export function AgentFiltersBar({ filters, onFiltersChange }: AgentFiltersProps)
           </select>
         </div>
 
+        {/* Price Range */}
+        <div className="flex gap-2 min-w-[200px]">
+          <div className="flex-1">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              Min Price
+            </label>
+            <input
+              type="number"
+              placeholder="0"
+              min="0"
+              value={filters.minPrice || ''}
+              onChange={handleMinPriceChange}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+              Max Price
+            </label>
+            <input
+              type="number"
+              placeholder="Any"
+              min="0"
+              value={filters.maxPrice || ''}
+              onChange={handleMaxPriceChange}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            />
+          </div>
+        </div>
+
         {/* Sort By */}
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[150px]">
           <label className="mb-1 block text-xs font-medium text-muted-foreground">
             Sort By
           </label>
@@ -86,6 +132,16 @@ export function AgentFiltersBar({ filters, onFiltersChange }: AgentFiltersProps)
             <option value="price_desc">Price: High to Low</option>
           </select>
         </div>
+
+        {/* Clear Filters */}
+        {hasActiveFilters && (
+          <button
+            onClick={clearFilters}
+            className="mb-[2px] px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+          >
+            Clear
+          </button>
+        )}
       </div>
     </div>
   );

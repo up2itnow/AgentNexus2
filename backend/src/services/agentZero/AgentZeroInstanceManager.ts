@@ -5,7 +5,7 @@
 
 import Docker from 'dockerode';
 import { PrismaClient, AgentZeroTier, AgentZeroStatus } from '@prisma/client';
-import axios from 'axios';
+// import axios from 'axios';
 import {
   CreateInstanceRequest,
   CreateInstanceResponse,
@@ -278,7 +278,7 @@ export class AgentZeroInstanceManager {
   /**
    * Create tunnel for external access (placeholder)
    */
-  private async createTunnel(port: number, instanceId: string): Promise<string> {
+  private async createTunnel(port: number, _instanceId: string): Promise<string> {
     // In production, use ngrok, cloudflare tunnel, or traefik
     // For now, return local URL
     return `http://localhost:${port}`;

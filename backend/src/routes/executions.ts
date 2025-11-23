@@ -11,17 +11,20 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '../index';
 import { ExecutionStatus } from '@prisma/client';
 import { ExecutionService } from '../services/ExecutionService';
+import { AgentService } from '../services/AgentService';
+import { authenticate } from '../middleware/auth';
 
-const router = Router();
-const executionService = new ExecutionService();
+const router: Router = Router();
+const agentService = new AgentService(prisma);
+const executionService = new ExecutionService(prisma, agentService);
 
 /**
  * POST /api/executions
  * Execute an agent with provided input data
  */
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', authenticate, async (req: Request, res: Response) => {
   try {
-    const { agentId, purchaseId, inputData } = req.body;
+    const { agentId, inputData } = req.body;
 
     // Validation
     if (!agentId || !inputData) {
@@ -40,69 +43,44 @@ router.post('/', async (req: Request, res: Response) => {
       });
     }
 
-    // TODO: Verify purchase/entitlement if required
-    // if (!purchaseId) {
-    //   return res.status(402).json({
-    //     error: 'Payment required',
-    //     message: 'Purchase ID required for agent execution',
-    //   });
-    // }
-
     // Create execution record
     const execution = await prisma.execution.create({
       data: {
+        userId: req.user!.id,
         agentId,
-        purchaseId: purchaseId || 'free-tier', // Default for testing
+        purchaseId: 'mock-purchase-id', // In real app, validate purchase
         inputData,
-        status: ExecutionStatus.PENDING,
-        startedAt: new Date(),
+        status: 'PENDING',
+        startTime: new Date(),
       },
     });
 
     // Start execution asynchronously
-    executionService.executeAgent(execution.id, agent.id, inputData)
+    executionService.executeAgent(req.user!.id, {
+      agentId,
+      purchaseId: 'mock-purchase-id',
+      inputData
+    })
       .then(async (result) => {
-        // Update execution with results
-        await prisma.execution.update({
-          where: { id: execution.id },
-          data: {
-            status: ExecutionStatus.COMPLETED,
-            outputData: result.output,
-            logs: result.logs,
-            completedAt: new Date(),
-          },
-        });
-
-        // Update agent statistics
-        await prisma.agent.update({
-          where: { id: agent.id },
-          data: {
-            totalExecutions: { increment: 1 },
-            totalRevenue: { increment: agent.price },
-          },
-        });
+        // Update execution with results - executeAgent already updates the DB,
+        // but we might want to do extra logging or notifications here if needed.
+        // The result is the updated Execution object.
+        console.log(`Execution ${result.id} completed with status ${result.status}`);
       })
       .catch(async (error) => {
-        // Update execution with error
-        await prisma.execution.update({
-          where: { id: execution.id },
-          data: {
-            status: ExecutionStatus.FAILED,
-            errorMessage: error.message,
-            completedAt: new Date(),
-          },
-        });
+        console.error(`Execution ${execution.id} failed:`, error);
+        // executeAgent handles DB updates on failure too, so we just log here
       });
 
     // Return execution ID immediately (async execution)
-    res.status(202).json({
+    return res.status(202).json({
       executionId: execution.id,
       status: execution.status,
       message: 'Execution started',
     });
   } catch (error) {
     console.error('Error starting execution:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to start execution',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -138,10 +116,10 @@ router.get('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    res.json(execution);
+    return res.json(execution);
   } catch (error) {
     console.error('Error fetching execution:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch execution',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -163,8 +141,8 @@ router.get('/:id/logs', async (req: Request, res: Response) => {
         status: true,
         logs: true,
         createdAt: true,
-        startedAt: true,
-        completedAt: true,
+        startTime: true,
+        endTime: true,
       },
     });
 
@@ -175,19 +153,19 @@ router.get('/:id/logs', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       executionId: execution.id,
       status: execution.status,
       logs: execution.logs || '',
       timestamps: {
         created: execution.createdAt,
-        started: execution.startedAt,
-        completed: execution.completedAt,
+        started: execution.startTime,
+        completed: execution.endTime,
       },
     });
   } catch (error) {
     console.error('Error fetching execution logs:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch execution logs',
       message: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -198,7 +176,7 @@ router.get('/:id/logs', async (req: Request, res: Response) => {
  * POST /api/executions/:id/cancel
  * Cancel a running execution
  */
-router.post('/:id/cancel', async (req: Request, res: Response) => {
+router.post('/:id/cancel', authenticate, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -211,8 +189,13 @@ router.post('/:id/cancel', async (req: Request, res: Response) => {
       });
     }
 
+    // Verify ownership
+    if (execution.userId !== req.user!.id) {
+      return res.status(403).json({ error: 'Unauthorized: You do not own this execution' });
+    }
+
     // Can only cancel pending or running executions
-    if (![ExecutionStatus.PENDING, ExecutionStatus.RUNNING].includes(execution.status)) {
+    if (!['PENDING', 'RUNNING'].includes(execution.status)) {
       return res.status(400).json({
         error: 'Cannot cancel execution',
         message: `Execution is in ${execution.status} state and cannot be cancelled`,
@@ -227,18 +210,18 @@ router.post('/:id/cancel', async (req: Request, res: Response) => {
       where: { id },
       data: {
         status: ExecutionStatus.CANCELLED,
-        completedAt: new Date(),
+        endTime: new Date(),
         errorMessage: 'Execution cancelled by user',
       },
     });
 
-    res.json({
+    return res.json({
       message: 'Execution cancelled successfully',
       executionId: id,
     });
   } catch (error) {
     console.error('Error cancelling execution:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to cancel execution',
       message: error instanceof Error ? error.message : 'Unknown error',
     });

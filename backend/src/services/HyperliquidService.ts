@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { ethers } from 'ethers';
+// import { ethers } from 'ethers';
 
 interface MarketData {
   symbol: string;
@@ -52,24 +52,23 @@ interface AccountInfo {
 
 export class HyperliquidService {
   private client: AxiosInstance;
-  private wsUrl: string = 'wss://api.hyperliquid.xyz/ws';
+  // private _wsUrl: string = 'wss://api.hyperliquid.xyz/ws';
 
   constructor(apiKey?: string, baseUrl: string = 'https://api.hyperliquid.xyz') {
     this.client = axios.create({
       baseURL: baseUrl,
-      timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
-        ...(apiKey && { 'X-API-Key': apiKey }),
+        'X-Hyperliquid-Key': apiKey || '',
       },
     });
 
     // Add response interceptor for error handling
     this.client.interceptors.response.use(
-      (response) => response,
-      (error) => {
+      (response: any) => response,
+      (error: any) => {
         console.error('Hyperliquid API Error:', error.response?.data || error.message);
-        throw error;
+        return Promise.reject(error);
       }
     );
   }
@@ -241,7 +240,7 @@ export class HyperliquidService {
     riskPercentage: number,
     entryPrice: string,
     stopLossPrice: string,
-    symbol: string
+    _symbol: string
   ): string {
     const balance = parseFloat(accountBalance);
     const riskAmount = balance * (riskPercentage / 100);
@@ -349,12 +348,12 @@ export class HyperliquidService {
    * Check if position would be liquidated at current price
    */
   checkLiquidationRisk(
-    entryPrice: string,
+    _entryPrice: string,
     currentPrice: string,
     liquidationPrice: string,
     isLong: boolean
   ): 'safe' | 'warning' | 'danger' {
-    const entry = parseFloat(entryPrice);
+    // const entry = parseFloat(entryPrice);
     const current = parseFloat(currentPrice);
     const liquidation = parseFloat(liquidationPrice);
 

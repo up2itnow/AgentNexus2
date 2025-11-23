@@ -125,7 +125,7 @@ export default function AdvancedBuilderPage() {
   const [previewData, setPreviewData] = useState<any>(null);
 
   // Handle editor mount
-  const handleEditorMount = (editor: any, monaco: any) => {
+  const handleEditorMount = (editor: any, _monaco: any) => {
     editorRef.current = editor;
   };
 
@@ -393,7 +393,7 @@ export default function AdvancedBuilderPage() {
             <div className="flex-1 p-4 overflow-y-auto font-mono text-xs">
               <h3 className="font-bold mb-3">Console Output</h3>
               {consoleOutput.length === 0 ? (
-                <p className="text-gray-500">Click "Validate" to check your code...</p>
+                <p className="text-gray-500">Click &quot;Validate&quot; to check your code...</p>
               ) : (
                 <div className="space-y-1">
                   {consoleOutput.map((msg, idx) => {

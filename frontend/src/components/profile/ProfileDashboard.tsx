@@ -8,17 +8,18 @@
 
 import { useState } from 'react';
 import useSWR from 'swr';
-import { User, ShoppingBag, History, Loader2 } from 'lucide-react';
-import { profileAPI, swrKeys } from '@/lib/api';
+import { User, ShoppingBag, History, Loader2, Hammer } from 'lucide-react';
+import { profileAPI, builderAPI, swrKeys } from '@/lib/api';
 import { ProfileStats } from './ProfileStats';
 import { PurchasesList } from './PurchasesList';
 import { ExecutionHistory } from './ExecutionHistory';
+import { AgentGrid } from '@/components/agents/AgentGrid';
 
 interface ProfileDashboardProps {
   address: string;
 }
 
-type Tab = 'purchases' | 'executions';
+type Tab = 'purchases' | 'executions' | 'created';
 
 export function ProfileDashboard({ address }: ProfileDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('purchases');
@@ -41,7 +42,12 @@ export function ProfileDashboard({ address }: ProfileDashboardProps) {
     () => profileAPI.getExecutions(userId)
   );
 
-  const isLoading = statsLoading || purchasesLoading || executionsLoading;
+  const { data: createdAgents, isLoading: createdLoading } = useSWR(
+    swrKeys.myCustomAgents(userId),
+    () => builderAPI.getMyAgents(userId)
+  );
+
+  const isLoading = statsLoading || purchasesLoading || executionsLoading || createdLoading;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -72,34 +78,42 @@ export function ProfileDashboard({ address }: ProfileDashboardProps) {
       ) : null}
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-2 border-b">
+      <div className="mb-6 flex gap-2 border-b overflow-x-auto">
         <button
           onClick={() => setActiveTab('purchases')}
-          className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors ${
-            activeTab === 'purchases'
+          className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'purchases'
               ? 'border-b-2 border-blue-600 text-blue-600'
               : 'text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           <ShoppingBag className="h-4 w-4" />
-          My Agents ({purchases?.length || 0})
+          Purchased ({purchases?.length || 0})
         </button>
         <button
           onClick={() => setActiveTab('executions')}
-          className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors ${
-            activeTab === 'executions'
+          className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'executions'
               ? 'border-b-2 border-blue-600 text-blue-600'
               : 'text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           <History className="h-4 w-4" />
-          Execution History ({executions?.length || 0})
+          History ({executions?.length || 0})
+        </button>
+        <button
+          onClick={() => setActiveTab('created')}
+          className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'created'
+              ? 'border-b-2 border-blue-600 text-blue-600'
+              : 'text-muted-foreground hover:text-foreground'
+            }`}
+        >
+          <Hammer className="h-4 w-4" />
+          Created ({createdAgents?.length || 0})
         </button>
       </div>
 
       {/* Tab Content */}
       <div>
-        {activeTab === 'purchases' ? (
+        {activeTab === 'purchases' && (
           purchasesLoading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -107,12 +121,26 @@ export function ProfileDashboard({ address }: ProfileDashboardProps) {
           ) : (
             <PurchasesList purchases={purchases || []} />
           )
-        ) : executionsLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          </div>
-        ) : (
-          <ExecutionHistory executions={executions || []} />
+        )}
+
+        {activeTab === 'executions' && (
+          executionsLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+          ) : (
+            <ExecutionHistory executions={executions || []} />
+          )
+        )}
+
+        {activeTab === 'created' && (
+          createdLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+          ) : (
+            <AgentGrid agents={createdAgents || []} />
+          )
         )}
       </div>
     </div>

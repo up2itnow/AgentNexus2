@@ -13,33 +13,33 @@
  * @author AgentNexus Team ()
  */
 
-import { 
-  Registry, 
-  Counter, 
-  Histogram, 
+import {
+  Registry,
+  Counter,
+  Histogram,
   Gauge,
-  collectDefaultMetrics 
+  collectDefaultMetrics
 } from 'prom-client';
 
 export class MetricsService {
   private registry: Registry;
 
   // Execution metrics
-  private executionCounter: Counter;
-  private executionDurationHistogram: Histogram;
-  private executionStatusCounter: Counter;
-  
+  private executionCounter!: Counter;
+  private executionDurationHistogram!: Histogram;
+  private executionStatusCounter!: Counter;
+
   // Agent metrics
-  private agentExecutionsGauge: Gauge;
-  private agentRevenueCounter: Counter;
-  
+  private agentExecutionsGauge!: Gauge;
+  private agentRevenueCounter!: Counter;
+
   // System metrics
-  private activeConnectionsGauge: Gauge;
-  private dockerHealthGauge: Gauge;
-  
+  private activeConnectionsGauge!: Gauge;
+  private dockerHealthGauge!: Gauge;
+
   // Resource metrics
-  private containerMemoryGauge: Gauge;
-  private containerCpuGauge: Gauge;
+  private containerMemoryGauge!: Gauge;
+  private containerCpuGauge!: Gauge;
 
   constructor() {
     // Create custom registry

@@ -59,11 +59,10 @@ const TierComparison: React.FC<TierComparisonProps> = ({
       <div className="grid md:grid-cols-2 gap-8">
         {/* Basic Tier */}
         <div
-          className={`relative rounded-2xl border-2 p-8 transition-all ${
-            currentTier === 'BASIC'
+          className={`relative rounded-2xl border-2 p-8 transition-all ${currentTier === 'BASIC'
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
               : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
-          }`}
+            }`}
         >
           {currentTier === 'BASIC' && (
             <div className="absolute top-4 right-4 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -98,11 +97,10 @@ const TierComparison: React.FC<TierComparisonProps> = ({
                   <X className="w-5 h-5 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5" />
                 )}
                 <span
-                  className={`text-sm ${
-                    feature.included
+                  className={`text-sm ${feature.included
                       ? 'text-gray-900 dark:text-white'
                       : 'text-gray-400 dark:text-gray-500'
-                  }`}
+                    }`}
                 >
                   {feature.name}
                 </span>
@@ -123,18 +121,17 @@ const TierComparison: React.FC<TierComparisonProps> = ({
 
           {currentTier === 'BASIC' && (
             <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-3">
-              You're on this plan
+              You&apos;re on this plan
             </div>
           )}
         </div>
 
         {/* Pro Tier */}
         <div
-          className={`relative rounded-2xl border-2 p-8 transition-all ${
-            currentTier === 'PRO'
+          className={`relative rounded-2xl border-2 p-8 transition-all ${currentTier === 'PRO'
               ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
               : 'border-purple-300 dark:border-purple-700 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 hover:border-purple-400 dark:hover:border-purple-600'
-          }`}
+            }`}
         >
           <div className="absolute -top-4 left-1/2 -translate-x-1/2">
             <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
@@ -191,7 +188,7 @@ const TierComparison: React.FC<TierComparisonProps> = ({
 
           {currentTier === 'PRO' && (
             <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-3">
-              You're on this plan
+              You&apos;re on this plan
             </div>
           )}
         </div>

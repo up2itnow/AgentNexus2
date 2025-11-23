@@ -7,6 +7,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { formatEther } from 'viem';
 import { Bot, Calendar, ExternalLink } from 'lucide-react';
 import type { Agent } from '@/types/agent';
@@ -56,10 +57,12 @@ export function PurchasesList({ purchases }: PurchasesListProps) {
             {/* Agent Icon */}
             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
               {purchase.agent.imageUrl ? (
-                <img
+                <Image
                   src={purchase.agent.imageUrl}
                   alt={purchase.agent.name}
-                  className="h-12 w-12 rounded-lg object-cover"
+                  width={48}
+                  height={48}
+                  className="rounded-lg object-cover"
                 />
               ) : (
                 <Bot className="h-6 w-6 text-blue-600 dark:text-blue-400" />
