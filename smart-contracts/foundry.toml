@@ -5,7 +5,7 @@ libs = ["lib"]
 solc_version = "0.8.28"
 optimizer = true
 optimizer_runs = 200
-via_ir = false
+via_ir = true
 
 [profile.ci]
 fuzz = { runs = 5000 }
@@ -23,9 +23,9 @@ ethereum_sepolia = "${ETHEREUM_RPC_URL}"
 ethereum_mainnet = "${ETHEREUM_MAINNET_RPC_URL}"
 
 [etherscan]
-# Base
-base = { key = "${BASESCAN_API_KEY}" }
-base_sepolia = { key = "${BASESCAN_API_KEY}" }
+# Base (uses Etherscan API key - BaseScan deprecated)
+base = { key = "${ETHERSCAN_API_KEY}" }
+base_sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 # Future chains
 arbitrum = { key = "${ARBISCAN_API_KEY}" }

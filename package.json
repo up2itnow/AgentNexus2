@@ -7,7 +7,8 @@
     "frontend",
     "backend",
     "smart-contracts",
-    "agent-runtime"
+    "agent-runtime",
+    "packages/sdk"
   ],
   "scripts": {
     "dev": "concurrently \"pnpm --filter frontend dev\" \"pnpm --filter backend dev\"",

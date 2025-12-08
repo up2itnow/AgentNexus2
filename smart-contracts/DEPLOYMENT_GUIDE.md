@@ -145,8 +145,8 @@ forge test --gas-report
 
 | Contract | Address | Explorer |
 |----------|---------|----------|
-| AgentNexusEscrow | `TBD` | [BaseScan](https://sepolia.basescan.org/address/TBD) |
-| AgentNexusEntitlements | `TBD` | [BaseScan](https://sepolia.basescan.org/address/TBD) |
+| AgentNexusEscrow | `0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0` | [BaseScan](https://sepolia.basescan.org/address/0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0) |
+| AgentNexusEntitlements | `0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d` | [BaseScan](https://sepolia.basescan.org/address/0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d) |
 
 ### Base Mainnet
 

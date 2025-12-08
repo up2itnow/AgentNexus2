@@ -1,0 +1,48 @@
+{
+    "name": "@agentnexus/sdk",
+    "version": "0.1.0",
+    "description": "TypeScript SDK for AgentNexus AI Agent Marketplace",
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
+    "scripts": {
+        "build": "tsup src/index.ts --format cjs,esm --dts",
+        "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+        "test": "jest",
+        "lint": "eslint src --ext .ts",
+        "clean": "rm -rf dist"
+    },
+    "keywords": [
+        "agentnexus",
+        "ai-agents",
+        "blockchain",
+        "base",
+        "erc-4337",
+        "smart-contracts"
+    ],
+    "author": "AgentNexus Team",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/agentnexus/sdk"
+    },
+    "dependencies": {
+        "ethers": "^6.9.0",
+        "viem": "^2.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "tsup": "^8.0.0",
+        "typescript": "^5.3.0"
+    },
+    "peerDependencies": {
+        "ethers": "^6.0.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
