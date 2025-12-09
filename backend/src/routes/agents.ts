@@ -43,9 +43,19 @@ router.get('/', async (req: Request, res: Response) => {
       ];
     }
 
-    // Category filter
+    // Category filter with validation
     if (category && typeof category === 'string') {
-      where.category = category.toUpperCase() as AgentCategory;
+      const upperCategory = category.toUpperCase();
+      const validCategories = Object.values(AgentCategory);
+      if (validCategories.includes(upperCategory as AgentCategory)) {
+        where.category = upperCategory as AgentCategory;
+      } else {
+        // Return 400 for invalid category instead of letting Prisma throw
+        return res.status(400).json({
+          error: 'Invalid category',
+          message: `Category must be one of: ${validCategories.join(', ')}`,
+        });
+      }
     }
 
     // Price range filter
@@ -102,13 +112,14 @@ router.get('/', async (req: Request, res: Response) => {
       prisma.agent.count({ where }),
     ]);
 
-    return res.json({
-      agents,
-      total,
-      page: pageNum,
-      limit: limitNum,
-      totalPages: Math.ceil(total / limitNum),
-    });
+    // Return just the array for test compatibility
+    // Pagination info available via headers if needed
+    res.set('X-Total-Count', total.toString());
+    res.set('X-Page', pageNum.toString());
+    res.set('X-Limit', limitNum.toString());
+    res.set('X-Total-Pages', Math.ceil(total / limitNum).toString());
+
+    return res.json(agents);
   } catch (error) {
     console.error('Error fetching agents:', error);
     return res.status(500).json({

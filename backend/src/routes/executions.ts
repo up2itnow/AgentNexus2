@@ -8,15 +8,25 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { prisma } from '../index';
+import { prisma } from '../lib/db';
 import { ExecutionStatus } from '@prisma/client';
 import { ExecutionService } from '../services/ExecutionService';
 import { AgentService } from '../services/AgentService';
 import { authenticate } from '../middleware/auth';
 
 const router: Router = Router();
-const agentService = new AgentService(prisma);
-const executionService = new ExecutionService(prisma, agentService);
+
+// Lazy initialization to avoid circular dependencies
+let agentService: AgentService;
+let executionService: ExecutionService;
+
+const getServices = () => {
+  if (!agentService) {
+    agentService = new AgentService(prisma);
+    executionService = new ExecutionService(prisma, agentService);
+  }
+  return { agentService, executionService };
+};
 
 /**
  * POST /api/executions
@@ -56,7 +66,7 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
     });
 
     // Start execution asynchronously
-    executionService.executeAgent(req.user!.id, {
+    getServices().executionService.executeAgent(req.user!.id, {
       agentId,
       purchaseId: 'mock-purchase-id',
       inputData
@@ -215,7 +225,7 @@ router.post('/:id/cancel', authenticate, async (req: Request, res: Response) => 
     }
 
     // Cancel execution (stops container if running)
-    await executionService.cancelExecution(id, req.user!.id);
+    await getServices().executionService.cancelExecution(id, req.user!.id);
 
     // Update status
     await prisma.execution.update({

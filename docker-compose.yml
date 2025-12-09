@@ -1,8 +1,11 @@
+# AgentNexus Docker Compose Configuration
+# Run: docker-compose up -d
+
 services:
-  # PostgreSQL Database
-  postgres:
+  # PostgreSQL Database with pgvector extension
+  agentnexus-postgres:
     image: pgvector/pgvector:pg16
-    container_name: agentnexus-db
+    container_name: agentnexus-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: agentnexus
@@ -11,60 +14,61 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
+      - agentnexus_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U agentnexus" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Redis Cache
-  redis:
+  # Redis Cache for sessions and real-time data
+  agentnexus-redis:
     image: redis:7-alpine
     container_name: agentnexus-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - agentnexus_redis_data:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 5
 
-  # Backend API
-  backend:
+  # Backend API Server (Express + WebSocket)
+  agentnexus-backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: runner # Use production build to avoid mounting source code
+      target: runner
     container_name: agentnexus-backend
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://agentnexus:${DB_PASSWORD:-devpassword}@postgres:5432/agentnexus
-      REDIS_URL: redis://redis:6379
-      PORT: 3000
-      MAINNET_RPC_URL: ${MAINNET_RPC_URL}
-      # DOCKER_HOST for spawning sibling containers if needed
-      DOCKER_HOST: tcp://agent-runtime:2375
+      DATABASE_URL: postgresql://agentnexus:${DB_PASSWORD:-devpassword}@agentnexus-postgres:5432/agentnexus
+      REDIS_URL: redis://agentnexus-redis:6379
+      PORT: 3001
+      # Smart Contract Addresses (Base Sepolia)
+      ESCROW_CONTRACT_ADDRESS: "0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0"
+      ENTITLEMENTS_CONTRACT_ADDRESS: "0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d"
+      # Docker connection for agent execution
+      DOCKER_HOST: tcp://agentnexus-agent-runtime:2375
     ports:
-      - "3000:3000"
+      - "3001:3001"
     depends_on:
-      postgres:
+      agentnexus-postgres:
         condition: service_healthy
-      redis:
+      agentnexus-redis:
         condition: service_healthy
 
-  # Agent Runtime (Docker-in-Docker) - Required for Docker-based agents
+  # Agent Runtime (Docker-in-Docker) - For containerized agent execution
   # ⚠️ SECURITY NOTE: privileged:true is required for DIND but grants elevated access
   # PRODUCTION ALTERNATIVES:
   #   1. Use Kubernetes with containerd instead of DIND
   #   2. Use Sysbox runtime (rootless containers)
   #   3. Use remote Docker daemon with mTLS
-  agent-runtime:
+  agentnexus-agent-runtime:
     image: docker:24-dind
     container_name: agentnexus-agent-runtime
     privileged: true # Required for DIND - see security note above
@@ -72,21 +76,21 @@ services:
     environment:
       DOCKER_TLS_CERTDIR: "" # Disable TLS for internal comms
     volumes:
-      - agent_runtime_data:/var/lib/docker
+      - agentnexus_agent_runtime_data:/var/lib/docker
     ports:
       - "2375:2375"
     # Security hardening for DIND
     security_opt:
-      - seccomp:unconfined # Required for DIND
+      - seccomp:unconfined
     cap_drop:
-      - NET_RAW # Drop unnecessary capabilities where possible
+      - NET_RAW
 
 volumes:
-  postgres_data:
+  agentnexus_postgres_data:
     driver: local
-  redis_data:
+  agentnexus_redis_data:
     driver: local
-  agent_runtime_data:
+  agentnexus_agent_runtime_data:
     driver: local
 
 networks:
