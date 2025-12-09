@@ -28,10 +28,10 @@ interface PurchasesListProps {
 export function PurchasesList({ purchases }: PurchasesListProps) {
   if (purchases.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed bg-muted/30 p-12 text-center">
+      <div className="rounded-lg border border-dashed bg-muted/30 p-12 text-center" data-testid="empty-purchases">
         <Bot className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-muted-foreground">
-          You haven&apos;t purchased any agents yet.
+          You haven&apos;t purchased any agents yet. Get started by browsing the marketplace!
         </p>
         <Link
           href="/"

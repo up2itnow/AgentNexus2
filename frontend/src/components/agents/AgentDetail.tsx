@@ -43,7 +43,7 @@ export function AgentDetail({ agent }: AgentDetailProps) {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8" data-testid="agent-detail-container">
       {/* Back Button */}
       <Link
         href="/"
@@ -73,7 +73,7 @@ export function AgentDetail({ agent }: AgentDetailProps) {
             </div>
             <div className="flex-1">
               <div className="mb-2 flex items-center gap-3">
-                <h1 className="text-3xl font-bold">{agent.name}</h1>
+                <h1 className="text-3xl font-bold" data-testid="agent-detail-name">{agent.name}</h1>
                 <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900 dark:text-blue-300">
                   {CATEGORY_LABELS[agent.category]}
                 </span>
@@ -138,6 +138,7 @@ export function AgentDetail({ agent }: AgentDetailProps) {
             </button>
             <button
               onClick={() => setActiveTab('execute')}
+              data-testid="execute-tab-button"
               className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors ${activeTab === 'execute'
                 ? 'border-b-2 border-blue-600 text-blue-600'
                 : 'text-muted-foreground hover:text-foreground'

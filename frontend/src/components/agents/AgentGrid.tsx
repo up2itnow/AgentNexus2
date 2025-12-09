@@ -20,8 +20,8 @@ export function AgentGrid({ agents, isLoading, isError }: AgentGridProps) {
   // Loading State
   if (isLoading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="text-center">
+      <div className="flex min-h-[400px] items-center justify-center" data-testid="loading">
+        <div className="text-center" data-testid="skeleton">
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-blue-600" />
           <p className="mt-4 text-sm text-muted-foreground">Loading agents...</p>
         </div>
@@ -32,7 +32,7 @@ export function AgentGrid({ agents, isLoading, isError }: AgentGridProps) {
   // Error State
   if (isError) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="flex min-h-[400px] items-center justify-center" data-testid="error-state">
         <div className="text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900">
             <Bot className="h-8 w-8 text-red-600 dark:text-red-400" />
@@ -55,14 +55,14 @@ export function AgentGrid({ agents, isLoading, isError }: AgentGridProps) {
   // Empty State
   if (!agents || agents.length === 0) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="flex min-h-[400px] items-center justify-center" data-testid="empty-state">
         <div className="text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
             <Bot className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h3 className="mt-4 text-lg font-semibold">No Agents Found</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Try adjusting your search or filters to find what you&apos;re looking for.
+            No agents available. Get started by creating an agent!
           </p>
         </div>
       </div>

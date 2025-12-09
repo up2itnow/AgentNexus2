@@ -50,7 +50,7 @@ export function ProfileDashboard({ address }: ProfileDashboardProps) {
   const isLoading = statsLoading || purchasesLoading || executionsLoading || createdLoading;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8" data-testid="profile-content">
       {/* Profile Header */}
       <div className="mb-8">
         <div className="flex items-center gap-4">
@@ -82,8 +82,8 @@ export function ProfileDashboard({ address }: ProfileDashboardProps) {
         <button
           onClick={() => setActiveTab('purchases')}
           className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'purchases'
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-muted-foreground hover:text-foreground'
+            ? 'border-b-2 border-blue-600 text-blue-600'
+            : 'text-muted-foreground hover:text-foreground'
             }`}
         >
           <ShoppingBag className="h-4 w-4" />
@@ -92,8 +92,8 @@ export function ProfileDashboard({ address }: ProfileDashboardProps) {
         <button
           onClick={() => setActiveTab('executions')}
           className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'executions'
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-muted-foreground hover:text-foreground'
+            ? 'border-b-2 border-blue-600 text-blue-600'
+            : 'text-muted-foreground hover:text-foreground'
             }`}
         >
           <History className="h-4 w-4" />
@@ -102,8 +102,8 @@ export function ProfileDashboard({ address }: ProfileDashboardProps) {
         <button
           onClick={() => setActiveTab('created')}
           className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors whitespace-nowrap ${activeTab === 'created'
-              ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-muted-foreground hover:text-foreground'
+            ? 'border-b-2 border-blue-600 text-blue-600'
+            : 'text-muted-foreground hover:text-foreground'
             }`}
         >
           <Hammer className="h-4 w-4" />

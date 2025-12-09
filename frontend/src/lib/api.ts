@@ -10,9 +10,9 @@ import type { Agent, AgentFilters, AgentListResponse } from '@/types/agent';
 // Create axios instance
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('api_url') || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8200';
+    return localStorage.getItem('api_url') || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8200';
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 };
 
 const api = axios.create({
@@ -72,8 +72,10 @@ export const agentsAPI = {
     if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
 
-    const { data } = await api.get<AgentListResponse>(`/agents?${params.toString()}`);
-    return data;
+    const response = await api.get<Agent[]>(`/agents?${params.toString()}`);
+    // Backend returns array directly, extract count from headers
+    const total = parseInt(response.headers['x-total-count'] || '0', 10) || response.data.length;
+    return { agents: response.data, total };
   },
 
   /**

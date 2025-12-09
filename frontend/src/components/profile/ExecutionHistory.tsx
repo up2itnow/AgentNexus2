@@ -30,7 +30,7 @@ const STATUS_CONFIG = {
 export function ExecutionHistory({ executions }: ExecutionHistoryProps) {
   if (executions.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed bg-muted/30 p-12 text-center">
+      <div className="rounded-lg border border-dashed bg-muted/30 p-12 text-center" data-testid="empty-history">
         <Loader2 className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-muted-foreground">
           No executions yet. Purchase an agent and start executing!

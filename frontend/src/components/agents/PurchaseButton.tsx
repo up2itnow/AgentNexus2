@@ -116,8 +116,20 @@ export function PurchaseButton({ agent, onPurchaseSuccess }: PurchaseButtonProps
   const [hasAccess, setHasAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(false);
 
-  // Convert price for display (price is in Wei from API)
-  const priceDisplay = formatEther(BigInt(agent.price));
+  // Convert price for display (price may be in Wei or ETH from API)
+  const priceDisplay = (() => {
+    const priceStr = String(agent.price);
+    // If it contains a decimal or is a small number, assume it's already in ETH
+    if (priceStr.includes('.') || (parseFloat(priceStr) < 1000 && parseFloat(priceStr) > 0)) {
+      return parseFloat(priceStr).toFixed(3);
+    }
+    // Otherwise, assume it's in Wei and convert
+    try {
+      return formatEther(BigInt(priceStr));
+    } catch {
+      return priceStr; // Fallback to original string
+    }
+  })();
 
   /**
    * Check if user already owns this agent on mount and when wallet changes
@@ -180,6 +192,7 @@ export function PurchaseButton({ agent, onPurchaseSuccess }: PurchaseButtonProps
           {({ openConnectModal }) => (
             <button
               onClick={openConnectModal}
+              data-testid="connect-wallet-button"
               className="w-full rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700"
             >
               Connect Wallet
@@ -228,7 +241,7 @@ export function PurchaseButton({ agent, onPurchaseSuccess }: PurchaseButtonProps
         <div className="flex items-baseline justify-between">
           <span className="text-sm text-muted-foreground">Price</span>
           <div className="text-right">
-            <div className="text-3xl font-bold">{priceDisplay} ETH</div>
+            <div className="text-3xl font-bold" data-testid="agent-detail-price">{priceDisplay} ETH</div>
             <div className="text-xs text-muted-foreground">
               One-time purchase
             </div>
@@ -239,6 +252,7 @@ export function PurchaseButton({ agent, onPurchaseSuccess }: PurchaseButtonProps
       <button
         onClick={handlePurchase}
         disabled={isPurchasing}
+        data-testid="purchase-button"
         className="w-full rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPurchasing ? (

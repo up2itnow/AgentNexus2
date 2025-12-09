@@ -19,12 +19,26 @@ interface AgentCardProps {
 
 export function AgentCard({ agent }: AgentCardProps) {
   // Convert price to ETH display format
-  // Price from API is in Wei
-  const priceDisplay = formatEther(BigInt(agent.price));
+  // Price from API might be in Wei (large integer) or ETH (decimal string)
+  // Handle both formats gracefully
+  const priceDisplay = (() => {
+    const priceStr = String(agent.price);
+    // If it contains a decimal or is a small number, assume it's already in ETH
+    if (priceStr.includes('.') || (parseFloat(priceStr) < 1000 && parseFloat(priceStr) > 0)) {
+      return parseFloat(priceStr).toFixed(3);
+    }
+    // Otherwise, assume it's in Wei and convert
+    try {
+      return formatEther(BigInt(priceStr));
+    } catch {
+      return priceStr; // Fallback to original string
+    }
+  })();
 
   return (
     <Link
       href={`/agents/${agent.id}`}
+      data-testid="agent-card"
       className="group relative block overflow-hidden rounded-xl border border-white/10 bg-background/40 p-6 backdrop-blur-md transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -47,13 +61,13 @@ export function AgentCard({ agent }: AgentCardProps) {
           </div>
 
           {/* Category Badge */}
-          <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent ring-1 ring-accent/20">
+          <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent ring-1 ring-accent/20" data-testid="agent-category">
             {CATEGORY_LABELS[agent.category]}
           </span>
         </div>
 
         {/* Agent Name */}
-        <h3 className="mb-2 text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
+        <h3 className="mb-2 text-lg font-semibold text-foreground transition-colors group-hover:text-primary" data-testid="agent-name">
           {agent.name}
         </h3>
 
@@ -82,7 +96,7 @@ export function AgentCard({ agent }: AgentCardProps) {
         <div className="flex items-center justify-between border-t border-white/10 pt-4">
           <div>
             <div className="text-xs text-muted-foreground">Price</div>
-            <div className="text-lg font-bold text-foreground">
+            <div className="text-lg font-bold text-foreground" data-testid="agent-price">
               {priceDisplay} ETH
             </div>
           </div>
