@@ -1,0 +1,84 @@
+# Gitleaks Configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "AgentNexus Gitleaks Config"
+
+# Allow list - patterns that are NOT secrets
+[allowlist]
+description = "Allowed patterns that are safe to commit"
+
+# Regex patterns for allowed secrets (test/mock values)
+regexes = [
+    # Mock/test API keys
+    '''sk-test-\w+''',
+    '''sk-mock-\w+''',
+    '''sk_test_\w+''',
+    
+    # Example AWS keys used in documentation
+    '''AKIAIOSFODNN7EXAMPLE''',
+    
+    # Zero addresses (placeholder contract addresses)
+    '''0x0{40}''',
+    
+    # Common test private keys
+    '''0x0123456789012345678901234567890123456789012345678901234567890123''',
+    '''1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef''',
+]
+
+# File paths to skip scanning
+paths = [
+    # Dependencies
+    '''node_modules/''',
+    '''\.pnpm/''',
+    
+    # Lock files
+    '''pnpm-lock\.yaml''',
+    '''package-lock\.json''',
+    
+    # Build outputs
+    '''\.next/''',
+    '''dist/''',
+    '''build/''',
+    
+    # Smart contract libraries (external dependencies)
+    '''smart-contracts/lib/''',
+    '''contracts/lib/''',
+    
+    # Test fixtures
+    '''__fixtures__/''',
+    '''__mocks__/''',
+    
+    # Archives
+    '''archive/''',
+    
+    # Broadcast files (deployment logs - contain public addresses)
+    '''broadcast/''',
+]
+
+# Custom rules for project-specific patterns
+[[rules]]
+id = "walletconnect-project-id"
+description = "WalletConnect Project ID (public, safe to commit)"
+regex = '''WALLETCONNECT_PROJECT_ID\s*=\s*['"]?[a-f0-9]{32}['"]?'''
+allowlist = { regexes = ['''.*'''] }  # All matches are safe
+
+[[rules]]
+id = "base-sepolia-rpc"
+description = "Public RPC URLs"
+regex = '''https://sepolia\.base\.org'''
+allowlist = { regexes = ['''.*'''] }  # All matches are safe
+
+[[rules]]
+id = "example-private-key-docs"
+description = "Example private key in documentation"
+regex = '''your_private_key_here|your-private-key'''
+allowlist = { regexes = ['''.*'''] }  # Documentation examples
+
+# Entropy settings - reduce false positives
+[extend]
+# Use default rules from gitleaks
+useDefault = true
+
+# Reduce sensitivity to avoid too many false positives
+[entropy]
+maxEntropy = 4.5
