@@ -1,77 +1,205 @@
 /**
- * Blockchain Utilities - Viem Client Setup
+ * Blockchain Utilities - Multi-Chain Viem Client Setup
  * 
- * Configures Viem clients for interacting with Base L2 and smart contracts
+ * Configures Viem clients for interacting with multiple EVM chains
  * 
- * @author AgentNexus Team ()
+ * Supported Chains:
+ * - Base (Primary)
+ * - Arbitrum, Polygon, Optimism (Tier 1)
+ * - BNB Chain, Avalanche (Tier 2)
+ * 
+ * @author AgentNexus Team
  */
 
-import { createPublicClient, createWalletClient, http, type PublicClient, type WalletClient, type Address } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
+import {
+  createPublicClient,
+  createWalletClient,
+  http,
+  type PublicClient,
+  type WalletClient,
+  type Address,
+  type Chain
+} from 'viem';
+import { base, baseSepolia, arbitrum, polygon, optimism, bsc, avalanche } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { BlockchainError } from '../types';
 
 /**
- * Get the appropriate chain based on environment
+ * Chain registry mapping chain IDs to chain configs and RPC env vars
  */
-export function getChain() {
+interface ChainConfig {
+  chain: Chain;
+  rpcEnvVar: string;
+  contractEnvPrefix: string;
+}
+
+export const CHAIN_REGISTRY: Record<number, ChainConfig> = {
+  // Base (Primary)
+  8453: {
+    chain: base,
+    rpcEnvVar: 'BASE_RPC_URL',
+    contractEnvPrefix: 'BASE'
+  },
+  84532: {
+    chain: baseSepolia,
+    rpcEnvVar: 'BASE_SEPOLIA_RPC_URL',
+    contractEnvPrefix: 'BASE_SEPOLIA'
+  },
+  // Tier 1 L2s
+  42161: {
+    chain: arbitrum,
+    rpcEnvVar: 'ARBITRUM_RPC_URL',
+    contractEnvPrefix: 'ARBITRUM'
+  },
+  137: {
+    chain: polygon,
+    rpcEnvVar: 'POLYGON_RPC_URL',
+    contractEnvPrefix: 'POLYGON'
+  },
+  10: {
+    chain: optimism,
+    rpcEnvVar: 'OPTIMISM_RPC_URL',
+    contractEnvPrefix: 'OPTIMISM'
+  },
+  // Tier 2
+  56: {
+    chain: bsc,
+    rpcEnvVar: 'BSC_RPC_URL',
+    contractEnvPrefix: 'BSC'
+  },
+  43114: {
+    chain: avalanche,
+    rpcEnvVar: 'AVALANCHE_RPC_URL',
+    contractEnvPrefix: 'AVALANCHE'
+  },
+};
+
+/**
+ * Get all supported chain IDs
+ */
+export function getSupportedChainIds(): number[] {
+  return Object.keys(CHAIN_REGISTRY).map(Number);
+}
+
+/**
+ * Check if a chain ID is supported
+ */
+export function isChainSupported(chainId: number): boolean {
+  return chainId in CHAIN_REGISTRY;
+}
+
+/**
+ * Get the default chain based on environment
+ */
+export function getDefaultChainId(): number {
   const env = process.env.NODE_ENV || 'development';
-  return env === 'production' ? base : baseSepolia;
+  return env === 'production' ? 8453 : 84532; // Base mainnet or Base Sepolia
+}
+
+/**
+ * Get chain config by chain ID
+ */
+export function getChainConfig(chainId: number): ChainConfig {
+  const config = CHAIN_REGISTRY[chainId];
+  if (!config) {
+    throw new BlockchainError(`Unsupported chain ID: ${chainId}`);
+  }
+  return config;
+}
+
+/**
+ * Get chain by chain ID (legacy compatibility)
+ */
+export function getChain(chainId?: number): Chain {
+  const id = chainId ?? getDefaultChainId();
+  return getChainConfig(id).chain;
+}
+
+/**
+ * Get RPC URL for a chain
+ */
+export function getRpcUrl(chainId: number): string {
+  const config = getChainConfig(chainId);
+  const rpcUrl = process.env[config.rpcEnvVar];
+
+  if (!rpcUrl) {
+    throw new BlockchainError(`${config.rpcEnvVar} not configured for chain ${chainId}`);
+  }
+
+  return rpcUrl;
 }
 
 /**
  * Create a public client for reading blockchain data
+ * @param chainId - Chain ID to connect to (defaults to environment chain)
  */
-export function createPublicViemClient(): PublicClient {
-  const chain = getChain();
-  const rpcUrl = process.env.BASE_RPC_URL;
-  
-  if (!rpcUrl) {
-    throw new BlockchainError('BASE_RPC_URL not configured');
-  }
-  
+export function createPublicViemClient(chainId?: number): PublicClient {
+  const id = chainId ?? getDefaultChainId();
+  const config = getChainConfig(id);
+  const rpcUrl = getRpcUrl(id);
+
   return createPublicClient({
-    chain,
+    chain: config.chain,
     transport: http(rpcUrl)
   }) as PublicClient;
 }
 
 /**
  * Create a wallet client for sending transactions
+ * @param chainId - Chain ID to connect to (defaults to environment chain)
  */
-export function createWalletViemClient(): WalletClient {
-  const chain = getChain();
-  const rpcUrl = process.env.BASE_RPC_URL;
+export function createWalletViemClient(chainId?: number): WalletClient {
+  const id = chainId ?? getDefaultChainId();
+  const config = getChainConfig(id);
+  const rpcUrl = getRpcUrl(id);
   const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
-  
-  if (!rpcUrl) {
-    throw new BlockchainError('BASE_RPC_URL not configured');
-  }
-  
+
   if (!privateKey) {
     throw new BlockchainError('DEPLOYER_PRIVATE_KEY not configured');
   }
-  
+
   const account = privateKeyToAccount(privateKey as `0x${string}`);
-  
+
   return createWalletClient({
     account,
-    chain,
+    chain: config.chain,
     transport: http(rpcUrl)
   });
 }
 
 /**
- * Get contract addresses from environment
+ * Contract addresses per chain
  */
-export function getContractAddresses() {
-  const escrowAddress = process.env.ESCROW_CONTRACT_ADDRESS;
-  const entitlementsAddress = process.env.ENTITLEMENTS_CONTRACT_ADDRESS;
-  
-  if (!escrowAddress || !entitlementsAddress) {
-    throw new BlockchainError('Contract addresses not configured');
+interface ChainContracts {
+  escrow: Address;
+  entitlements: Address;
+}
+
+/**
+ * Get contract addresses for a specific chain
+ * Falls back to generic env vars if chain-specific not found
+ */
+export function getContractAddresses(chainId?: number): ChainContracts {
+  const id = chainId ?? getDefaultChainId();
+  const config = CHAIN_REGISTRY[id];
+  const prefix = config?.contractEnvPrefix || '';
+
+  // Try chain-specific addresses first
+  let escrowAddress = process.env[`${prefix}_ESCROW_CONTRACT_ADDRESS`];
+  let entitlementsAddress = process.env[`${prefix}_ENTITLEMENTS_CONTRACT_ADDRESS`];
+
+  // Fall back to generic addresses
+  if (!escrowAddress) {
+    escrowAddress = process.env.ESCROW_CONTRACT_ADDRESS;
   }
-  
+  if (!entitlementsAddress) {
+    entitlementsAddress = process.env.ENTITLEMENTS_CONTRACT_ADDRESS;
+  }
+
+  if (!escrowAddress || !entitlementsAddress) {
+    throw new BlockchainError(`Contract addresses not configured for chain ${id}`);
+  }
+
   return {
     escrow: escrowAddress as Address,
     entitlements: entitlementsAddress as Address
@@ -105,7 +233,7 @@ export async function waitForTransaction(
       hash,
       confirmations
     });
-    
+
     return receipt;
   } catch (error) {
     throw new BlockchainError(`Transaction failed: ${error}`);
@@ -129,8 +257,6 @@ export function generatePaymentId(
 ): `0x${string}` {
   const data = `${userAddress}-${agentId}-${timestamp}`;
   // In production, use proper keccak256 hashing
-  // For now, simple implementation
   const hash = Buffer.from(data).toString('hex').padEnd(64, '0');
   return `0x${hash.slice(0, 64)}` as `0x${string}`;
 }
-
