@@ -15,12 +15,14 @@ import {
   createPublicClient,
   createWalletClient,
   http,
+  keccak256,
+  stringToBytes,
   type PublicClient,
   type WalletClient,
   type Address,
   type Chain
 } from 'viem';
-import { base, baseSepolia, arbitrum, polygon, optimism, bsc, avalanche } from 'viem/chains';
+import { base, baseSepolia, arbitrum, polygon, optimism, bsc, avalanche, mainnet } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import { BlockchainError } from '../types';
 
@@ -45,7 +47,12 @@ export const CHAIN_REGISTRY: Record<number, ChainConfig> = {
     rpcEnvVar: 'BASE_SEPOLIA_RPC_URL',
     contractEnvPrefix: 'BASE_SEPOLIA'
   },
-  // Tier 1 L2s
+  // Tier 1 networks
+  1: {
+    chain: mainnet,
+    rpcEnvVar: 'ETHEREUM_RPC_URL',
+    contractEnvPrefix: 'ETHEREUM'
+  },
   42161: {
     chain: arbitrum,
     rpcEnvVar: 'ARBITRUM_RPC_URL',
@@ -148,11 +155,11 @@ export function createPublicViemClient(chainId?: number): PublicClient {
  * Create a wallet client for sending transactions
  * @param chainId - Chain ID to connect to (defaults to environment chain)
  */
-export function createWalletViemClient(chainId?: number): WalletClient {
+export function createWalletViemClient(chainId?: number, privateKeyOverride?: string): WalletClient {
   const id = chainId ?? getDefaultChainId();
   const config = getChainConfig(id);
   const rpcUrl = getRpcUrl(id);
-  const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
+  const privateKey = privateKeyOverride ?? process.env.DEPLOYER_PRIVATE_KEY;
 
   if (!privateKey) {
     throw new BlockchainError('DEPLOYER_PRIVATE_KEY not configured');
@@ -255,8 +262,7 @@ export function generatePaymentId(
   agentId: string,
   timestamp: number
 ): `0x${string}` {
-  const data = `${userAddress}-${agentId}-${timestamp}`;
-  // In production, use proper keccak256 hashing
-  const hash = Buffer.from(data).toString('hex').padEnd(64, '0');
-  return `0x${hash.slice(0, 64)}` as `0x${string}`;
+  const payload = `${userAddress.toLowerCase()}:${agentId}:${timestamp}`;
+  const hash = keccak256(stringToBytes(payload));
+  return hash as `0x${string}`;
 }
