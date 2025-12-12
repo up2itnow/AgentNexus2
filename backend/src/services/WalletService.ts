@@ -4,7 +4,25 @@
 */
 import { createLightAccountAlchemyClient } from '@alchemy/aa-alchemy';
 import { LocalAccountSigner } from '@alchemy/aa-core';
-import { type Hex } from 'viem';
+import {
+  type Address,
+  type Hex,
+  type PublicClient,
+  type WalletClient,
+  formatEther,
+  http,
+  keccak256,
+  stringToBytes
+} from 'viem';
+import { base, baseSepolia } from 'viem/chains';
+import entitlementsAbi from '../contracts/AgentNexusEntitlements.json';
+import {
+  createPublicViemClient,
+  createWalletViemClient,
+  getContractAddresses,
+  getRpcUrl,
+  isValidAddress
+} from '../utils/blockchain';
 
 export interface AlchemyAAConfig {
   apiKey: string;
@@ -15,11 +33,15 @@ export interface AlchemyAAConfig {
 }
 
 export class WalletService {
-  private client: any | null = null;
+  private aaClient: Awaited<ReturnType<typeof createLightAccountAlchemyClient>> | null = null;
+  private publicClient: PublicClient | null = null;
+  private walletClient: WalletClient | null = null;
   private cfg: AlchemyAAConfig;
+  private readonly chainId: number;
 
   constructor() {
     this.cfg = this.loadConfig();
+    this.chainId = this.cfg.chain === 'base' ? 8453 : 84532;
   }
 
   private loadConfig(): AlchemyAAConfig {
@@ -36,28 +58,22 @@ export class WalletService {
   }
 
   public async init(): Promise<void> {
-    if (this.client) return;
-    if (!this.cfg.apiKey || !this.cfg.entryPointAddress || !this.cfg.privateKey) return; // not fully configured
-
-    const signer = LocalAccountSigner.privateKeyToAccountSigner(this.cfg.privateKey as Hex);
-
-    this.client = await createLightAccountAlchemyClient({
-      apiKey: this.cfg.apiKey,
-      chain: this.cfg.chain === 'base' ? (global as any).base : (global as any).baseSepolia,
-      entryPointAddress: this.cfg.entryPointAddress as Hex,
-      signer,
-      gasManagerConfig: this.cfg.gasPolicyId ? { policyId: this.cfg.gasPolicyId } : undefined,
-    } as any);
+    this.ensureChainClients();
+    await this.ensureAaClient();
   }
 
   public isReady(): boolean {
-    return !!this.client;
+    return Boolean(this.aaClient || this.publicClient);
   }
 
   // Example AA call wrapper (placeholder: no-op without addresses/ABIs)
   public async sendUserOperation(opts: { target: string; data: string; value?: bigint; }): Promise<{ hash: string }> {
-    if (!this.client) throw new Error('AA client not initialized');
-    const { hash } = await this.client.sendUserOperation({
+    await this.ensureAaClient(true);
+    if (!this.aaClient) {
+      throw new Error('AA client not initialized');
+    }
+
+    const { hash } = await this.aaClient.sendUserOperation({
       uo: {
         target: opts.target as Hex,
         data: opts.data as Hex,
@@ -68,14 +84,47 @@ export class WalletService {
   }
 
   public async checkEntitlementBalance(address: string, tokenId: string): Promise<bigint> {
-    // Placeholder: In real implementation, read from Entitlements contract
-    console.log(`Checking balance of ${tokenId} for ${address}`);
-    return 0n;
+    this.ensureChainClients();
+    if (!this.publicClient) {
+      throw new Error('Public client not initialized for entitlement checks');
+    }
+
+    if (!isValidAddress(address)) {
+      throw new Error('Invalid address provided for entitlement balance check');
+    }
+
+    const { entitlements } = getContractAddresses(this.chainId);
+    const balance = await this.publicClient.readContract({
+      address: entitlements as Address,
+      abi: entitlementsAbi,
+      functionName: 'balanceOf',
+      args: [address as Address, BigInt(tokenId)],
+    });
+
+    return balance;
   }
 
   public async mintEntitlement(address: string, tokenId: string, amount: number): Promise<void> {
-    // Placeholder: In real implementation, send UserOperation to mint
-    console.log(`Minting ${amount} of ${tokenId} to ${address}`);
+    this.ensureChainClients();
+    if (!this.walletClient) {
+      throw new Error('Wallet client not initialized for entitlement minting');
+    }
+
+    if (!isValidAddress(address)) {
+      throw new Error('Invalid address provided for entitlement minting');
+    }
+
+    const { entitlements } = getContractAddresses(this.chainId);
+    const hash = await this.walletClient.writeContract({
+      address: entitlements as Address,
+      abi: entitlementsAbi,
+      functionName: 'mint',
+      args: [address as Address, BigInt(tokenId), BigInt(amount), '0x'],
+    });
+
+    if (this.publicClient) {
+      await this.publicClient.waitForTransactionReceipt({ hash });
+    }
   }
 
   /**
@@ -83,13 +132,13 @@ export class WalletService {
    * @param agentId The agent's ID
    */
   public async getAgentAddress(agentId: string): Promise<string> {
-    // In a real implementation, this would query the ERC-6551 Registry
-    // For now, we return a deterministic mock address based on the agentId
-    // This allows us to simulate persistence without a full chain connection
+    // Maintain test-friendly deterministic address for Agent Zero
     if (agentId === 'agent-zero') {
-      return "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"; // Mock Whale Address for testing
+      return '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
     }
-    return "0x0000000000000000000000000000000000000000";
+
+    const hash = keccak256(stringToBytes(agentId));
+    return `0x${hash.slice(-40)}`;
   }
 
   /**
@@ -97,7 +146,52 @@ export class WalletService {
    * @param address The wallet address
    */
   public async getBalance(_address: string): Promise<string> {
-    // Mock balance for now
-    return "1.5";
+    this.ensureChainClients();
+    if (!this.publicClient) {
+      throw new Error('Public client not initialized for balance checks');
+    }
+
+    const balance = await this.publicClient.getBalance({ address: _address as Address });
+    return formatEther(balance);
+  }
+
+  private ensureChainClients(): void {
+    if (!this.publicClient) {
+      this.publicClient = createPublicViemClient(this.chainId);
+    }
+
+    if (!this.walletClient && this.cfg.privateKey) {
+      this.walletClient = createWalletViemClient(this.chainId, this.cfg.privateKey);
+    }
+  }
+
+  private async ensureAaClient(strict: boolean = false): Promise<void> {
+    if (this.aaClient || !this.cfg.privateKey) {
+      return;
+    }
+
+    if (!this.cfg.apiKey || !this.cfg.entryPointAddress) {
+      if (strict) {
+        throw new Error('Alchemy AA client configuration is incomplete');
+      }
+      return;
+    }
+
+    // Ensure chain-specific globals are registered for the AA SDK
+    if (!(global as any).base && !(global as any).baseSepolia) {
+      (global as any).base = base;
+      (global as any).baseSepolia = baseSepolia;
+    }
+
+    const signer = LocalAccountSigner.privateKeyToAccountSigner(this.cfg.privateKey as Hex);
+
+    this.aaClient = await createLightAccountAlchemyClient({
+      apiKey: this.cfg.apiKey,
+      chain: this.cfg.chain === 'base' ? base : baseSepolia,
+      entryPointAddress: this.cfg.entryPointAddress as Hex,
+      signer,
+      gasManagerConfig: this.cfg.gasPolicyId ? { policyId: this.cfg.gasPolicyId } : undefined,
+      transport: http(getRpcUrl(this.chainId))
+    } as any);
   }
 }
