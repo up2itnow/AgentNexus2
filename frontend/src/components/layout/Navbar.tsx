@@ -14,14 +14,17 @@
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useTheme } from 'next-themes';
-import { Moon, Sun, Menu, Settings } from 'lucide-react';
+import { Moon, Sun, Menu, Settings, ArrowRightLeft } from 'lucide-react';
 import { useState } from 'react';
 import { SettingsModal } from './SettingsModal';
+import { ChainSelector } from '@/components/ChainSelector';
+import { BridgeModal } from '@/components/BridgeModal';
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [bridgeOpen, setBridgeOpen] = useState(false);
 
   // Import SettingsModal dynamically or at top level if possible, but here we need to add the import
   // Since I can't see the imports in this block, I'll assume I need to add the import at the top of the file in a separate edit or assume it's available.
@@ -83,6 +86,16 @@ export function Navbar() {
               <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </button>
 
+            {/* Bridge Button */}
+            <button
+              onClick={() => setBridgeOpen(true)}
+              className="rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
+              aria-label="Bridge assets"
+              title="Bridge assets between chains"
+            >
+              <ArrowRightLeft className="h-5 w-5" />
+            </button>
+
             {/* Settings Button */}
             <button
               onClick={() => setSettingsOpen(true)}
@@ -92,8 +105,9 @@ export function Navbar() {
               <Settings className="h-5 w-5" />
             </button>
 
-            {/* Wallet Connect Button */}
-            <div className="hidden sm:block">
+            {/* Chain Selector and Wallet Connect */}
+            <div className="hidden sm:flex sm:items-center sm:space-x-3">
+              <ChainSelector />
               <ConnectButton />
             </div>
 
@@ -142,7 +156,8 @@ export function Navbar() {
               >
                 Docs
               </Link>
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col space-y-2">
+                <ChainSelector />
                 <ConnectButton />
               </div>
             </div>
@@ -151,6 +166,7 @@ export function Navbar() {
       </div>
 
       <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <BridgeModal isOpen={bridgeOpen} onClose={() => setBridgeOpen(false)} />
     </nav>
   );
 }

@@ -75,7 +75,9 @@ export const agentsAPI = {
     const response = await api.get<Agent[]>(`/agents?${params.toString()}`);
     // Backend returns array directly, extract count from headers
     const total = parseInt(response.headers['x-total-count'] || '0', 10) || response.data.length;
-    return { agents: response.data, total };
+    const page = parseInt(response.headers['x-page'] || '1', 10);
+    const limit = parseInt(response.headers['x-limit'] || String(response.data.length), 10);
+    return { agents: response.data, total, page, limit };
   },
 
   /**
