@@ -104,6 +104,18 @@ export class CrossChainService {
             name: 'Polygon',
             nativeCurrency: 'MATIC',
             explorerUrl: 'https://polygonscan.com'
+        },
+        {
+            id: 56,
+            name: 'BNB Chain',
+            nativeCurrency: 'BNB',
+            explorerUrl: 'https://bscscan.com'
+        },
+        {
+            id: 43114,
+            name: 'Avalanche',
+            nativeCurrency: 'AVAX',
+            explorerUrl: 'https://snowtrace.io'
         }
     ];
 
@@ -116,9 +128,21 @@ export class CrossChainService {
         // Arbitrum
         { address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831', symbol: 'USDC', decimals: 6, chainId: 42161 },
         { address: '0x0000000000000000000000000000000000000000', symbol: 'ETH', decimals: 18, chainId: 42161 },
+        // Optimism
+        { address: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85', symbol: 'USDC', decimals: 6, chainId: 10 },
+        { address: '0x0000000000000000000000000000000000000000', symbol: 'ETH', decimals: 18, chainId: 10 },
         // Ethereum
         { address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', symbol: 'USDC', decimals: 6, chainId: 1 },
         { address: '0x0000000000000000000000000000000000000000', symbol: 'ETH', decimals: 18, chainId: 1 },
+        // Polygon
+        { address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', symbol: 'USDC', decimals: 6, chainId: 137 },
+        { address: '0x0000000000000000000000000000000000000000', symbol: 'MATIC', decimals: 18, chainId: 137 },
+        // BNB Chain
+        { address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', symbol: 'USDC', decimals: 18, chainId: 56 },
+        { address: '0x0000000000000000000000000000000000000000', symbol: 'BNB', decimals: 18, chainId: 56 },
+        // Avalanche
+        { address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E', symbol: 'USDC', decimals: 6, chainId: 43114 },
+        { address: '0x0000000000000000000000000000000000000000', symbol: 'AVAX', decimals: 18, chainId: 43114 },
     ];
 
     // In-memory transaction tracking (would be database in production)

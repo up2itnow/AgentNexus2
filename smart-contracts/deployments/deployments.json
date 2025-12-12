@@ -1,0 +1,72 @@
+{
+    "chains": {
+        "8453": {
+            "name": "Base",
+            "status": "not_deployed",
+            "contracts": {
+                "AgentNexusEntitlements": null,
+                "AgentNexusEscrow": null
+            }
+        },
+        "84532": {
+            "name": "Base Sepolia",
+            "status": "deployed",
+            "deployedAt": "2025-12-10",
+            "deployer": "0x2413C0DE9CBdFB3eADA6D7d20fB0A953F85bcb41",
+            "contracts": {
+                "AgentNexusEntitlements": "0x5358AaC949f7e7B4B3920533BADfABADBF16F5cE",
+                "AgentNexusEscrow": "0xCbE3580863D77F6E48FF9A66c04e7D7B7b009B20"
+            }
+        },
+        "421614": {
+            "name": "Arbitrum Sepolia",
+            "status": "deployed",
+            "deployedAt": "2025-12-10",
+            "deployer": "0x2413C0DE9CBdFB3eADA6D7d20fB0A953F85bcb41",
+            "contracts": {
+                "AgentNexusEntitlements": "0x3c8f32F9cF41Dc255129d6Add447218053743b33",
+                "AgentNexusEscrow": "0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC"
+            }
+        },
+        "42161": {
+            "name": "Arbitrum",
+            "status": "not_deployed",
+            "contracts": {
+                "AgentNexusEntitlements": null,
+                "AgentNexusEscrow": null
+            }
+        },
+        "137": {
+            "name": "Polygon",
+            "status": "not_deployed",
+            "contracts": {
+                "AgentNexusEntitlements": null,
+                "AgentNexusEscrow": null
+            }
+        },
+        "10": {
+            "name": "Optimism",
+            "status": "not_deployed",
+            "contracts": {
+                "AgentNexusEntitlements": null,
+                "AgentNexusEscrow": null
+            }
+        },
+        "56": {
+            "name": "BNB Chain",
+            "status": "not_deployed",
+            "contracts": {
+                "AgentNexusEntitlements": null,
+                "AgentNexusEscrow": null
+            }
+        },
+        "43114": {
+            "name": "Avalanche",
+            "status": "not_deployed",
+            "contracts": {
+                "AgentNexusEntitlements": null,
+                "AgentNexusEscrow": null
+            }
+        }
+    }
+}
