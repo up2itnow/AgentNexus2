@@ -4,6 +4,9 @@
  * 
  * All compliance settings are loaded from environment variables
  * with sensible defaults for development.
+ * 
+ * COMPLIANCE-CAPABLE: All toggles default to FALSE.
+ * Set to TRUE via environment variables to enable enforcement.
  */
 
 export interface ComplianceConfig {
@@ -19,6 +22,21 @@ export interface ComplianceConfig {
     kyc: {
         enabled: boolean;
         requiredForCategories: string[];
+    };
+    auditLogging: {
+        enabled: boolean;
+        retentionDays: number;
+        logLevel: 'minimal' | 'standard' | 'verbose';
+    };
+    runtimeIsolation: {
+        enabled: boolean;
+        networkMode: 'none' | 'bridge';
+        readOnlyRootfs: boolean;
+        dropAllCapabilities: boolean;
+        seccompProfile: boolean;
+        maxMemoryMB: number;
+        maxCpuPercent: number;
+        timeoutSeconds: number;
     };
 }
 
@@ -52,11 +70,12 @@ function parseCategoryByCountry(envVar: string | undefined): Record<string, stri
 
 /**
  * Load compliance configuration from environment
+ * ALL TOGGLES DEFAULT TO FALSE (compliance-capable, not enforcing)
  */
 export function loadComplianceConfig(): ComplianceConfig {
     return {
         geofence: {
-            // Enable geofencing (default: false for dev, true for prod)
+            // Enable geofencing (default: false)
             enabled: process.env.COMPLIANCE_GEOFENCE_ENABLED === 'true',
 
             // Blocked countries (ISO 3166-1 alpha-2 codes)
@@ -68,7 +87,7 @@ export function loadComplianceConfig(): ComplianceConfig {
         },
 
         agentRestrictions: {
-            // Enable category restrictions (default: false for dev)
+            // Enable category restrictions (default: false)
             enabled: process.env.COMPLIANCE_AGENT_RESTRICTIONS_ENABLED === 'true',
 
             // Globally blocked categories
@@ -77,14 +96,13 @@ export function loadComplianceConfig(): ComplianceConfig {
             ),
 
             // Country-specific category restrictions
-            // Example: US blocks trading agents with certain risk levels
             categoryByCountry: parseCategoryByCountry(
                 process.env.COMPLIANCE_CATEGORY_BY_COUNTRY || ''
             )
         },
 
         kyc: {
-            // Enable KYC requirements (default: false for dev)
+            // Enable KYC requirements (default: false)
             enabled: process.env.COMPLIANCE_KYC_ENABLED === 'true',
 
             // Categories that require KYC verification
@@ -92,6 +110,40 @@ export function loadComplianceConfig(): ComplianceConfig {
                 process.env.COMPLIANCE_KYC_REQUIRED_CATEGORIES ||
                 'trading,financial,high-risk'
             )
+        },
+
+        auditLogging: {
+            // Enable audit logging (default: false)
+            enabled: process.env.COMPLIANCE_AUDIT_LOGGING_ENABLED === 'true',
+
+            // Log retention period in days
+            retentionDays: parseInt(process.env.COMPLIANCE_AUDIT_RETENTION_DAYS || '90', 10),
+
+            // Log detail level
+            logLevel: (process.env.COMPLIANCE_AUDIT_LOG_LEVEL as 'minimal' | 'standard' | 'verbose') || 'standard'
+        },
+
+        runtimeIsolation: {
+            // Enable runtime isolation (default: false)
+            // When false, Docker containers run with relaxed settings for development
+            enabled: process.env.COMPLIANCE_RUNTIME_ISOLATION_ENABLED === 'true',
+
+            // Network mode: 'none' for full isolation, 'bridge' for development
+            networkMode: (process.env.COMPLIANCE_RUNTIME_NETWORK_MODE as 'none' | 'bridge') || 'none',
+
+            // Read-only root filesystem
+            readOnlyRootfs: process.env.COMPLIANCE_RUNTIME_READONLY_ROOTFS !== 'false',
+
+            // Drop all Linux capabilities
+            dropAllCapabilities: process.env.COMPLIANCE_RUNTIME_DROP_CAPS !== 'false',
+
+            // Use seccomp profile for syscall filtering
+            seccompProfile: process.env.COMPLIANCE_RUNTIME_SECCOMP !== 'false',
+
+            // Resource limits
+            maxMemoryMB: parseInt(process.env.COMPLIANCE_RUNTIME_MAX_MEMORY_MB || '512', 10),
+            maxCpuPercent: parseInt(process.env.COMPLIANCE_RUNTIME_MAX_CPU_PERCENT || '50', 10),
+            timeoutSeconds: parseInt(process.env.COMPLIANCE_RUNTIME_TIMEOUT_SECONDS || '300', 10)
         }
     };
 }
@@ -110,4 +162,54 @@ export function refreshComplianceConfig(): ComplianceConfig {
     complianceConfig = loadComplianceConfig();
     console.log('[COMPLIANCE] Configuration refreshed');
     return complianceConfig;
+}
+
+/**
+ * Get current compliance status for all features
+ * Used by the /api/compliance/status endpoint
+ */
+export function getComplianceStatus(): {
+    timestamp: string;
+    features: {
+        geofence: { enabled: boolean; blockedCountries: number };
+        kyc: { enabled: boolean; requiredCategories: number };
+        agentRestrictions: { enabled: boolean; blockedCategories: number };
+        auditLogging: { enabled: boolean; retentionDays: number; logLevel: string };
+        runtimeIsolation: { enabled: boolean; networkMode: string; seccompProfile: boolean };
+    };
+    allEnabled: boolean;
+} {
+    const config = complianceConfig;
+    return {
+        timestamp: new Date().toISOString(),
+        features: {
+            geofence: {
+                enabled: config.geofence.enabled,
+                blockedCountries: config.geofence.blockedCountries.length
+            },
+            kyc: {
+                enabled: config.kyc.enabled,
+                requiredCategories: config.kyc.requiredForCategories.length
+            },
+            agentRestrictions: {
+                enabled: config.agentRestrictions.enabled,
+                blockedCategories: config.agentRestrictions.blockedCategories.length
+            },
+            auditLogging: {
+                enabled: config.auditLogging.enabled,
+                retentionDays: config.auditLogging.retentionDays,
+                logLevel: config.auditLogging.logLevel
+            },
+            runtimeIsolation: {
+                enabled: config.runtimeIsolation.enabled,
+                networkMode: config.runtimeIsolation.networkMode,
+                seccompProfile: config.runtimeIsolation.seccompProfile
+            }
+        },
+        allEnabled: config.geofence.enabled &&
+            config.kyc.enabled &&
+            config.agentRestrictions.enabled &&
+            config.auditLogging.enabled &&
+            config.runtimeIsolation.enabled
+    };
 }
