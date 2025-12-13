@@ -7,7 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.ts",
     "test": "jest",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint . --ext .ts --no-error-on-unmatched-pattern"
   },
   "dependencies": {
     "dockerode": "^4.0.2",
