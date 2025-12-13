@@ -13,6 +13,33 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
+const pluginRegistry: Record<string, unknown> = {
+    "@elizaos/plugin-evm": evmPlugin,
+    "@elizaos/plugin-solana": solanaPlugin,
+    "@elizaos/plugin-twitter": TwitterPlugin,
+    "@elizaos/plugin-discord": discordPlugin,
+};
+
+const resolvePlugins = (character: Character): any[] => {
+    const requestedPlugins = new Set(character.plugins ?? []);
+
+    if (process.env.TWITTER_USERNAME) {
+        requestedPlugins.add("@elizaos/plugin-twitter");
+    }
+
+    if (process.env.DISCORD_API_TOKEN) {
+        requestedPlugins.add("@elizaos/plugin-discord");
+    }
+
+    return Array.from(requestedPlugins).map((name) => {
+        const plugin = pluginRegistry[name];
+        if (!plugin) {
+            console.warn(`Plugin ${name} is not installed for this mock agent.`);
+        }
+        return plugin;
+    }).filter(Boolean) as any[];
+};
+
 async function main() {
     console.log("Starting NexusGrowth (ELIZAOS Pilot)...");
 
@@ -42,15 +69,7 @@ async function main() {
     // Initialize Runtime
     const runtime = new AgentRuntime({
         character,
-        plugins: [
-            // Initialize plugins if they have required config
-            process.env.TWITTER_USERNAME ? TwitterPlugin : null,
-            process.env.DISCORD_API_TOKEN ? discordPlugin : null,
-            // Multi-chain plugins
-            // In a real app, we'd check character.plugins or settings
-            character.plugins?.includes("@elizaos/plugin-solana") ? solanaPlugin : null,
-            character.plugins?.includes("@elizaos/plugin-evm") ? evmPlugin : null,
-        ].filter(Boolean) as any[],
+        plugins: resolvePlugins(character),
         // Simple in-memory database for pilot
         adapter: {} as any,
     });
