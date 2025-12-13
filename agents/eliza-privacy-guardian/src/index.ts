@@ -8,6 +8,20 @@ import solanaPlugin from "@elizaos/plugin-solana";
 
 dotenv.config();
 
+const pluginRegistry: Record<string, unknown> = {
+    "@elizaos/plugin-evm": evmPlugin,
+    "@elizaos/plugin-solana": solanaPlugin,
+};
+
+const resolvePlugins = (character: Character): any[] =>
+    (character.plugins ?? []).map((name) => {
+        const plugin = pluginRegistry[name];
+        if (!plugin) {
+            console.warn(`Plugin ${name} is not installed for this mock agent.`);
+        }
+        return plugin;
+    }).filter(Boolean) as any[];
+
 async function main() {
     console.log("Starting Privacy Guardian (ELIZAOS)...");
 
@@ -31,10 +45,7 @@ async function main() {
     // Initialize Runtime
     const runtime = new AgentRuntime({
         character,
-        plugins: [
-            evmPlugin,
-            solanaPlugin
-        ].filter(Boolean) as any[],
+        plugins: resolvePlugins(character),
         adapter: {} as any,
     });
 
