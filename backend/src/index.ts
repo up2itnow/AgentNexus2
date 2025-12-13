@@ -65,17 +65,25 @@ import builderRouter from './routes/builder';
 import agentZeroRouter from './routes/agentZero';
 import walletRouter from './routes/wallet';
 import socialRouter from './routes/social';
+import receiptsRouter from './routes/receipts';
+
+/**
+ * Import middleware
+ */
+import { complianceMiddleware } from './middleware/compliance';
 
 /**
  * Register API routes
+ * Compliance middleware applied to agent execution paths
  */
-app.use('/api/agents', agentsRouter);
-app.use('/api/executions', executionsRouter);
+app.use('/api/agents', complianceMiddleware, agentsRouter);
+app.use('/api/executions', complianceMiddleware, executionsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/builder', builderRouter);
-app.use('/api/agent-zero', agentZeroRouter);
+app.use('/api/agent-zero', complianceMiddleware, agentZeroRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/social', socialRouter);
+app.use('/api/receipts', receiptsRouter);
 
 /**
  * Health check endpoint
@@ -136,8 +144,7 @@ app.get('/health/ready', async (_req: Request, res: Response) => {
 /**
  * Prometheus metrics endpoint
  */
-let totalExecutions = 0;
-let totalRevenue = 0;
+let _totalRevenue = 0;     // Reserved for future revenue tracking
 let activeConnections = 0;
 
 app.get('/metrics', async (_req: Request, res: Response) => {
@@ -163,7 +170,7 @@ agentnexus_total_users ${userCount}
 
 # HELP agentnexus_total_revenue Total platform revenue
 # TYPE agentnexus_total_revenue counter
-agentnexus_total_revenue ${totalRevenue}
+agentnexus_total_revenue ${_totalRevenue}
 
 # HELP agentnexus_active_websocket_connections Active WebSocket connections
 # TYPE agentnexus_active_websocket_connections gauge

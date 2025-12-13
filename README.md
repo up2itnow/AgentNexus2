@@ -1,5 +1,9 @@
 # AgentNexus
 
+[![CI Suite](https://github.com/agentnexus/agentnexus/actions/workflows/ci.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/agentnexus/agentnexus/actions/workflows/codeql.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/codeql.yml)
+[![Security Scan](https://github.com/agentnexus/agentnexus/actions/workflows/security-scan.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/security-scan.yml)
+
 **Decentralized AI Agent Marketplace on Base L2**
 
 AgentNexus is a platform for discovering, purchasing, and executing autonomous AI agents. Built on Base, it leverages Account Abstraction (ERC-4337) to provide a seamless, secure, and non-custodial experience for users and agents alike.

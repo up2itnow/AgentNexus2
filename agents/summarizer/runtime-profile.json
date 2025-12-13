@@ -1,0 +1,38 @@
+{
+    "id": "summarizer",
+    "name": "Summarizer Agent",
+    "version": "1.0.0",
+    "description": "Sprint 1 reference agent for text summarization",
+    "type": "utility",
+    "deterministic": true,
+    "runtime": {
+        "cpu": "0.25",
+        "memory": "256m",
+        "timeout": 15,
+        "network": false,
+        "readonly_rootfs": true,
+        "no_new_privileges": true
+    },
+    "security": {
+        "sandbox": "strict",
+        "capabilities_drop": [
+            "ALL"
+        ],
+        "seccomp_profile": "default"
+    },
+    "pricing": {
+        "base_fee_usdc": "0.01",
+        "per_request": true
+    },
+    "metadata": {
+        "author": "AgentNexus Team",
+        "license": "MIT",
+        "category": "text-processing",
+        "tags": [
+            "summarization",
+            "text",
+            "utility",
+            "demo"
+        ]
+    }
+}
