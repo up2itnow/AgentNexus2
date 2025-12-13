@@ -71,6 +71,7 @@ import receiptsRouter from './routes/receipts';
  * Import middleware
  */
 import { complianceMiddleware } from './middleware/compliance';
+import { getComplianceStatus } from './config/compliance';
 
 /**
  * Register API routes
@@ -192,6 +193,19 @@ agentnexus_uptime_seconds ${process.uptime()}
 });
 
 /**
+ * Compliance status endpoint
+ * Returns current state of all compliance toggles
+ */
+app.get('/api/compliance/status', (_req: Request, res: Response) => {
+  const status = getComplianceStatus();
+  res.json({
+    success: true,
+    message: 'Compliance-capable infrastructure. All toggles configurable via environment variables.',
+    ...status
+  });
+});
+
+/**
  * Root endpoint
  */
 app.get('/', (_req: Request, res: Response) => {
@@ -201,6 +215,7 @@ app.get('/', (_req: Request, res: Response) => {
     description: 'Decentralized AI Agent Marketplace on Base L2',
     endpoints: {
       health: '/health',
+      compliance: '/api/compliance/status',
       agents: '/api/agents',
       purchases: '/api/purchases',
       executions: '/api/executions',
