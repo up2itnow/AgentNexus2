@@ -1,0 +1,55 @@
+{
+    "id": "paper-trader",
+    "name": "Paper Trader Agent",
+    "version": "1.0.0",
+    "description": "Sprint 3 trading agent with paper/live toggle and A2A capability",
+    "type": "trading",
+    "deterministic": true,
+    "modes": {
+        "paper": {
+            "network": false,
+            "description": "Simulated trading with deterministic prices"
+        },
+        "live": {
+            "network": true,
+            "description": "Real trading with external APIs (not enabled)"
+        }
+    },
+    "a2a": {
+        "enabled": true,
+        "calls": [
+            "summarizer"
+        ],
+        "description": "Calls Summarizer agent for market analysis"
+    },
+    "runtime": {
+        "cpu": "0.5",
+        "memory": "256m",
+        "timeout": 30,
+        "network": false,
+        "readonly_rootfs": true,
+        "no_new_privileges": true
+    },
+    "security": {
+        "sandbox": "strict",
+        "capabilities_drop": [
+            "ALL"
+        ],
+        "seccomp_profile": "default"
+    },
+    "pricing": {
+        "base_fee_usdc": "0.05",
+        "per_trade": true
+    },
+    "metadata": {
+        "author": "AgentNexus Team",
+        "license": "MIT",
+        "category": "trading",
+        "tags": [
+            "trading",
+            "paper",
+            "a2a",
+            "composable"
+        ]
+    }
+}
