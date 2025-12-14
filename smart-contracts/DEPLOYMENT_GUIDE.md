@@ -74,7 +74,9 @@ forge verify-contract \
 
 ## ⚙️ Post-Deployment Configuration
 
-### 1. Grant Roles to Backend
+### Post-deploy (Base Sepolia)
+
+#### 1. Grant Roles to Backend
 
 ```bash
 # Using cast (Foundry tool)
@@ -94,7 +96,7 @@ cast send ENTITLEMENTS_ADDRESS \
   --private-key $PRIVATE_KEY
 ```
 
-### 2. Register Initial Agents
+#### 2. Register Initial Agents
 
 ```bash
 # Register an agent (ID, developer address)
@@ -106,7 +108,53 @@ cast send ESCROW_ADDRESS \
   --private-key $PRIVATE_KEY
 ```
 
-### 3. Add Supported Tokens
+#### 3. Add Supported Tokens
+
+```bash
+# Add a test token
+cast send ESCROW_ADDRESS \
+  "setSupportedToken(address,bool)" \
+  TESTNET_TOKEN_ADDRESS \
+  true \
+  --rpc-url base-sepolia \
+  --private-key $PRIVATE_KEY
+```
+
+### Post-deploy (Base Mainnet)
+
+#### 1. Grant Roles to Backend
+
+```bash
+# Using cast (Foundry tool)
+cast send ESCROW_ADDRESS \
+  "grantRole(bytes32,address)" \
+  $(cast keccak "ORCHESTRATOR_ROLE()") \
+  BACKEND_ADDRESS \
+  --rpc-url base \
+  --private-key $PRIVATE_KEY
+
+# Grant MINTER_ROLE for Entitlements
+cast send ENTITLEMENTS_ADDRESS \
+  "grantRole(bytes32,address)" \
+  $(cast keccak "MINTER_ROLE()") \
+  BACKEND_ADDRESS \
+  --rpc-url base \
+  --private-key $PRIVATE_KEY
+```
+
+#### 2. Register Initial Agents
+
+```bash
+# Register an agent (ID, developer address)
+cast send ESCROW_ADDRESS \
+  "registerAgent(uint256,address)" \
+  1 \
+  DEVELOPER_WALLET \
+  --rpc-url base \
+  --private-key $PRIVATE_KEY
+```
+
+#### 3. Add Supported Tokens
 
 ```bash
 # Add USDC
@@ -120,7 +168,7 @@ cast send ESCROW_ADDRESS \
 
 ## 🔍 Verification
 
-### Verify Deployment
+### Post-deploy (Base Sepolia)
 
 ```bash
 # Check Escrow configuration
@@ -129,6 +177,17 @@ cast call ESCROW_ADDRESS "platformFeePercentage()" --rpc-url base-sepolia
 
 # Check Entitlements
 cast call ENTITLEMENTS_ADDRESS "baseURI()" --rpc-url base-sepolia
+```
+
+### Post-deploy (Base Mainnet)
+
+```bash
+# Check Escrow configuration
+cast call ESCROW_ADDRESS "platformFeeRecipient()" --rpc-url base
+cast call ESCROW_ADDRESS "platformFeePercentage()" --rpc-url base
+
+# Check Entitlements
+cast call ENTITLEMENTS_ADDRESS "baseURI()" --rpc-url base
 ```
 
 ### Run Tests Against Deployed Contracts
