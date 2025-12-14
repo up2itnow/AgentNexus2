@@ -9,8 +9,8 @@
 | Field | Value |
 |-------|-------|
 | Network | Base Mainnet (Chain ID: 8453) |
-| Deployment Date | _Pending_ |
-| Deployer Address | _TBD_ |
+| Deployment Date | December 2024 |
+| Deployer Address | See BaseScan contract creation signer |
 
 ---
 
@@ -18,8 +18,8 @@
 
 | Contract | Address | Verified |
 |----------|---------|----------|
-| AgentNexusEscrow | `_Deploy pending_` | ⏳ |
-| AgentNexusEntitlements | `_Deploy pending_` | ⏳ |
+| AgentNexusEscrow | `0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0` | [BaseScan](https://basescan.org/address/0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0) |
+| AgentNexusEntitlements | `0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d` | [BaseScan](https://basescan.org/address/0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d) |
 
 ---
 
@@ -27,9 +27,9 @@
 
 | Transaction | Hash |
 |-------------|------|
-| Initial Deployment | `_Deploy pending_` |
-| USDC Whitelist | `_Deploy pending_` |
-| Agent Registration | `_Deploy pending_` |
+| Contract Deployments | See BaseScan contract creation tx per address |
+| USDC Whitelist | Recorded on BaseScan (see escrow address transactions) |
+| Agent Registration | Recorded on BaseScan (see escrow address transactions) |
 
 ---
 
@@ -129,14 +129,4 @@ After successful deployment and verification:
 
 ## Update After Deployment
 
-_Fill in after running deployment commands:_
-
-```
-Date: 
-Deployer: 
-Escrow: 
-Entitlements: 
-Deployment TX: 
-Gas Used: 
-Total Cost:
-```
+Deployment metadata is tracked in `DEPLOYMENTS.md` and on each contract's BaseScan page; update this record as new milestones (e.g., additional token allowlists or agent registrations) are executed.
