@@ -129,7 +129,8 @@ Agent Zero is an open-source autonomous AI agent framework that can:
 ### Step 1: Clone Repository
 
 ```bash
-cd /Users/billwilson_home/Desktop/AgentNexus-V1
+# From your workspace root
+cd /path/to/AgentNexus2
 ```
 
 ### Step 2: Install Dependencies
