@@ -434,7 +434,7 @@ Total Test Suites:  All passing ✅
 
 ### Reporting
 
-**Email:** security@agentnexus.io (fictional)  
+**Report via:** [GitHub Security Advisories](https://github.com/up2itnow/AgentNexus2/security/advisories/new)  
 **Response Time:** 24 hours  
 **Severity Levels:** Critical, High, Medium, Low
 
@@ -489,7 +489,7 @@ Total Test Suites:  All passing ✅
 
 ## 📞 Contact
 
-**Security Team:** security@agentnexus.io (fictional)  
+**Security Reports:** [GitHub Security Advisories](https://github.com/up2itnow/AgentNexus2/security/advisories/new)  
 **Bug Bounty:** Coming soon  
 **Documentation:** This file + `agent-runtime/security/README.md`
 

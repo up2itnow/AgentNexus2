@@ -60,3 +60,5 @@ temp/
 *.tmp
 
 smart-contracts/.env
+smart-contracts/env/*.save
+*.save
