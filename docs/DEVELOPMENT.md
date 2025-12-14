@@ -17,8 +17,8 @@ Before you begin, ensure you have the following installed:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/up2itnow/AgentNexus2.git
-cd AgentNexus2
+git clone https://github.com/up2itnow/AgentNexus2.git AgentNexus
+cd AgentNexus
 ```
 
 ### Project Structure
