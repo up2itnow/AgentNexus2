@@ -68,7 +68,7 @@ PRIVATE_KEY=your_private_key
 ```bash
 BASE_RPC_URL=https://mainnet.base.org
 BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
-BASESCAN_API_KEY=your_basescan_key
+ETHERSCAN_API_KEY=your_etherscan_key  # BASESCAN_API_KEY is still accepted as an alias
 PRIVATE_KEY=your_private_key
 ```
 

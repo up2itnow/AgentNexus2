@@ -32,9 +32,9 @@ ethereum = "${ETHEREUM_RPC_URL}"
 ethereum_sepolia = "${ETHEREUM_SEPOLIA_RPC_URL}"
 
 [etherscan]
-# Base
-base = { key = "${BASESCAN_API_KEY}" }
-base_sepolia = { key = "${BASESCAN_API_KEY}" }
+# Base (uses ETHERSCAN_API_KEY; BASESCAN_API_KEY is kept as an alias in docs/scripts)
+base = { key = "${ETHERSCAN_API_KEY}" }
+base_sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 # Tier 1 L2s
 arbitrum = { key = "${ARBISCAN_API_KEY}" }

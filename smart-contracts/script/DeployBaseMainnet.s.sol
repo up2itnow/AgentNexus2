@@ -13,7 +13,7 @@ import "../src/AgentNexusEntitlements.sol";
  * PREREQUISITES:
  * 1. Set PRIVATE_KEY in .env.base-mainnet (funded with ~0.01 ETH)
  * 2. Set BASE_RPC_URL (Alchemy recommended)
- * 3. Set BASESCAN_API_KEY for verification
+ * 3. Set ETHERSCAN_API_KEY for verification (BASESCAN_API_KEY is supported as an alias)
  * 4. Set PLATFORM_FEE_RECIPIENT (treasury address)
  * 
  * GRANT LANGUAGE UNLOCKED:

@@ -64,7 +64,7 @@ cp .env.base-mainnet.example .env
 # Edit .env with your values
 # - PRIVATE_KEY
 # - BASE_RPC_URL
-# - BASESCAN_API_KEY
+# - ETHERSCAN_API_KEY (BASESCAN_API_KEY also supported)
 # - PLATFORM_FEE_RECIPIENT
 
 # Deploy to Base mainnet

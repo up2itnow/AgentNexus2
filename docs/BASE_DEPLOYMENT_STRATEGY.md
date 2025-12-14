@@ -127,8 +127,8 @@ base = "${BASE_RPC_URL}"
 base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
 
 [etherscan]
-base = { key = "${BASESCAN_API_KEY}" }
-base_sepolia = { key = "${BASESCAN_API_KEY}" }
+base = { key = "${ETHERSCAN_API_KEY}" } # BASESCAN_API_KEY remains a supported alias
+base_sepolia = { key = "${ETHERSCAN_API_KEY}" } # BASESCAN_API_KEY remains a supported alias
 ```
 
 ### Deployment Commands
@@ -139,7 +139,7 @@ forge script script/Deploy.s.sol \
   --rpc-url base_sepolia \
   --broadcast \
   --verify \
-  --etherscan-api-key $BASESCAN_API_KEY
+  --etherscan-api-key "${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}"
 ```
 
 **Deploy to Base Mainnet**:
@@ -148,7 +148,7 @@ forge script script/Deploy.s.sol \
   --rpc-url base \
   --broadcast \
   --verify \
-  --etherscan-api-key $BASESCAN_API_KEY
+  --etherscan-api-key ${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}
 ```
 
 ### Contract Verification
@@ -159,7 +159,7 @@ forge verify-contract \
   --chain-id 8453 \
   --num-of-optimizations 200 \
   --watch \
-  --etherscan-api-key $BASESCAN_API_KEY \
+  --etherscan-api-key ${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY} \
   --compiler-version v0.8.28 \
   <CONTRACT_ADDRESS> \
   src/AgentNexusEscrow.sol:AgentNexusEscrow

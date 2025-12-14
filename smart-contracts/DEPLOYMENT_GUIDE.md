@@ -35,7 +35,7 @@ This guide covers deploying AgentNexus smart contracts to Base Sepolia (testnet)
    # Edit .env and add:
    PRIVATE_KEY=your_private_key_here
    BASE_SEPOLIA_RPC_URL=https://base-sepolia.g.alchemy.com/v2/YOUR_KEY
-   BASESCAN_API_KEY=your_basescan_key
+   ETHERSCAN_API_KEY=your_etherscan_key  # BASESCAN_API_KEY remains supported as an alias
    ```
 
 ### Deploy to Base Sepolia (Testnet)
@@ -48,7 +48,7 @@ forge script script/Deploy.s.sol:TestnetDeployScript \
   --rpc-url base-sepolia \
   --broadcast \
   --verify \
-  --etherscan-api-key $BASESCAN_API_KEY
+  --etherscan-api-key ${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}
 
 # Note the deployed contract addresses from output
 ```
@@ -62,14 +62,14 @@ forge script script/Deploy.s.sol:DeployScript \
   --rpc-url base \
   --broadcast \
   --verify \
-  --etherscan-api-key $BASESCAN_API_KEY
+  --etherscan-api-key ${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}
 
 # Verify on BaseScan
 forge verify-contract \
   CONTRACT_ADDRESS \
   src/AgentNexusEscrow.sol:AgentNexusEscrow \
   --chain-id 8453 \
-  --etherscan-api-key $BASESCAN_API_KEY
+  --etherscan-api-key ${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}
 ```
 
 ## ⚙️ Post-Deployment Configuration
