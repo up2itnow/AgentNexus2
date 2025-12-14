@@ -272,7 +272,4 @@ Examples:
 - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 - [Trivy Security Scanner](https://github.com/aquasecurity/trivy)
 
----
-
-*Built with ❤️ by AgentNexus Team*
 

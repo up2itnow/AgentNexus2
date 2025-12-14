@@ -299,8 +299,4 @@ If agents need additional syscalls (e.g., for specific libraries):
 3. Version control (track changes)
 4. Monitor for denied syscalls (audit logs)
 
----
-
-*Seccomp profile created with  Security Expert*  
-*AgentNexus Team - October 2025*
 

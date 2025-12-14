@@ -1,66 +1,66 @@
-## Foundry
+# AgentNexus Smart Contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Solidity contracts for the AgentNexus platform, built with Foundry.
 
-Foundry consists of:
+## Contracts
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+| Contract | Description |
+|----------|-------------|
+| `AgentNexusAccount` | ERC-4337 smart account for users |
+| `AgentRegistry` | On-chain agent registration and metadata |
+| `AgentNexusEscrow` | Payment escrow for agent purchases |
+| `AgentNexusEntitlements` | ERC-1155 access tokens |
 
-## Documentation
+## Setup
 
-https://book.getfoundry.sh/
-
-## Usage
+### Prerequisites
+- [Foundry](https://book.getfoundry.sh/getting-started/installation)
 
 ### Build
 
-```shell
-$ forge build
+```bash
+forge build
 ```
 
 ### Test
 
-```shell
-$ forge test
+```bash
+forge test
 ```
 
 ### Format
 
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
+```bash
+forge fmt
 ```
 
 ### Deploy
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```bash
+# Base Sepolia
+forge script script/Deploy.s.sol --rpc-url $BASE_SEPOLIA_RPC_URL --broadcast
+
+# Base Mainnet
+forge script script/Deploy.s.sol --rpc-url $BASE_MAINNET_RPC_URL --broadcast --verify
 ```
 
-### Cast
+## Environment Variables
 
-```shell
-$ cast <subcommand>
+Create a `.env` file:
+
+```bash
+BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
+BASE_MAINNET_RPC_URL=https://mainnet.base.org
+PRIVATE_KEY=0x...
+ETHERSCAN_API_KEY=...
 ```
 
-### Help
+## Documentation
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- [Foundry Book](https://book.getfoundry.sh/)
+- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts)
+- [ERC-4337 Spec](https://eips.ethereum.org/EIPS/eip-4337)
+
+## License
+
+MIT

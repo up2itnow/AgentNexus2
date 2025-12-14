@@ -553,8 +553,4 @@ artillery quick --count 10 --num 100 http://localhost:3001/health
 3. Test query in Prometheus UI
 4. Check dashboard time range
 
----
-
-*Monitoring system built with  Observability Expert*  
-*AgentNexus Team - October 2025*
 
