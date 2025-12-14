@@ -1,30 +1,43 @@
-# Contributing to AgentNexus
+# Contributing
 
-Thank you for your interest in contributing to AgentNexus! We are building the future of decentralized AI, and we need your help.
+This project is currently in an exploratory phase.
 
-## Code of Conduct
+## We Welcome
 
-Please read and follow our [Code of Conduct](./CODE_OF_CONDUCT.md). We expect all contributors to be respectful and professional.
+- Bug reports
+- Design feedback
+- Security observations
+- Documentation improvements
 
-## How to Contribute
+## We Are Not Currently Accepting
 
-1.  **Fork the repository**.
-2.  **Create a branch** for your feature or fix: `git checkout -b feature/amazing-feature`.
-3.  **Commit your changes**: `git commit -m 'Add amazing feature'`.
-4.  **Push to the branch**: `git push origin feature/amazing-feature`.
-5.  **Open a Pull Request**.
+- Large feature PRs
+- Behavioral changes
+- API redesigns
+- New integrations
+
+**Please open an issue before submitting a PR.**
+
+## Process
+
+1. Open an issue describing the problem or suggestion
+2. Wait for maintainer feedback before investing significant effort
+3. If approved, fork and create a branch
+4. Submit a PR referencing the issue
 
 ## Development Standards
 
--   **TypeScript**: We use strict TypeScript. Please ensure no `any` types unless absolutely necessary.
--   **Testing**: Write unit tests for new logic. Run `npm test` before submitting.
--   **Linting**: Ensure code passes `npm run lint`.
--   **Commits**: Use conventional commits (e.g., `feat: add new agent`, `fix: resolve login bug`).
-
-## Reporting Bugs
-
-Please open an issue on GitHub with a detailed description, reproduction steps, and screenshots if applicable.
+- **TypeScript**: Strict mode, avoid `any` types
+- **Testing**: Run `pnpm test` before submitting
+- **Linting**: Ensure code passes `pnpm lint`
+- **Commits**: Use conventional commits (`feat:`, `fix:`, `docs:`, etc.)
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability, please **DO NOT** open a public issue. Email us at security@agentnexus.io immediately.
+If you discover a security vulnerability, **DO NOT** open a public issue.
+
+Email: security@agentnexus.io
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the Apache 2.0 License.
