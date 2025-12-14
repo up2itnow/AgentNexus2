@@ -3,7 +3,8 @@
 # Update Frontend .env.local with Contract Addresses
 # Run this to add your deployed contracts to the frontend
 
-ENV_FILE="/Users/billwilson_home/Desktop/AgentNexus-V1/frontend/.env.local"
+PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+ENV_FILE="${ENV_FILE:-"${PROJECT_ROOT}/frontend/.env.local"}"
 
 echo "🔧 Updating frontend .env.local with contract addresses..."
 echo ""
