@@ -139,7 +139,7 @@ forge script script/Deploy.s.sol \
   --rpc-url base_sepolia \
   --broadcast \
   --verify \
-  --etherscan-api-key ${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}
+  --etherscan-api-key "${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}"
 ```
 
 **Deploy to Base Mainnet**:
