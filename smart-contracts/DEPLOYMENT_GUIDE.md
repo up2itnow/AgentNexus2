@@ -4,6 +4,8 @@
 
 This guide covers deploying AgentNexus smart contracts to Base Sepolia (testnet) and Base L2 (mainnet).
 
+> **Status:** Deployment steps are finalized. Items marked with ⏳ are deliberate pre-mainnet gates (e.g., audits) rather than TBD placeholders.
+
 ## 🔐 Contracts
 
 1. **AgentNexusEscrow** - Payment escrow with multi-token support

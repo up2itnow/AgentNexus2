@@ -5,19 +5,20 @@
 
 PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ENV_FILE="${ENV_FILE:-"${PROJECT_ROOT}/frontend/.env.local"}"
+REL_ENV_FILE=$(realpath --relative-to="$PROJECT_ROOT" "$ENV_FILE" 2>/dev/null || echo "$ENV_FILE")
 
 echo "🔧 Updating frontend .env.local with contract addresses..."
 echo ""
 
 # Check if file exists
 if [ ! -f "$ENV_FILE" ]; then
-    echo "❌ Error: .env.local not found at $ENV_FILE"
+    echo "❌ Error: .env.local not found at $REL_ENV_FILE"
     exit 1
 fi
 
 # Backup existing file
 cp "$ENV_FILE" "${ENV_FILE}.backup"
-echo "✅ Created backup: ${ENV_FILE}.backup"
+echo "✅ Created backup: ${REL_ENV_FILE}.backup"
 
 # Contract addresses from DEPLOYED_CONTRACTS.md
 ESCROW_ADDRESS="0x3c8f32F9cF41Dc255129d6Add447218053743b33"
@@ -43,7 +44,7 @@ echo "NEXT_PUBLIC_ENTITLEMENTS_CONTRACT=$ENTITLEMENTS_ADDRESS" >> "$ENV_FILE"
 echo "NEXT_PUBLIC_AGENT_REGISTRY_CONTRACT=$ENTITLEMENTS_ADDRESS" >> "$ENV_FILE"
 
 echo ""
-echo "✅ Updated $ENV_FILE with:"
+echo "✅ Updated $REL_ENV_FILE with:"
 echo "   - Chain ID: $CHAIN_ID (Base Sepolia)"
 echo "   - Base RPC: $BASE_RPC"
 echo "   - Escrow: $ESCROW_ADDRESS"

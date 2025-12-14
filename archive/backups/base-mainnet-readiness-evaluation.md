@@ -1,5 +1,7 @@
 # Base Mainnet Readiness Evaluation
 
+> **Archived NO-GO Notice:** This assessment reflects a historical no-go decision. It is kept for traceability only and should not be treated as current deployment guidance without a fresh review.
+
 ## Executive Summary
 The latest main branch includes Base-first network defaults, contract toolchain wiring, and frontend wallet flows aimed at Base. However, the current state is **not ready for Base mainnet launch** because the account abstraction path and payment identifiers remain placeholder implementations without production-grade security or determinism. Launch should be gated on closing these gaps.
 

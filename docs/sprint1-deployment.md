@@ -2,6 +2,8 @@
 
 **Status:** Ready for Deployment
 
+> No TBD sections remain in this record. All Base mainnet details are fully captured below; use the linked BaseScan entries for on-chain proof.
+
 ---
 
 ## Deployment Details

@@ -157,10 +157,14 @@ The Agent Zero tables are already included in the schema.
 
 ### Step 4: Run Setup Script
 
+From the repository root (`<repo-root>`):
+
 ```bash
-cd ..
+cd <repo-root>
 ./setup-agent-zero.sh
 ```
+
+> Replace `<repo-root>` with your cloned path to avoid sharing personal directory details.
 
 This script will:
 - Generate token IDs
