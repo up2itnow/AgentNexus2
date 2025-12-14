@@ -4,71 +4,95 @@
 [![CodeQL](https://github.com/agentnexus/agentnexus/actions/workflows/codeql.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/codeql.yml)
 [![Security Scan](https://github.com/agentnexus/agentnexus/actions/workflows/security-scan.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/security-scan.yml)
 
-**Decentralized AI Agent Marketplace on Base L2**
+## What This Is
 
-AgentNexus is a platform for discovering, purchasing, and executing autonomous AI agents. Built on Base, it leverages Account Abstraction (ERC-4337) to provide a seamless, secure, and non-custodial experience for users and agents alike.
+AgentNexus is a decentralized infrastructure platform for discovering, purchasing, and executing autonomous AI agents on Base L2. Built on Base, it leverages Account Abstraction (ERC-4337) to provide a seamless, secure, and non-custodial experience for users and agents alike.
 
-![AgentNexus Banner](https://agentnexus.io/banner.png)
+The platform consists of three layers: a Next.js frontend for user interaction and marketplace browsing, a Node.js/Express backend that orchestrates agent execution in isolated Docker environments, and Solidity smart contracts (Foundry) that manage ownership, payments, and access control. See [ARCHITECTURE.md](./ARCHITECTURE.md) for a deep dive.
 
-## 🚀 Features
+## What This Is NOT
 
--   **Decentralized Marketplace**: Buy and sell AI agent services using crypto.
--   **Secure Execution**: Agents run in isolated, keyless Docker environments with no access to user private keys.
--   **Smart Accounts**: Every user and agent interaction is secured by ERC-4337 smart accounts.
--   **Agent Zero**: Our flagship autonomous agent capable of complex multi-step tasks.
--   **Real-time Observability**: Live execution logs and detailed analytics for every agent run.
--   **Space Theme UI**: A premium, immersive interface designed for the future of AI.
+This project is **NOT**:
 
-## 🏗 Architecture
+- A consumer-facing AI app
+- A trading platform or financial product
+- A token launch or ICO
+- A permissionless agent marketplace (agents require registration)
+- A custodial wallet service (users control their own keys)
+- A no-code AI builder
 
-AgentNexus consists of three main layers:
+AgentNexus is **infrastructure software** intended for technically competent users who understand blockchain technology and smart contracts.
 
-1.  **Frontend**: Next.js + Tailwind CSS + RainbowKit. Handles user interaction, wallet connection, and marketplace browsing.
-2.  **Backend**: Node.js + Express + Docker. Orchestrates agent execution, manages off-chain data, and bridges the "Air Gap" between AI and Blockchain.
-3.  **Smart Contracts**: Solidity (Foundry). Manages ownership, payments, and access control via `AgentNexusAccount` and `AgentRegistry`.
+## Current Status
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for a deep dive.
+**Version**: 0.3.0 (Sprint 3 Complete)
 
-## 🛠 Setup
+**Deployment**: Live on Base Mainnet
+
+| Component | Status |
+|-----------|--------|
+| Smart Contracts (`AgentNexusAccount`, `AgentRegistry`) | ✅ Deployed to Base Mainnet |
+| Account Abstraction (ERC-4337) | ✅ Implemented |
+| Agent Execution Environment | ✅ Docker-based, sandboxed |
+| Compliance Toggles | ✅ Implemented (disabled by default) |
+| Frontend Marketplace | 🚧 In Development |
+
+## Security & Scope Notes
+
+### What Is Safe
+- **No Private Keys in Agents**: Agents run in ephemeral containers without wallet access
+- **Smart Contract Security**: Contracts use `ReentrancyGuard` and standard OpenZeppelin libraries
+- **Sandboxed Execution**: Docker containers are hardened with `seccomp` profiles and read-only filesystems
+- **Audit-Ready Logging**: Structured logging available (toggle-controlled)
+
+### What Is Experimental
+- **Compliance Features**: Geo/KYC toggles, agent category restrictions, and runtime isolation are implemented but disabled by default
+- **Agent Zero**: Our flagship autonomous agent is functional but under active development
+
+### What Is Out of Scope
+- Consumer protection mechanisms (this is B2B infrastructure)
+- Financial advice or trading guarantees
+- Key recovery services
+
+## Getting Started
+
+> **Note**: We only provide support for the setup described below. Custom configurations or deployment scenarios are your responsibility.
 
 ### Prerequisites
--   Node.js v20+
--   Docker (for agent execution)
--   Foundry (for smart contracts)
--   pnpm
+- Node.js v20+
+- Docker (for agent execution)
+- Foundry (for smart contracts)
+- pnpm
 
 ### Installation
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/agentnexus/agentnexus.git
-    cd agentnexus
-    ```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/agentnexus/agentnexus.git
+   cd agentnexus
+   ```
 
-2.  **Install dependencies**
-    ```bash
-    pnpm install
-    ```
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
 
-3.  **Environment Setup**
-    Copy `.env.example` to `.env` and fill in your API keys (Alchemy, WalletConnect, etc.).
+3. **Environment Setup**
+   Copy `.env.example` to `.env` and fill in your API keys (Alchemy, WalletConnect, etc.).
 
-4.  **Run Locally**
-    ```bash
-    pnpm dev
-    ```
+4. **Run Locally**
+   ```bash
+   pnpm dev
+   ```
 
-## 🔒 Security
+For smart contract deployment, see the `contracts/` directory README.
 
-Security is our top priority.
--   **No Private Keys in Agents**: Agents run in ephemeral containers without wallet access.
--   **Smart Contract Audited**: Contracts use `ReentrancyGuard` and standard OpenZeppelin libraries.
--   **Sandboxed Execution**: Docker containers are hardened with `seccomp` profiles and read-only filesystems.
+---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-## 📄 License
+## License
 
 MIT
