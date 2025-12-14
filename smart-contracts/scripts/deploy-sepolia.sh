@@ -50,7 +50,7 @@ if [ -z "$BASE_SEPOLIA_RPC" ]; then
     BASE_SEPOLIA_RPC="https://sepolia.base.org"
 fi
 
-ETHERSCAN_KEY=${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}
+ETHERSCAN_KEY="${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}"
 if [ -z "$ETHERSCAN_KEY" ]; then
     echo -e "${YELLOW}⚠ Warning: ETHERSCAN_API_KEY/BASESCAN_API_KEY not set; using dummy verification key${NC}"
 fi
