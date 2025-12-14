@@ -35,7 +35,7 @@ else
     echo "Please create a .env file with:"
     echo "  PRIVATE_KEY=your_private_key"
     echo "  BASE_SEPOLIA_RPC=https://sepolia.base.org"
-    echo "  BASESCAN_API_KEY=your_basescan_api_key"
+    echo "  ETHERSCAN_API_KEY=your_etherscan_api_key  # BASESCAN_API_KEY also supported"
     exit 1
 fi
 
@@ -48,6 +48,11 @@ fi
 if [ -z "$BASE_SEPOLIA_RPC" ]; then
     echo -e "${YELLOW}⚠ Warning: BASE_SEPOLIA_RPC not set, using default${NC}"
     BASE_SEPOLIA_RPC="https://sepolia.base.org"
+fi
+
+ETHERSCAN_KEY="${ETHERSCAN_API_KEY:-$BASESCAN_API_KEY}"
+if [ -z "$ETHERSCAN_KEY" ]; then
+    echo -e "${YELLOW}⚠ Warning: ETHERSCAN_API_KEY/BASESCAN_API_KEY not set; using dummy verification key${NC}"
 fi
 
 # Get deployer address
@@ -130,7 +135,7 @@ forge script script/Deploy.s.sol:TestnetDeployScript \
     --rpc-url $BASE_SEPOLIA_RPC \
     --broadcast \
     --verify \
-    --etherscan-api-key ${BASESCAN_API_KEY:-"dummy"} \
+    --etherscan-api-key "${ETHERSCAN_KEY:-dummy}" \
     -vvvv \
     2>&1 | tee deployment.log
 
