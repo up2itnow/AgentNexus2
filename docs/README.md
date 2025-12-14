@@ -63,4 +63,4 @@ pnpm prisma generate
 
 ## License
 
-MIT
+Apache 2.0

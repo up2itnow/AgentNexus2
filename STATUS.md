@@ -4,9 +4,11 @@ AgentNexus is live on Base mainnet as of December 2024.
 
 ## Current State
 
+**Version**: v0.1.0 (Base Mainnet Launch)
+
 The project is:
 - **Actively maintained**
-- **Early-stage** (v0.3.0)
+- **Early-stage**
 - **Infrastructure-focused**
 
 ## Not Production-Hardened For
@@ -25,10 +27,10 @@ Breaking changes will be documented in release notes when possible, but backward
 
 ## Deployment
 
-| Network | Status |
-|---------|--------|
-| Base Mainnet | ✅ Live |
-| Base Sepolia | ✅ Live (testnet) |
+| Network | Status | Details |
+|---------|--------|---------|
+| Base Mainnet | ✅ Live | See [DEPLOYMENTS.md](./DEPLOYMENTS.md) |
+| Base Sepolia | ✅ Live | Testnet |
 
 ## Roadmap
 

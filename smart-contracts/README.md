@@ -63,4 +63,4 @@ ETHERSCAN_API_KEY=...
 
 ## License
 
-MIT
+Apache 2.0

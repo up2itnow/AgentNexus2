@@ -1,8 +1,8 @@
 # AgentNexus
 
-[![CI Suite](https://github.com/agentnexus/agentnexus/actions/workflows/ci.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/agentnexus/agentnexus/actions/workflows/codeql.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/codeql.yml)
-[![Security Scan](https://github.com/agentnexus/agentnexus/actions/workflows/security-scan.yml/badge.svg)](https://github.com/agentnexus/agentnexus/actions/workflows/security-scan.yml)
+[![CI Suite](https://github.com/up2itnow/AgentNexus2/actions/workflows/ci.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml)
+[![Security Scan](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml)
 
 ## What This Is
 
@@ -25,13 +25,15 @@ AgentNexus is **infrastructure software** intended for technically competent use
 
 ## Current Status
 
-**Version**: 0.3.0 (Sprint 3 Complete)
+**Version**: v0.1.0 (Base Mainnet Launch)
 
-**Deployment**: Live on Base Mainnet
+**Deployment**: Live on Base Mainnet (December 2024)
+
+See [STATUS.md](./STATUS.md) for detailed project status and [DEPLOYMENTS.md](./DEPLOYMENTS.md) for contract addresses.
 
 | Component | Status |
 |-----------|--------|
-| Smart Contracts (`AgentNexusAccount`, `AgentRegistry`) | ✅ Deployed to Base Mainnet |
+| Smart Contracts (`AgentNexusEscrow`, `AgentNexusEntitlements`) | ✅ Deployed to Base Mainnet |
 | Account Abstraction (ERC-4337) | ✅ Implemented |
 | Agent Execution Environment | ✅ Docker-based, sandboxed |
 | Compliance Toggles | ✅ Implemented (disabled by default) |
@@ -68,8 +70,8 @@ AgentNexus is **infrastructure software** intended for technically competent use
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/agentnexus/agentnexus.git
-   cd agentnexus
+   git clone https://github.com/up2itnow/AgentNexus2.git
+   cd AgentNexus2
    ```
 
 2. **Install dependencies**
@@ -85,7 +87,7 @@ AgentNexus is **infrastructure software** intended for technically competent use
    pnpm dev
    ```
 
-For smart contract deployment, see the `contracts/` directory README.
+For smart contract deployment, see the `smart-contracts/` directory README.
 
 ---
 

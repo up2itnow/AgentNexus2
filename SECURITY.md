@@ -1,10 +1,21 @@
-# 🔒 AgentNexus Security Documentation
+# Security Policy
 
-**Comprehensive security hardening for decentralized AI agent execution**
+## Reporting a Vulnerability
+
+**DO NOT** open a public GitHub issue for security vulnerabilities.
+
+**Email**: security@agentnexus.io  
+**Response Time**: 24 hours  
+
+Please include:
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Any suggested fixes
 
 ---
 
-## 🛡️ Security Overview
+## Security Overview
 
 AgentNexus implements **defense-in-depth** security with multiple layers of protection. We take security seriously and follow industry best practices for containerized application security.
 
