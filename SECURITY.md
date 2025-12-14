@@ -4,8 +4,10 @@
 
 **DO NOT** open a public GitHub issue for security vulnerabilities.
 
-**Email**: security@agentnexus.io  
-**Response Time**: 24 hours  
+**Report via GitHub Security Advisories**:
+https://github.com/AgentNexus/AgentNexus2/security/advisories/new
+
+**Response Time**: 24 hours
 
 Please include:
 - Description of the vulnerability

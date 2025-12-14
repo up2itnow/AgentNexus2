@@ -129,7 +129,8 @@ Agent Zero is an open-source autonomous AI agent framework that can:
 ### Step 1: Clone Repository
 
 ```bash
-cd /Users/billwilson_home/Desktop/AgentNexus-V1
+# After cloning, navigate into the repository directory
+cd <repository-name>
 ```
 
 ### Step 2: Install Dependencies
@@ -156,10 +157,14 @@ The Agent Zero tables are already included in the schema.
 
 ### Step 4: Run Setup Script
 
+From the repository root (`<repo-root>`):
+
 ```bash
-cd ..
+cd <repo-root>
 ./setup-agent-zero.sh
 ```
+
+> Replace `<repo-root>` with your cloned path to avoid sharing personal directory details.
 
 This script will:
 - Generate token IDs

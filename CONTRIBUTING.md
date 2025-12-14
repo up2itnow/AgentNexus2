@@ -36,7 +36,8 @@ This project is currently in an exploratory phase.
 
 If you discover a security vulnerability, **DO NOT** open a public issue.
 
-Email: security@agentnexus.io
+Report privately via GitHub Security Advisories:
+https://github.com/AgentNexus/AgentNexus2/security/advisories/new
 
 ## License
 
