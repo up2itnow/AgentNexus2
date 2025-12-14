@@ -4,9 +4,11 @@
  * 
  * Usage: pnpm ts-node scripts/aa-happy-path.ts
  * 
+ * ⚠️ DEMO ONLY: Use a disposable test key, never a wallet holding real funds.
+ * 
  * PREREQUISITES:
  * 1. Set ALCHEMY_API_KEY in .env
- * 2. Set PRIVATE_KEY in .env (funded account for signing)
+ * 2. Set PRIVATE_KEY in .env (use a TEST key only - never a funded wallet)
  * 3. Set ESCROW_ADDRESS and ENTITLEMENTS_ADDRESS after deployment
  * 4. Optional: Set PAYMASTER_POLICY_ID for gas sponsorship
  */
@@ -65,7 +67,7 @@ async function main() {
   // Step 1: Create smart wallet from "email"
   const demoEmail = 'demo@agentnexus.io';
   console.log(`1. Creating smart wallet for: ${demoEmail}`);
-  
+
   const { smartWallet, smartAccountAddress } = await createSmartWalletFromEmail(demoEmail);
   console.log(`   ✅ Smart wallet created: ${smartAccountAddress}`);
   console.log(`   ℹ️  No MetaMask required!\n`);
@@ -75,24 +77,24 @@ async function main() {
     chain: base,
     transport: http(`https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`)
   });
-  
+
   const balance = await publicClient.getBalance({ address: smartAccountAddress as Hex });
   console.log(`2. Wallet balance: ${formatEther(balance)} ETH`);
   console.log(`   ℹ️  Gas will be sponsored by paymaster\n`);
 
   // Step 3: Prepare escrow deposit (demo only - no actual tx without funds)
   console.log('3. Preparing sponsored transaction...');
-  
+
   const paymentId = keccak256(stringToBytes(`demo-${Date.now()}`));
   const agentId = 1n; // Summarizer agent
   const amount = 1000000n; // 1 USDC (6 decimals)
-  
+
   const depositCalldata = encodeFunctionData({
     abi: ESCROW_ABI,
     functionName: 'depositPayment',
     args: [paymentId, agentId, amount, BASE_USDC]
   });
-  
+
   console.log(`   Payment ID: ${paymentId.slice(0, 18)}...`);
   console.log(`   Agent ID: ${agentId} (Summarizer)`);
   console.log(`   Amount: 1 USDC`);
