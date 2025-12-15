@@ -5,7 +5,7 @@
 **DO NOT** open a public GitHub issue for security vulnerabilities.
 
 **Report via GitHub Security Advisories**:
-https://github.com/AgentNexus/AgentNexus2/security/advisories/new
+https://github.com/up2itnow/AgentNexus2/security/advisories/new
 
 **Response Time**: 24 hours
 

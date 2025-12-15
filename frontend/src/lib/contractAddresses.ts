@@ -21,8 +21,8 @@ export interface ChainContracts {
 export const CONTRACT_ADDRESSES: Record<number, ChainContracts> = {
     // Base Sepolia (Testnet) - Deployed Dec 10, 2025
     84532: {
-        entitlements: '0x5358AaD0a9dC39DFA95c4B0cC7e8D2b76c08E1c9' as Address,
-        escrow: '0xCbE3582d7A83C55d9C4a7C6f0C9c1e30cA6a71b5' as Address,
+        entitlements: '0x5358aac949f7e7b4b3920533badfabadbf16f5ce' as Address,
+        escrow: '0xcbe3580863d77f6e48ff9a66c04e7d7b7b009b20' as Address,
     },
     // Arbitrum Sepolia (Testnet)
     421614: {
