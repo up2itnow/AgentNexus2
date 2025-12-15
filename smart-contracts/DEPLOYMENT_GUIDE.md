@@ -213,8 +213,8 @@ forge test --gas-report
 
 | Contract | Address | Explorer |
 |----------|---------|----------|
-| AgentNexusEscrow | `0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0` | [BaseScan](https://basescan.org/address/0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0) |
-| AgentNexusEntitlements | `0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d` | [BaseScan](https://basescan.org/address/0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d) |
+| AgentNexusEscrow | `0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0` | [BaseScan](https://basescan.org/address/0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC) |
+| AgentNexusEntitlements | `0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d` | [BaseScan](https://basescan.org/address/0x3c8f32F9cF41Dc255129d6Add447218053743b33) |
 
 **Deployed**: December 2024
 
