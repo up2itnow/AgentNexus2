@@ -11,7 +11,7 @@
 | Field | Value |
 |-------|-------|
 | Network | Base Mainnet (Chain ID: 8453) |
-| Deployment Date | December 2024 |
+| Deployment Date | December 2025 |
 | Deployer Address | See BaseScan contract creation signer |
 
 ---

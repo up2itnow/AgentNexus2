@@ -71,7 +71,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
  * - Reputation-based fee discounts
  * 
  * @author AgentNexus Team ()
- * @custom:security-contact https://github.com/AgentNexus/AgentNexus2/security/advisories/new
+ * @custom:security-contact https://github.com/up2itnow/AgentNexus2/security/advisories/new
  */
 contract AgentNexusEscrow is ReentrancyGuard, AccessControl {
     using SafeERC20 for IERC20;
