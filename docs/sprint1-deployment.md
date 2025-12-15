@@ -132,3 +132,15 @@ After successful deployment and verification:
 ## Update After Deployment
 
 Deployment metadata is tracked in `DEPLOYMENTS.md` and on each contract's BaseScan page; update this record as new milestones (e.g., additional token allowlists or agent registrations) are executed.
+
+_Deployed on December 14, 2025:_
+
+```
+Date: December 14, 2025 03:09 UTC
+Deployer: 0x2413C0DE9CBdFB3eADA6D7d20fB0A953F85bcb41
+Escrow: 0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC
+Entitlements: 0x3c8f32F9cF41Dc255129d6Add447218053743b33
+Deployment TX: broadcast/DeployBaseMainnet.s.sol/8453/
+Gas Used: 3,749,939
+Total Cost: 0.0000012 ETH
+```

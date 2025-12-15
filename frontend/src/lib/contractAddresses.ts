@@ -24,10 +24,10 @@ export const CONTRACT_ADDRESSES: Record<number, ChainContracts> = {
         entitlements: '0x5358AaC949f7e7B4B3920533BADfABADBF16F5cE' as Address,
         escrow: '0xCbE3580863D77F6E48FF9A66c04e7D7B7b009B20' as Address,
     },
-    // Arbitrum Sepolia (Testnet) - Deployed Dec 10, 2025
+    // Arbitrum Sepolia (Testnet)
     421614: {
-        entitlements: '0x3c8f32F9cF41Dc255129d6Add447218053743b33' as Address,
-        escrow: '0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC' as Address,
+        entitlements: '0x0000000000000000000000000000000000000000' as Address,
+        escrow: '0x0000000000000000000000000000000000000000' as Address,
     },
     // Base Mainnet - Primary chain
     8453: {

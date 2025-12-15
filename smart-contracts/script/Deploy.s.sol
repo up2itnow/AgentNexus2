@@ -12,7 +12,6 @@ import "../src/AgentNexusEntitlements.sol";
  */
 contract DeployScript is Script {
     // Configuration
-    address public constant PLATFORM_FEE_RECIPIENT = 0x742d35cC6634c0532925A3b844bc9E7595F0beB1; // Replace with actual
     uint256 public constant PLATFORM_FEE_BPS = 250; // 2.5%
     string public constant BASE_URI = "https://api.agentnexus.io/metadata/";
     
@@ -20,6 +19,10 @@ contract DeployScript is Script {
         // Get deployer private key from environment
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(deployerPrivateKey);
+        
+        // Get fee recipient from environment
+        address platformFeeRecipient = vm.envAddress("PLATFORM_FEE_RECIPIENT");
+        require(platformFeeRecipient != address(0), "PLATFORM_FEE_RECIPIENT not set");
         
         console.log("Deploying contracts with address:", deployer);
         console.log("Deployer balance:", deployer.balance);
@@ -29,7 +32,7 @@ contract DeployScript is Script {
         // Deploy Escrow
         console.log("\n=== Deploying AgentNexusEscrow ===");
         AgentNexusEscrow escrow = new AgentNexusEscrow(
-            PLATFORM_FEE_RECIPIENT,
+            platformFeeRecipient,
             PLATFORM_FEE_BPS
         );
         console.log("AgentNexusEscrow deployed at:", address(escrow));
@@ -63,7 +66,7 @@ contract DeployScript is Script {
         console.log("AgentNexusEscrow:", address(escrow));
         console.log("AgentNexusEntitlements:", address(entitlements));
         console.log("Platform Fee:", PLATFORM_FEE_BPS, "bps (2.5%)");
-        console.log("Platform Fee Recipient:", PLATFORM_FEE_RECIPIENT);
+        console.log("Platform Fee Recipient:", platformFeeRecipient);
         console.log("\n=== Next Steps ===");
         console.log("1. Verify contracts on BaseScan");
         console.log("2. Grant ORCHESTRATOR_ROLE to backend");

@@ -216,8 +216,6 @@ forge test --gas-report
 | AgentNexusEscrow | `0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC` | [BaseScan](https://basescan.org/address/0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC) |
 | AgentNexusEntitlements | `0x3c8f32F9cF41Dc255129d6Add447218053743b33` | [BaseScan](https://basescan.org/address/0x3c8f32F9cF41Dc255129d6Add447218053743b33) |
 
-**Deployed**: December 2024
-
 ## 🛡️ Security Considerations
 
 ### Before Mainnet Deployment

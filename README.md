@@ -4,13 +4,21 @@
 [![CodeQL](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml)
 [![Security Scan](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml)
 
+> [!IMPORTANT]
+> **🟢 Live on Base Mainnet (December 2025)**
+> 
+> - **Escrow**: `0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC`
+> - **Entitlements**: `0x3c8f32F9cF41Dc255129d6Add447218053743b33`
+> 
+> See [DEPLOYMENTS.md](./DEPLOYMENTS.md) for full details.
+
 ## What This Is
 
 AgentNexus is a decentralized infrastructure platform for discovering, purchasing, and executing autonomous AI agents on Base L2. Built on Base, it leverages Account Abstraction (ERC-4337) to provide a seamless, secure, and non-custodial experience for users and agents alike.
 
 The platform consists of three layers: a Next.js frontend for user interaction and marketplace browsing, a Node.js/Express backend that orchestrates agent execution in isolated Docker environments, and Solidity smart contracts (Foundry) that manage ownership, payments, and access control. See [ARCHITECTURE.md](./ARCHITECTURE.md) for a deep dive.
 
-## What This Is NOT
+## 🚀 Features
 
 This project is **NOT**:
 
@@ -27,7 +35,7 @@ AgentNexus is **infrastructure software** intended for technically competent use
 
 **Version**: v0.1.0 (Base Mainnet Launch)
 
-**Deployment**: Live on Base Mainnet (December 2024)
+**Deployment**: Live on Base Mainnet (December 2025)
 
 See [STATUS.md](./STATUS.md) for detailed project status and [DEPLOYMENTS.md](./DEPLOYMENTS.md) for contract addresses.
 
@@ -68,11 +76,11 @@ See [STATUS.md](./STATUS.md) for detailed project status and [DEPLOYMENTS.md](./
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/up2itnow/AgentNexus2.git
-   cd AgentNexus2
-   ```
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/up2itnow/AgentNexus2.git
+    cd AgentNexus2
+    ```
 
 2. **Install dependencies**
    ```bash

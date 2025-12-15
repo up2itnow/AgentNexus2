@@ -3,6 +3,8 @@
         "8453": {
             "name": "Base",
             "status": "deployed",
+            "deployedAt": "2025-12-14",
+            "deployer": "0x2413C0DE9CBdFB3eADA6D7d20fB0A953F85bcb41",
             "contracts": {
                 "AgentNexusEntitlements": "0x3c8f32F9cF41Dc255129d6Add447218053743b33",
                 "AgentNexusEscrow": "0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC"
@@ -20,12 +22,10 @@
         },
         "421614": {
             "name": "Arbitrum Sepolia",
-            "status": "deployed",
-            "deployedAt": "2025-12-10",
-            "deployer": "0x2413C0DE9CBdFB3eADA6D7d20fB0A953F85bcb41",
+            "status": "not_deployed",
             "contracts": {
-                "AgentNexusEntitlements": "0x3c8f32F9cF41Dc255129d6Add447218053743b33",
-                "AgentNexusEscrow": "0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC"
+                "AgentNexusEntitlements": null,
+                "AgentNexusEscrow": null
             }
         },
         "42161": {
