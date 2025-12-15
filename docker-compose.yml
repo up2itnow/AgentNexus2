@@ -49,7 +49,7 @@ services:
       DATABASE_URL: postgresql://agentnexus:${DB_PASSWORD:-devpassword}@agentnexus-postgres:5432/agentnexus
       REDIS_URL: redis://agentnexus-redis:6379
       PORT: 3001
-      # Smart Contract Addresses (Base Sepolia)
+      # Smart Contract Addresses (Base mainnet)
       ESCROW_CONTRACT_ADDRESS: "0x37A7B1f10b87f31ad916Fb3518118f8AA0d8d2fC"
       ENTITLEMENTS_CONTRACT_ADDRESS: "0x3c8f32F9cF41Dc255129d6Add447218053743b33"
       # Docker connection for agent execution
