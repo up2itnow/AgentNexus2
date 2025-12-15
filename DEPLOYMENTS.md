@@ -17,8 +17,8 @@ This document serves as the canonical source of truth for all AgentNexus smart c
 
 | Contract | Address | Explorer |
 |----------|---------|----------|
-| **AgentNexusEscrow** | `0xCbE3580863D77F6E48FF9A66c04e7D7B7b009B20` | [BaseScan](https://sepolia.basescan.org/address/0xCbE3580863D77F6E48FF9A66c04e7D7B7b009B20) |
-| **AgentNexusEntitlements** | `0x5358AaC949f7e7B4B3920533BADfABADBF16F5cE` | [BaseScan](https://sepolia.basescan.org/address/0x5358AaC949f7e7B4B3920533BADfABADBF16F5cE) |
+| AgentNexusEscrow | `0xCbE3582d7A83C55d9C4a7C6f0C9c1e30cA6a71b5` | [BaseScan](https://sepolia.basescan.org/address/0xCbE3582d7A83C55d9C4a7C6f0C9c1e30cA6a71b5) |
+| AgentNexusEntitlements | `0x5358AaD0a9dC39DFA95c4B0cC7e8D2b76c08E1c9` | [BaseScan](https://sepolia.basescan.org/address/0x5358AaD0a9dC39DFA95c4B0cC7e8D2b76c08E1c9) |
 
 - **Chain ID**: 84532
 

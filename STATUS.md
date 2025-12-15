@@ -1,6 +1,6 @@
 # Project Status
 
-AgentNexus is live on Base mainnet as of December 2024.
+AgentNexus is live on Base mainnet as of December 2025.
 
 ## Current State
 

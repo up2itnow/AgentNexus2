@@ -16,8 +16,8 @@
             "deployedAt": "2025-12-10",
             "deployer": "0x2413C0DE9CBdFB3eADA6D7d20fB0A953F85bcb41",
             "contracts": {
-                "AgentNexusEntitlements": "0x1662AeCE70441B8482e09f04D3Ef3954a8E26C0d",
-                "AgentNexusEscrow": "0x14F12c3F36DD6Fa860E21f7D51f696231057A8a0"
+                "AgentNexusEntitlements": "0x5358AaD0a9dC39DFA95c4B0cC7e8D2b76c08E1c9",
+                "AgentNexusEscrow": "0xCbE3582d7A83C55d9C4a7C6f0C9c1e30cA6a71b5"
             }
         },
         "421614": {
