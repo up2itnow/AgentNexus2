@@ -1,0 +1,47 @@
+{
+  "success": true,
+  "testWallet": {
+    "address": "0x4C3aB2D507F97f4A9E2da613F5406e09849c75E1",
+    "privateKey": "REDACTED"
+  },
+  "recipientWallet": {
+    "address": "0x643AcD2bc6293fb471E7D9fb150B76c901a4c062",
+    "privateKey": "REDACTED"
+  },
+  "paymentFlow": {
+    "initialRequestStatus": 402,
+    "paymentRequired": {
+      "amount": "50000",
+      "amountUsdc": "0.05",
+      "recipient": "0x643AcD2bc6293fb471E7D9fb150B76c901a4c062",
+      "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+      "tokenSymbol": "USDC",
+      "chainId": "eip155:84532",
+      "chainName": "Base Sepolia",
+      "reference": "x402-test-1766021184735",
+      "expiresAt": 1766021484,
+      "facilitatorUrl": "https://x402.coinbase.com",
+      "description": "x402 testnet verification payment"
+    },
+    "paymentTxHash": "0x6c4907aa22407b02fab523ed6b01fc533b7288493481f8318c255c1930938783",
+    "paymentBlockNumber": 35126450,
+    "paymentStatus": "SUCCESS",
+    "retryRequestStatus": 200,
+    "finalResponse": {
+      "message": "Payment verified, access granted",
+      "transactionHash": "0x6c4907aa22407b02fab523ed6b01fc533b7288493481f8318c255c1930938783",
+      "blockNumber": "35126450"
+    }
+  },
+  "explorerUrl": "https://sepolia.basescan.org/tx/0x6c4907aa22407b02fab523ed6b01fc533b7288493481f8318c255c1930938783",
+  "timestamp": "2025-12-18T01:26:23.011Z",
+  "network": "base-sepolia",
+  "verifiedOnChain": true,
+  "grantArtifact": {
+    "type": "x402_payment_proof",
+    "description": "Proof of x402 internet-native payment protocol implementation",
+    "project": "AgentNexus2",
+    "protocol": "x402",
+    "facilitator": "Coinbase"
+  }
+}

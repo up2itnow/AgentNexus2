@@ -311,15 +311,16 @@ router.delete('/:id', authenticate, async (req: Request, res: Response) => {
 });
 
 // ============================================
-// x402 Premium Endpoints (Optional, disabled by default)
-// Requires ENABLE_X402=true in environment
+// x402 Premium Endpoints (Pay-per-request)
 // ============================================
 
 /**
  * GET /api/agents/:id/premium-analytics
- * Premium analytics data for an agent - requires x402 payment when enabled
+ * Premium analytics data for an agent - requires x402 payment
  * 
  * Price: 0.05 USDC per request
+ * 
+ * When x402 is disabled, returns 503 Service Unavailable
  */
 router.get(
   '/:id/premium-analytics',
@@ -393,6 +394,10 @@ router.get(
           date: e.createdAt,
         })),
         generatedAt: new Date().toISOString(),
+        x402Payment: {
+          priceUsdc: '0.05',
+          description: 'Premium analytics access',
+        },
       };
 
       return res.json(analytics);
@@ -408,7 +413,7 @@ router.get(
 
 /**
  * GET /api/agents/:id/detailed-metrics
- * Detailed performance metrics for an agent - requires x402 payment when enabled
+ * Detailed performance metrics for an agent - requires x402 payment
  * 
  * Price: 0.02 USDC per request
  */
@@ -478,6 +483,10 @@ router.get(
           version: agent.version,
         },
         generatedAt: new Date().toISOString(),
+        x402Payment: {
+          priceUsdc: '0.02',
+          description: 'Detailed performance metrics',
+        },
       };
 
       return res.json(metrics);
@@ -511,6 +520,7 @@ router.get('/x402/status', (_req: Request, res: Response) => {
       },
     ],
     network: process.env.X402_NETWORK || 'base-sepolia',
+    facilitator: process.env.X402_FACILITATOR_URL || 'https://x402.coinbase.com',
   });
 });
 

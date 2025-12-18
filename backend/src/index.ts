@@ -66,6 +66,7 @@ import agentZeroRouter from './routes/agentZero';
 import walletRouter from './routes/wallet';
 import socialRouter from './routes/social';
 import receiptsRouter from './routes/receipts';
+import cctpPaymentsRouter from './routes/cctp-payments';
 
 /**
  * Import middleware
@@ -85,6 +86,7 @@ app.use('/api/agent-zero', complianceMiddleware, agentZeroRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/social', socialRouter);
 app.use('/api/receipts', receiptsRouter);
+app.use('/api/payments/cctp', cctpPaymentsRouter);
 
 /**
  * Health check endpoint

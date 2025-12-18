@@ -28,6 +28,30 @@ export interface X402PaymentRequest {
   expiresAt: number;
   /** Facilitator URL for payment verification */
   facilitatorUrl: string;
+  /** Optional settlement details for cross-chain payments */
+  settlement?: X402SettlementDetails;
+  /** Available payment routes (e.g. Base Direct, Arbitrum CCTP) */
+  routes?: X402PaymentRoute[];
+}
+
+export interface X402SettlementDetails {
+  type: 'cctp';
+  source: string; // CAIP-2
+  destination: string; // CAIP-2
+  destinationReceiver: string;
+  referenceId: string;
+}
+
+export interface X402PaymentRoute {
+  id: string; // e.g. 'base_direct_usdc', 'optimism_cctp'
+  amount: string;
+  token: string;
+  sourceChain: string; // CAIP-2
+  destinationChain: string; // CAIP-2
+  destinationReceiver: string;
+  referenceId: string;
+  expiry: number;
+  settlement?: X402SettlementDetails;
 }
 
 /**

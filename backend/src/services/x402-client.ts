@@ -157,13 +157,12 @@ export class X402Client {
                 };
             }
 
-            // Validate payment amount against safety limit (use BigInt for safe comparison)
+            // Validate payment amount against policy
             const amount = BigInt(paymentRequest.amount);
-            const maxPayment = parseUnits(String(this.config.maxPaymentUsdc || 1.0), 6);
-            if (amount > maxPayment) {
+            if (!this.checkSpendPolicy(amount, paymentRequest.recipient)) {
                 return {
                     success: false,
-                    error: `Payment amount ${formatUnits(amount, 6)} USDC exceeds limit of ${this.config.maxPaymentUsdc} USDC`,
+                    error: `Payment amount ${formatUnits(amount, 6)} USDC exceeds limit or policy`,
                 };
             }
 
@@ -298,6 +297,108 @@ export class X402Client {
             signature,
             payer: this.account.address,
             timestamp,
+        };
+    }
+
+    /**
+     * Check if payment is allowed by policy
+     */
+    private checkSpendPolicy(amount: bigint, _recipient: string): boolean {
+        // TODO: distinct implementation with AgentSpendPolicy
+        // For now, use the simple maxPaymentUsdc config
+        const maxPayment = parseUnits(String(this.config.maxPaymentUsdc || 1.0), 6);
+        return amount <= maxPayment;
+    }
+
+    /**
+     * Execute CCTP Burn on Source Chain
+     * 
+     * 1. Switch to source chain
+     * 2. Approve TokenMessenger
+     * 3. Call depositForBurn
+     */
+    async submitCctpBurn(
+        route: any, // Typed as X402PaymentRoute in full implementation
+        cctpConfig: any // Typed as CctpChainConfig
+    ): Promise<{ txHash: string; referenceId: string }> {
+        const sourceChainId = cctpConfig.chainId;
+        const rpcUrl = process.env[cctpConfig.rpcUrlEnv];
+
+        if (!rpcUrl) throw new Error(`Missing RPC URL for chain ${sourceChainId}`);
+
+        const transport = http(rpcUrl);
+        const sourceChain = {
+            id: sourceChainId,
+            name: `Chain ${sourceChainId}`,
+            network: `chain-${sourceChainId}`,
+            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+            rpcUrls: { default: { http: [rpcUrl] }, public: { http: [rpcUrl] } }
+        } as const;
+
+        const walletClient = createWalletClient({
+            account: this.account,
+            chain: sourceChain,
+            transport,
+        });
+
+        // 1. Approve TokenMessenger
+        const usdcAddress = cctpConfig.usdcAddress as `0x${string}`;
+        const tokenMessenger = cctpConfig.tokenMessenger as `0x${string}`;
+        const amount = BigInt(route.amount);
+
+        // Check policy
+        if (!this.checkSpendPolicy(amount, route.settlement.destinationReceiver)) {
+            throw new Error('Payment exceeds spend policy');
+        }
+
+        const approveHash = await walletClient.sendTransaction({
+            chain: sourceChain,
+            to: usdcAddress,
+            data: encodeFunctionData({
+                abi: [{
+                    name: 'approve',
+                    type: 'function',
+                    inputs: [{ name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }],
+                    outputs: [{ name: '', type: 'bool' }]
+                }],
+                functionName: 'approve',
+                args: [tokenMessenger, amount]
+            })
+        });
+
+        console.log(`[X402 Client] Approved CCTP: ${approveHash}`);
+
+        // 2. Deposit For Burn
+        const recipientBytes32 = route.settlement.destinationReceiver.padEnd(66, '0').replace('0x', '0x000000000000000000000000');
+
+        const burnHash = await walletClient.sendTransaction({
+            chain: sourceChain,
+            to: tokenMessenger,
+            data: encodeFunctionData({
+                abi: [{
+                    name: 'depositForBurn',
+                    type: 'function',
+                    inputs: [
+                        { name: 'amount', type: 'uint256' },
+                        { name: 'destinationDomain', type: 'uint32' },
+                        { name: 'mintRecipient', type: 'bytes32' },
+                        { name: 'burnToken', type: 'address' }
+                    ],
+                    outputs: [{ name: 'nonce', type: 'uint64' }]
+                }],
+                functionName: 'depositForBurn',
+                args: [
+                    amount,
+                    6, // Base domain
+                    recipientBytes32 as `0x${string}`,
+                    usdcAddress
+                ]
+            })
+        });
+
+        return {
+            txHash: burnHash,
+            referenceId: route.referenceId
         };
     }
 }
