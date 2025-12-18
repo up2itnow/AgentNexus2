@@ -63,10 +63,10 @@ export class ReceiptService {
             walletAddress: execution.user?.walletAddress || undefined,
 
             // Payment info (from purchase if available)
-            paymentId: execution.purchase?.paymentId || undefined,
+            paymentId: (execution.purchase as any)?.paymentId || undefined,
             amount: execution.purchase?.amount?.toString() || undefined,
-            token: execution.purchase?.tokenAddress || undefined,
-            platformFee: execution.purchase?.platformFee?.toString() || undefined,
+            token: (execution.purchase as any)?.tokenAddress || undefined,
+            platformFee: (execution.purchase as any)?.platformFee?.toString() || undefined,
 
             // Execution result
             status: this.mapStatus(execution.status),

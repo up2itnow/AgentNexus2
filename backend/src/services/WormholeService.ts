@@ -15,7 +15,7 @@
  * @author AgentNexus Team
  */
 
-import { PublicKey, Connection, Transaction } from '@solana/web3.js';
+import { PublicKey, Connection } from '@solana/web3.js';
 
 /**
  * Wormhole Chain IDs (different from EVM chain IDs)
@@ -239,7 +239,7 @@ export class WormholeService {
      * NOTE: This is a simplified simulation. Production implementation
      * requires the full Wormhole SDK and actual transaction signing.
      */
-    public async initiateBridge(quote: BridgeQuote, senderAddress: string): Promise<BridgeTransaction> {
+    public async initiateBridge(quote: BridgeQuote, _senderAddress: string): Promise<BridgeTransaction> {
         const txId = `wh_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
         const transaction: BridgeTransaction = {
@@ -275,7 +275,7 @@ export class WormholeService {
     /**
      * Get all transactions for an address
      */
-    public getTransactionsForAddress(address: string): BridgeTransaction[] {
+    public getTransactionsForAddress(_address: string): BridgeTransaction[] {
         // In production, filter by sender/recipient address
         return Array.from(this.transactions.values());
     }

@@ -162,7 +162,7 @@ export class CrossChainService {
         fromToken: string,
         toToken: string,
         amount: string,
-        userAddress: string
+        _userAddress: string
     ): Promise<BridgeQuote> {
         console.log(`[CrossChain] Getting quote: ${amount} from chain ${fromChainId} to ${toChainId}`);
 
@@ -202,8 +202,8 @@ export class CrossChainService {
      */
     async executeBridge(
         quote: BridgeQuote,
-        userAddress: string,
-        signer?: ethers.Signer
+        _userAddress: string,
+        _signer?: ethers.Signer
     ): Promise<BridgeTransaction> {
         console.log(`[CrossChain] Executing bridge: ${quote.fromAmount} ${quote.fromToken}`);
         console.log(`[CrossChain] Route: Chain ${quote.fromChainId} → Chain ${quote.toChainId}`);
@@ -285,7 +285,7 @@ export class CrossChainService {
 
     // ============ Private Helpers ============
 
-    private calculateEstimatedOutput(amount: string, fromChain: number, toChain: number): string {
+    private calculateEstimatedOutput(amount: string, _fromChain: number, _toChain: number): string {
         // Simulate slippage (0.1-0.5%)
         const slippage = 0.997 + Math.random() * 0.002;
         return (parseFloat(amount) * slippage).toFixed(6);

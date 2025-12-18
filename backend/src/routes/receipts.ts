@@ -24,7 +24,7 @@ router.get('/:executionId', async (req: Request, res: Response) => {
 
         const receipt = await receiptService.generateReceipt(executionId);
 
-        res.json({
+        return res.json({
             success: true,
             data: receipt
         });
@@ -44,7 +44,7 @@ router.get('/:executionId', async (req: Request, res: Response) => {
         }
 
         console.error('Error fetching receipt:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: 'Failed to generate receipt'
         });
@@ -67,7 +67,7 @@ router.get('/:executionId/summary', async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('Error fetching receipt summary:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: 'Failed to generate receipt summary'
         });
@@ -97,14 +97,14 @@ router.get('/', async (req: Request, res: Response) => {
             offset: offset ? parseInt(offset as string) : undefined
         });
 
-        res.json({
+        return res.json({
             success: true,
             data: receipts,
             count: receipts.length
         });
     } catch (error: any) {
         console.error('Error listing receipts:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             error: 'Failed to list receipts'
         });

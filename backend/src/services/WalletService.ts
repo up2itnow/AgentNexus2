@@ -101,7 +101,7 @@ export class WalletService {
       args: [address as Address, BigInt(tokenId)],
     });
 
-    return balance;
+    return balance as bigint;
   }
 
   public async mintEntitlement(address: string, tokenId: string, amount: number): Promise<void> {
@@ -115,7 +115,7 @@ export class WalletService {
     }
 
     const { entitlements } = getContractAddresses(this.chainId);
-    const hash = await this.walletClient.writeContract({
+    const hash = await (this.walletClient as any).writeContract({
       address: entitlements as Address,
       abi: entitlementsAbi,
       functionName: 'mint',
