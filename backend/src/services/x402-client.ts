@@ -10,7 +10,7 @@
  * @see https://docs.cdp.coinbase.com/x402/welcome
  */
 
-import { createWalletClient, http, encodeFunctionData } from 'viem';
+import { createWalletClient, http, encodeFunctionData, parseUnits, formatUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base, baseSepolia } from 'viem/chains';
 import {
@@ -94,7 +94,15 @@ export class X402Client {
             ...config,
         };
 
-        this.account = privateKeyToAccount(config.privateKey as `0x${string}`);
+        // Validate private key format
+        const privateKey = config.privateKey.startsWith('0x')
+            ? config.privateKey
+            : `0x${config.privateKey}`;
+        if (!/^0x[0-9a-fA-F]{64}$/.test(privateKey)) {
+            throw new Error('Invalid private key format: expected 64 hex characters with 0x prefix');
+        }
+
+        this.account = privateKeyToAccount(privateKey as `0x${string}`);
         this.chain = config.network === 'base' ? base : baseSepolia;
     }
 
@@ -149,12 +157,13 @@ export class X402Client {
                 };
             }
 
-            // Validate payment amount against safety limit
-            const amountUsdc = Number(paymentRequest.amount) / 1_000_000;
-            if (amountUsdc > (this.config.maxPaymentUsdc || 1.0)) {
+            // Validate payment amount against safety limit (use BigInt for safe comparison)
+            const amount = BigInt(paymentRequest.amount);
+            const maxPayment = parseUnits(String(this.config.maxPaymentUsdc || 1.0), 6);
+            if (amount > maxPayment) {
                 return {
                     success: false,
-                    error: `Payment amount ${amountUsdc} USDC exceeds limit ${this.config.maxPaymentUsdc} USDC`,
+                    error: `Payment amount ${formatUnits(amount, 6)} USDC exceeds limit of ${this.config.maxPaymentUsdc} USDC`,
                 };
             }
 
@@ -209,7 +218,12 @@ export class X402Client {
     private parsePaymentRequest(header: string): X402PaymentRequest | null {
         try {
             const decoded = Buffer.from(header, 'base64').toString('utf-8');
-            return JSON.parse(decoded) as X402PaymentRequest;
+            const parsed = JSON.parse(decoded);
+            // Validate required fields
+            if (!parsed.amount || !parsed.recipient || !parsed.chainId) {
+                return null;
+            }
+            return parsed as X402PaymentRequest;
         } catch {
             return null;
         }

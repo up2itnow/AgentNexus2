@@ -12,6 +12,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
+import { parseUnits } from 'viem';
 import {
     X402PaymentRequest,
     X402PaymentPayload,
@@ -31,7 +32,7 @@ const getConfig = (): X402MiddlewareConfig => ({
         url: process.env.X402_FACILITATOR_URL || DEFAULT_FACILITATOR_URL,
         network: (process.env.X402_NETWORK as 'base' | 'base-sepolia') || 'base-sepolia',
         recipientAddress: process.env.X402_PAYMENT_RECIPIENT || '',
-        maxPaymentUsdc: parseFloat(process.env.X402_MAX_PAYMENT_USDC || '100'),
+        maxPaymentUsdc: Number(process.env.X402_MAX_PAYMENT_USDC) || 100,
         paymentTimeout: 300, // 5 minutes
     },
     protectedEndpoints: [], // Configured per-route
@@ -45,7 +46,17 @@ const parsePaymentHeader = (header: string | undefined): X402PaymentPayload | nu
 
     try {
         const decoded = Buffer.from(header, 'base64').toString('utf-8');
-        return JSON.parse(decoded) as X402PaymentPayload;
+        const parsed = JSON.parse(decoded);
+
+        // Validate required fields exist
+        if (!parsed.paymentRequest || !parsed.transactionHash || !parsed.payer) {
+            return null;
+        }
+        if (!parsed.paymentRequest.amount || !parsed.paymentRequest.recipient) {
+            return null;
+        }
+
+        return parsed as X402PaymentPayload;
     } catch {
         return null;
     }
@@ -102,9 +113,8 @@ const generatePaymentRequest = (
     config: X402MiddlewareConfig
 ): X402PaymentRequest => {
     const network = config.facilitator.network;
-    const amountInSmallestUnit = BigInt(
-        Math.floor(parseFloat(endpoint.priceUsdc) * 1_000_000)
-    ).toString();
+    // Use parseUnits for safe decimal-to-smallest-unit conversion (avoids floating-point errors)
+    const amountInSmallestUnit = parseUnits(endpoint.priceUsdc, 6).toString();
 
     return {
         amount: amountInSmallestUnit,
@@ -178,9 +188,18 @@ export const x402Paywall = (priceUsdc: string, description: string) => {
             return;
         }
 
-        // Validate payment amount
-        const expectedAmount = BigInt(Math.floor(parseFloat(priceUsdc) * 1_000_000));
-        const providedAmount = BigInt(payment.paymentRequest.amount);
+        // Validate payment amount (use parseUnits for safe conversion)
+        const expectedAmount = parseUnits(priceUsdc, 6);
+        let providedAmount: bigint;
+        try {
+            providedAmount = BigInt(payment.paymentRequest.amount);
+        } catch {
+            res.status(402).json({
+                error: 'Invalid payment amount format',
+                code: X402ErrorCode.PAYMENT_INVALID,
+            });
+            return;
+        }
 
         if (providedAmount < expectedAmount) {
             res.status(402).json({

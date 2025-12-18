@@ -11,6 +11,7 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '../index';
 import { AgentCategory, AgentStatus } from '@prisma/client';
 import { authenticate } from '../middleware/auth';
+import { x402Paywall, x402Enabled } from '../middleware/x402';
 
 const router: Router = Router();
 
@@ -313,8 +314,6 @@ router.delete('/:id', authenticate, async (req: Request, res: Response) => {
 // x402 Premium Endpoints (Optional, disabled by default)
 // Requires ENABLE_X402=true in environment
 // ============================================
-
-import { x402Paywall, x402Enabled } from '../middleware/x402';
 
 /**
  * GET /api/agents/:id/premium-analytics
