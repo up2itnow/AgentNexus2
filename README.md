@@ -97,6 +97,46 @@ See [STATUS.md](./STATUS.md) for detailed project status and [DEPLOYMENTS.md](./
 
 For smart contract deployment, see the `smart-contracts/` directory README.
 
+## x402 Payments (USDC on Base)
+
+AgentNexus supports [x402](https://docs.cdp.coinbase.com/x402/welcome), an internet-native payment protocol for pay-per-request API access using USDC on Base.
+
+### Paywalled Endpoints
+
+| Endpoint | Price | Description |
+|----------|-------|-------------|
+| `GET /agents/:id/premium-analytics` | 0.05 USDC | Agent analytics with execution trends, revenue breakdown |
+| `GET /agents/:id/detailed-metrics` | 0.02 USDC | Performance metrics, status distribution, duration analysis |
+| `GET /agents/x402/status` | Free | Check x402 configuration |
+
+### Configuration
+
+```bash
+# backend/.env
+ENABLE_X402=true                              # Enable x402 payments
+X402_NETWORK=base-sepolia                     # or "base" for mainnet
+X402_PAYMENT_RECIPIENT=0xYourWalletAddress    # Receives payments
+X402_MAX_PAYMENT_USDC=100                     # Safety limit per request
+```
+
+### Quick Test
+
+```bash
+# Request without payment → 402
+curl -i http://localhost:3001/agents/test-id/premium-analytics
+# HTTP/1.1 402 Payment Required
+# X-Payment-Required: <base64-encoded payment request>
+
+# After paying USDC and retrying with payment proof → 200
+curl -i http://localhost:3001/agents/test-id/premium-analytics \
+  -H "X-Payment: <base64-encoded payment payload>"
+# HTTP/1.1 200 OK
+```
+
+### Verified on Base Sepolia
+
+✅ **Transaction**: [`0x6c4907aa...`](https://sepolia.basescan.org/tx/0x6c4907aa22407b02fab523ed6b01fc533b7288493481f8318c255c1930938783) | Block 35126450 | 0.05 USDC
+
 ---
 
 ## Contributing
