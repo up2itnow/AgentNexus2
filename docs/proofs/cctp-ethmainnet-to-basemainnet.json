@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-12-21T04:34:07.675Z",
+  "network": {
+    "source": "ethereum-mainnet",
+    "sourceChainId": 1,
+    "destination": "base-mainnet",
+    "destinationChainId": 8453
+  },
+  "entities": {
+    "payer": "0x2c9A89325E209c89bb06195761f93e298417b85e",
+    "relayer": "0x63909D52082d17f236110359855757e0ff7Ab49F",
+    "receiverContract": "0xeCEE0ddcafED1cA856865a8Fee95E1859027cAe0",
+    "beneficiary": "0x2c9A89325E209c89bb06195761f93e298417b85e"
+  },
+  "cctp": {
+    "amount": "1.0",
+    "messageHash": "0x9e3cbbff4f14c95ede29a08faee8f9db925c4448fa592fa83a277820cedbcec6",
+    "attestationReceived": true,
+    "attestationSource": "https://iris-api.circle.com/attestations/0x9e3cbbff4f14c95ede29a08faee8f9db925c4448fa592fa83a277820cedbcec6",
+    "attestationReceivedAt": "2025-12-21T04:33:00.000Z"
+  },
+  "transactions": {
+    "burn": {
+      "hash": "0x60d4ceb83736d9ad2b989c0e73593386bd4d90f35e0a2e8843a68193a4cf2b74",
+      "block": "24057271",
+      "explorer": "https://etherscan.io/tx/0x60d4ceb83736d9ad2b989c0e73593386bd4d90f35e0a2e8843a68193a4cf2b74"
+    },
+    "mint": {
+      "hash": "0x858a3ab20a167952935e798a6b9630cf840de15f6bd2f09c45acd6bd843e095f",
+      "block": "39743431",
+      "explorer": "https://basescan.org/tx/0x858a3ab20a167952935e798a6b9630cf840de15f6bd2f09c45acd6bd843e095f"
+    },
+    "credit": {
+      "hash": "0x33c251f0c336baf6c6121878cbf8c0e09581adb30e4208b832bfb9f2f5c7c455",
+      "block": "39751151",
+      "explorer": "https://basescan.org/tx/0x33c251f0c336baf6c6121878cbf8c0e09581adb30e4208b832bfb9f2f5c7c455"
+    }
+  }
+}

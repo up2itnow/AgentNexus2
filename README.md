@@ -45,6 +45,7 @@ See [STATUS.md](./STATUS.md) for detailed project status and [DEPLOYMENTS.md](./
 | Account Abstraction (ERC-4337) | ✅ Implemented |
 | Agent Execution Environment | ✅ Docker-based, sandboxed |
 | Compliance Toggles | ✅ Implemented (disabled by default) |
+| **CCTP Integration** | ✅ [Mainnet Proof](./docs/REVIEWER_WALKTHROUGH.md) |
 | Frontend Marketplace | 🚧 In Development |
 
 ## Security & Scope Notes
@@ -136,6 +137,21 @@ curl -i http://localhost:3001/agents/test-id/premium-analytics \
 ### Verified on Base Sepolia
 
 ✅ **Transaction**: [`0x6c4907aa...`](https://sepolia.basescan.org/tx/0x6c4907aa22407b02fab523ed6b01fc533b7288493481f8318c255c1930938783) | Block 35126450 | 0.05 USDC
+
+## x402 + CCTP (Cross-Chain Payments)
+
+AgentNexus now supports funding via Circle CCTP from Arbitrum and Optimism.
+
+### Usage
+- Client requests regular premium resource.
+- Paywall includes `cctp` routes for Arbitrum/Optimism.
+- Client burns USDC on source chain and submits proof.
+- Permissionless Relayer mints and credits on Base.
+
+### Verification (v0.2.0)
+✅ **Receiver Contract**: [`0x661a9903...`](https://sepolia.basescan.org/address/0x661a9903747E7634e459ac1fb30F51f84D6f4063) (Base Sepolia)
+✅ **Mainnet Proof**: See [docs/proofs/cctp-ethmainnet-to-basemainnet.json](./docs/proofs/cctp-ethmainnet-to-basemainnet.json) for tiny-amount verification (Burn Eth -> Mint Base).
+⚠️ **Testnet Routes**: Circle testnet limited to Ethereum->Base; Arb/OP routes restricted on testnet but active on mainnet.
 
 ---
 

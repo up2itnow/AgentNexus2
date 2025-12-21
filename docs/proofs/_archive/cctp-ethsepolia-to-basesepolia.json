@@ -1,0 +1,6 @@
+{
+    "note": "This file will be populated with verification proof after running backend/scripts/verify-cctp-sepolia.ts",
+    "sourceChain": "ethereum-sepolia",
+    "destinationChain": "base-sepolia",
+    "status": "pending"
+}

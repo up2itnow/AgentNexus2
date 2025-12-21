@@ -1,0 +1,39 @@
+{
+    "_comment": "TEMPLATE: Grant-safe proof artifact. Fill in values after running verify-cctp-mainnet.ts",
+    "proofType": "CCTP E2E Verification",
+    "timestamp": "YYYY-MM-DDTHH:MM:SS.sssZ",
+    "chains": {
+        "source": {
+            "name": "Ethereum Mainnet",
+            "chainId": 1
+        },
+        "destination": {
+            "name": "Base Mainnet",
+            "chainId": 8453,
+            "receiverContract": "0x...",
+            "beneficiary": "0x..."
+        }
+    },
+    "cctp": {
+        "amount": "1.0",
+        "messageHash": "0x...",
+        "attestationReceived": true
+    },
+    "transactions": {
+        "burn": {
+            "hash": "0x...",
+            "block": "...",
+            "explorer": "https://etherscan.io/tx/0x..."
+        },
+        "mint": {
+            "hash": "0x...",
+            "block": "...",
+            "explorer": "https://basescan.org/tx/0x..."
+        },
+        "credit": {
+            "hash": "0x...",
+            "block": "...",
+            "explorer": "https://basescan.org/tx/0x..."
+        }
+    }
+}

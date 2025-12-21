@@ -68,3 +68,25 @@ x402-test-wallets.json
 x402-verification-error.json
 **/x402-test-wallets.json
 **/x402-verification-error.json
+
+# CCTP verification outputs (may contain sensitive data)
+**/*wallet*.json
+**/*verification-error*.json
+**/*-receipt-dump*.json
+
+# Additional secret/PII protection
+**/.env
+**/.env.*
+**/*.env
+**/*.env.*
+**/secrets/
+**/credentials/
+**/*private*.key
+**/*secret*.json
+**/keystore/
+
+# Never commit these patterns (safety net)
+*.pem
+*.p12
+*.pfx
+*.cer
