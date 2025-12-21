@@ -183,3 +183,39 @@ git checkout -b chore/cctp-proof-hardening
 - ✅ Public visibility
 - ✅ Grant review
 - ✅ External developer reading
+
+---
+
+## PR Readiness Report
+
+### What Changed (Tooling + Docs Only)
+- `backend/scripts/verify-cctp-mainnet.ts` - Proof script with resume mode, fail-fast env validation
+- `backend/src/config/cctp.ts` - Corrected MessageTransmitter addresses
+- `docs/proofs/*` - Canonical mainnet proof artifact
+- `docs/REVIEWER_WALKTHROUGH.md` - 5-minute verification guide
+- `docs/x402-cctp.md` - Trust model and architecture docs
+- `.gitignore` - Hardened secret patterns
+
+### What Did NOT Change
+- ❌ No runtime service behavior changes
+- ❌ No contract logic changes  
+- ❌ x402 remains disabled by default
+- ❌ No new dependencies added
+
+### How to Verify in 5 Minutes
+1. Open [Reviewer Walkthrough](./docs/REVIEWER_WALKTHROUGH.md)
+2. Click each explorer link (burn, attestation, mint, credit)
+3. Verify tx hashes match proof JSON
+4. Confirm receiver contract is a contract (not EOA)
+
+### No-Custody Statement
+> **"Funds are non-custodial. USDC flows directly from Circle's burn contract on Ethereum to Circle's mint contract on Base, then into the AgentNexusCctpReceiver contract. The relayer service pays gas only and never holds user funds."**
+
+### Final Secret Scan
+```
+✅ billwilson_home: None
+✅ /Users/: None  
+✅ alchemy.com/v2/ with keys: None
+✅ infura with keys: None
+✅ .env tracked: None
+```

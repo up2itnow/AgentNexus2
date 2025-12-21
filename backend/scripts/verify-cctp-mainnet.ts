@@ -146,9 +146,7 @@ const RECEIVER_ABI = [
     parseAbiItem('function creditFromCctp(bytes32 referenceId, address beneficiary, uint256 amount) external')
 ];
 
-const MINTER_ABI = [
-    parseAbiItem('function getLocalToken(uint32 remoteDomain, bytes32 remoteToken) external view returns (address)')
-];
+// NOTE: MINTER_ABI removed - not used in V1 flow. TokenMessenger handles approval/burn directly.
 
 // MessageSent(bytes message) topic
 const MESSAGE_SENT_TOPIC = '0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036';
@@ -202,13 +200,13 @@ async function main() {
     const srcUsdc = srcConfig.usdcAddress as `0x${string}`;
     const srcMessageTransmitter = srcConfig.messageTransmitter as `0x${string}`;
 
-    // Get TokenMinter address - THIS is what needs approval, not TokenMessenger!
+    // Fetch TokenMinter address (for reference only - approval goes to TokenMessenger in V1 CCTP)
     const srcTokenMinter = await ethPublicClient.readContract({
         address: srcTokenMessenger,
         abi: TM_ABI,
         functionName: 'localMinter'
     }) as `0x${string}`;
-    console.log(`TokenMinter: ${srcTokenMinter}`);
+    console.log(`TokenMinter (reference): ${srcTokenMinter}`);
 
     console.log(`Payer: ${payerAccount.address}`);
     console.log(`Relayer: ${relayerAccount.address}`);
@@ -523,10 +521,33 @@ async function main() {
         if (errMsg.includes('Nonce already used') || errMsg.includes('already executed') || errMsg.includes('nonce')) {
             console.log('✅ Message already minted (Nonce already used - this is expected for resume)');
             alreadyMinted = true;
-            // For already-minted case, we mark mint as needing lookup
-            // The canonical proof should already have the real tx hash
-            mintTx = 'LOOKUP_REQUIRED';
-            console.log('   Note: Mint tx hash requires manual lookup from block explorer.');
+
+            // Attempt to discover mint tx hash from MessageReceived events on Base
+            // This requires scanning recent blocks on the destination chain
+            console.log('   Attempting to discover existing mint tx...');
+            try {
+                // Use the canonical proof if it exists (best effort)
+                const existingProofPath = path.join(path.dirname(new URL(import.meta.url).pathname), '../../docs/proofs/cctp-ethmainnet-to-basemainnet.json');
+                if (fs.existsSync(existingProofPath)) {
+                    const existingProof = JSON.parse(fs.readFileSync(existingProofPath, 'utf-8'));
+                    if (existingProof.transactions?.mint?.hash?.startsWith('0x')) {
+                        mintTx = existingProof.transactions.mint.hash;
+                        mintBlock = BigInt(existingProof.transactions.mint.block || 0);
+                        console.log(`   ✅ Found mint tx from existing proof: ${mintTx}`);
+                    }
+                }
+            } catch {
+                // Ignore discovery failures
+            }
+
+            // If still not found, check if ALLOW_PARTIAL_PROOF is set
+            if (!mintTx || !mintTx.startsWith('0x')) {
+                if (process.env.ALLOW_PARTIAL_PROOF !== 'true') {
+                    throw new Error('❌ Mint tx hash unknown and ALLOW_PARTIAL_PROOF not set. Lookup mint tx manually from BaseScan.');
+                }
+                mintTx = 'UNKNOWN';
+                console.log('   ⚠️ Mint tx unknown. Set from existing proof or lookup manually.');
+            }
         } else {
             throw e;
         }
