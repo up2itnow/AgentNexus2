@@ -422,15 +422,19 @@ async function main() {
     let attestation: `0x${string}` | undefined;
     let attestationTimestamp: string = '';
 
-    // Endpoints to try (both v1 and v2 paths)
+    // Endpoints to try - prioritized order:
+    // 1. /attestations/{hash} - Most reliable for V1 burns (legacy endpoint)
+    // 2. /v1/messages/{hash} - V1 message format
+    // NOTE: /v2/messages returns 400 for V1 burns (expected behavior)
+    const enableV2 = process.env.ENABLE_IRIS_V2 === 'true';
     const endpoints = [
-        `${irisUrl}/v2/messages/${messageHash}`,
-        `${irisUrl}/v1/messages/${messageHash}`,
-        `${irisUrl}/attestations/${messageHash}` // Legacy fallback
+        `${irisUrl}/attestations/${messageHash}`, // Primary: legacy attestation endpoint
+        `${irisUrl}/v1/messages/${messageHash}`,  // V1 message format
+        ...(enableV2 ? [`${irisUrl}/v2/messages/${messageHash}`] : []) // V2 only if enabled
     ];
 
-    console.log('Polling endpoints:');
-    endpoints.forEach(e => console.log(`  - ${e}`));
+    console.log('Polling endpoints (prioritized):');
+    endpoints.forEach((e, i) => console.log(`  ${i + 1}. ${e}`));
     console.log('Backoff: 30s (attempts 1-10), 60s (attempts 11+)');
 
     // Poll loop - infinite retry until attestation is received
@@ -519,8 +523,10 @@ async function main() {
         if (errMsg.includes('Nonce already used') || errMsg.includes('already executed') || errMsg.includes('nonce')) {
             console.log('✅ Message already minted (Nonce already used - this is expected for resume)');
             alreadyMinted = true;
-            mintTx = 'ALREADY_MINTED';
-            // The USDC is already at the receiver contract!
+            // For already-minted case, we mark mint as needing lookup
+            // The canonical proof should already have the real tx hash
+            mintTx = 'LOOKUP_REQUIRED';
+            console.log('   Note: Mint tx hash requires manual lookup from block explorer.');
         } else {
             throw e;
         }
