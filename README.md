@@ -149,7 +149,7 @@ AgentNexus now supports funding via Circle CCTP from Arbitrum and Optimism.
 ✅ **Mainnet Proof**: See [docs/proofs/cctp-ethmainnet-to-basemainnet.json](./docs/proofs/cctp-ethmainnet-to-basemainnet.json) for tiny-amount verification (Burn Eth -> Mint Base).
 ⚠️ **Testnet Routes**: Circle testnet limited to Ethereum->Base; Arb/OP routes restricted on testnet but active on mainnet.
 
-### > CI and security scans are currently being reworked to better reflect tooling-only scripts and archived artifacts.
+### > > Status: Mainnet proof complete. Tooling and CI refinements in progress.
 
 ---
 
