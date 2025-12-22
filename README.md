@@ -1,8 +1,8 @@
 # AgentNexus
 
-[![CI Suite](https://github.com/up2itnow/AgentNexus2/actions/workflows/ci.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml)
-[![Security Scan](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml)
+# [![CI Suite](https://github.com/up2itnow/AgentNexus2/actions/workflows/ci.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/ci.yml)
+# [![CodeQL](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/codeql.yml)
+# [![Security Scan](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml/badge.svg)](https://github.com/up2itnow/AgentNexus2/actions/workflows/security-scan.yml)
 
 > [!IMPORTANT]
 > **🟢 Live on Base Mainnet (December 2025)**
@@ -152,6 +152,8 @@ AgentNexus now supports funding via Circle CCTP from Arbitrum and Optimism.
 ✅ **Receiver Contract**: [`0x661a9903...`](https://sepolia.basescan.org/address/0x661a9903747E7634e459ac1fb30F51f84D6f4063) (Base Sepolia)
 ✅ **Mainnet Proof**: See [docs/proofs/cctp-ethmainnet-to-basemainnet.json](./docs/proofs/cctp-ethmainnet-to-basemainnet.json) for tiny-amount verification (Burn Eth -> Mint Base).
 ⚠️ **Testnet Routes**: Circle testnet limited to Ethereum->Base; Arb/OP routes restricted on testnet but active on mainnet.
+
+### > CI and security scans are currently being reworked to better reflect tooling-only scripts and archived artifacts.
 
 ---
 
