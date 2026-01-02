@@ -4,10 +4,10 @@ These commands walk through the sandbox flow end-to-end: entitlement purchase, a
 
 ## Prerequisites
 
-- Node.js 20+, pnpm 8+
-- Foundry (`cast`) installed for on-chain reads
-- Access to a Base Sepolia RPC endpoint (`BASE_SEPOLIA_RPC_URL`) and the signing key as `PRIVATE_KEY`
-- Environment variables set in `backend/.env` for testnet keys and relayer funding
+- Node.js 20+, pnpm 8+.
+- Foundry (`cast`) installed for on-chain reads.
+- Access to a Base Sepolia RPC endpoint (`BASE_SEPOLIA_RPC_URL`) and the signing key as `PRIVATE_KEY`.
+- Environment variables set in `backend/.env` for testnet keys and relayer funding.
 
 ## Boot the stack
 
@@ -41,7 +41,7 @@ cast call --rpc-url "$BASE_SEPOLIA_RPC_URL" \
 ## 2) Invoke the agent with entitlement proof
 
 ```bash
-curl -i \
+curl -i -X POST \
   -H "X-Wallet-Address: $BUYER" \
   -H "X-Entitlement-Token: sandbox-demo" \
   http://localhost:3001/agents/demo/run -d '{"input":"hello"}'

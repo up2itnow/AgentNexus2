@@ -8,7 +8,7 @@ AgentNexus demonstrates end-to-end CCTP (Cross-Chain Transfer Protocol) integrat
 
 ## Base Mainnet Screencasts
 
-- [Entitlement purchase walkthrough](https://TODO.example.com/agentnexus-base-entitlement.mp4) — wallet connects, entitlement token minted, and BaseScan transaction confirmed. Replace with the final hosted recording link if mirrored elsewhere.
+- [Entitlement purchase walkthrough](https://TODO.example.com/agentnexus-base-entitlement.mp4) — wallet connects, entitlement token minted, and BaseScan transaction confirmed. TODO: Replace with the final hosted recording link if mirrored elsewhere.
 - [Agent invocation + fulfillment](https://TODO.example.com/agentnexus-base-invoke.mp4) — entitlement check passes, backend executes the agent container, and streaming logs/response are captured.
 - [x402 + CCTP payment proof](https://TODO.example.com/agentnexus-base-x402-cctp.mp4) — 402 response shown, CCTP burn/mint/credit chain demonstrated, and Base receiver credit is verified.
 
