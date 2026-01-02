@@ -1,0 +1,20 @@
+# Third-Party Notices
+
+This project integrates several external protocols, services, and open-source packages. Their use is governed by their respective licenses or terms of service; no ownership is claimed over these components.
+
+## Protocols and Services
+- **Base (Coinbase L2)** – Deployment target and RPC layer for AgentNexus contracts and wallet flows. Subject to Base network terms and Coinbase developer policies (see https://www.base.org/terms).
+- **Coinbase x402 Payment Protocol** – Powers pay-per-request USDC payments and payment challenge headers for protected endpoints. Governed by Coinbase Developer Platform terms (see https://docs.cdp.coinbase.com/x402/welcome and linked legal notices).
+- **Circle Cross-Chain Transfer Protocol (CCTP)** – Handles USDC burn/mint settlement and attestation verification for cross-chain funding routes. Subject to Circle platform terms and developer policies (see https://www.circle.com/en/legal/terms and related CCTP documentation).
+- **WalletConnect (v2)** – Enables wallet connection and session negotiation for Base interactions. Distributed under the Apache-2.0 license (https://github.com/WalletConnect/walletconnect-monorepo/blob/v2.0/LICENSE).
+
+## Open-Source Dependencies Requiring Attribution
+License inventory generated via `pnpm licenses list`; highlighted items with notice or copyleft obligations include:
+- **@lifi/sdk** (LGPL-3.0) – Included in the dependency graph for cross-chain routing utilities; dynamically linked only.
+- **web3-utils** (LGPL-3.0) – Used for Ethereum/Base helper utilities.
+- **rpc-websockets** (LGPL-3.0-only) – Used for JSON-RPC WebSocket handling.
+- **@ethereumjs/tx** and related packages (MPL-2.0) – Provide transaction serialization/parsing utilities.
+- Packages marked "SEE LICENSE IN LICENSE.md" (e.g., `@trezor/*`) should be used in accordance with the bundled LICENSE.md files.
+- Public-domain-style dependencies (e.g., `big-integer`, `tweetnacl`) and permissive/WTFPL packages are included under their respective terms.
+
+Full license texts are available in each package's `LICENSE` file within `node_modules` or via the upstream repositories.

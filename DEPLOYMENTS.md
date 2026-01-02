@@ -1,6 +1,6 @@
 # AgentNexus Deployments
 
-This document serves as the canonical source of truth for all AgentNexus smart contract deployments.
+This document serves as the canonical source of truth for all AgentNexus smart contract deployments. Third-party protocol terms (Base, WalletConnect, Coinbase x402, Circle CCTP) are summarized in [NOTICE](./NOTICE).
 
 ## 🟢 Live on Base Mainnet (December 2025)
 
