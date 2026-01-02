@@ -1,12 +1,12 @@
 # Sandbox (Base Sepolia) Verification Demo
 
-These commands walk through the sandbox flow end-to-end: entitlement purchase, agent invocation, and x402+CCTP proof replay using Base Sepolia endpoints.
+These commands walk through the sandbox flow end-to-end: entitlement purchase, agent invocation, and x402/CCTP proof replay using Base Sepolia endpoints. Run all commands from the repository root so workspace paths resolve correctly.
 
 ## Prerequisites
 
 - Node.js 20+, pnpm 8+
 - Foundry (`cast`) installed for on-chain reads
-- Access to a Base Sepolia RPC endpoint (`BASE_SEPOLIA_RPC_URL`)
+- Access to a Base Sepolia RPC endpoint (`BASE_SEPOLIA_RPC_URL`) and the signing key as `PRIVATE_KEY`
 - Environment variables set in `backend/.env` for testnet keys and relayer funding
 
 ## Boot the stack
@@ -24,7 +24,7 @@ The `pnpm dev` script starts both frontend and backend. Wait for `ready - starte
 # Replace with your wallet address
 BUYER=0xYourSepoliaWallet
 # Sample contract address from DEPLOYMENTS.md
-ENTITLEMENTS=0x661a9903747E7634e459ac1fb30F51f84D6f4063
+ENTITLEMENTS=0x5358AaD0a9dC39DFA95c4B0cC7e8D2b76c08E1c9
 
 cast send --rpc-url "$BASE_SEPOLIA_RPC_URL" \
   --private-key $PRIVATE_KEY \
@@ -61,7 +61,7 @@ jq -r '.paymentRequest.routes[] | [.name,.chain,.amount] | @tsv' /tmp/resp.txt
 # Submit a recorded sandbox burn hash to simulate the relayer flow
 curl -X POST http://localhost:3001/api/payments/cctp/submit \
   -H "Content-Type: application/json" \
-  -d '{"burnTxHash":"0xsandboxburnhash","referenceId":"sandbox-demo"}'
+  -d '{"burnTxHash":"<YOUR_SANDBOX_BURN_HASH>","referenceId":"sandbox-demo"}'
 ```
 
 Relayer logs should show `receiveMessage` submission to Base Sepolia followed by `creditFromCctp` on the receiver contract.

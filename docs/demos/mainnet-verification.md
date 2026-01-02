@@ -1,10 +1,11 @@
 # Base Mainnet Verification Demo
 
 Use this script to replay the production proof chain (entitlement, agent execution, x402+CCTP credit) against Base mainnet.
+Run all commands from the repository root so relative paths resolve correctly.
 
 ## Prerequisites
 
-- Base mainnet RPC URL exported as `BASE_RPC_URL`
+- Base mainnet RPC URL exported as `BASE_RPC_URL` and the signing key as `PRIVATE_KEY`
 - `cast`, `curl`, and `jq` installed
 - Wallet funded with small amount of ETH+USDC for gas/fees
 - Backend `.env` configured with `ENABLE_X402=true`, `ENABLE_CCTP_ROUTES=true`, and relayer key funded on Base
