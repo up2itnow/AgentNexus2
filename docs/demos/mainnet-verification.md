@@ -35,6 +35,7 @@ cast call --rpc-url "$BASE_RPC_URL" \
 
 ```bash
 curl -i \
+  -X POST \
   -H "X-Wallet-Address: $BUYER" \
   -H "X-Entitlement-Token: mainnet-demo" \
   http://localhost:3001/agents/demo/run -d '{"input":"mainnet check"}' | tee /tmp/run.log
