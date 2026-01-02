@@ -14,6 +14,10 @@ AgentNexus is a decentralized infrastructure platform for discovering, purchasin
 
 The platform consists of three layers: a Next.js frontend for user interaction and marketplace browsing, a Node.js/Express backend that orchestrates agent execution in isolated Docker environments, and Solidity smart contracts (Foundry) that manage ownership, payments, and access control. See [ARCHITECTURE.md](./ARCHITECTURE.md) for a deep dive.
 
+## Architecture Overview
+
+![AgentNexus architecture diagram](./docs/architecture-overview.svg)
+
 ## 🚀 Features
 
 This project is **NOT**:

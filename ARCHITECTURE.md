@@ -4,6 +4,8 @@
 
 AgentNexus is a hybrid decentralized application (dApp) that combines on-chain security with off-chain AI computation.
 
+![AgentNexus architecture diagram](./docs/architecture-overview.svg)
+
 ```mermaid
 graph TD
     User[User] -->|Connects Wallet| Frontend[Next.js Frontend]
