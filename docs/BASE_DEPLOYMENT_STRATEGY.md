@@ -2,7 +2,7 @@
 
 ## Overview
 
-AgentNexus V1 will launch **primarily on Base**, Coinbase's Layer 2 network, with a strategic path for multi-chain expansion.
+AgentNexus V1 will launch **primarily on Base**, Coinbase's Layer 2 network, with a strategic path for multi-chain expansion. See [NOTICE](../NOTICE) for third-party protocol terms covering Base, WalletConnect, Coinbase x402, and Circle CCTP.
 
 ## Why Base?
 

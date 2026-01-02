@@ -159,4 +159,4 @@ We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for gu
 
 ## License
 
-Apache 2.0 - See [LICENSE](./LICENSE) for details.
+Apache 2.0 - See [LICENSE](./LICENSE) for details. Third-party protocol and dependency notices are documented in [NOTICE](./NOTICE).

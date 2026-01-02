@@ -1,5 +1,7 @@
 # Base-First Setup (Testnet: Base Sepolia)
 
+Refer to [NOTICE](../NOTICE) for third-party protocol terms (Base network, WalletConnect, Coinbase x402, Circle CCTP) relevant to this setup.
+
 ## 1. Contracts
 - Copy `smart-contracts/env/.env.base.example` to `smart-contracts/env/.env.base` and fill variables.
 - Run `smart-contracts/scripts/deploy-base.sh` after installing Foundry.
