@@ -2,26 +2,24 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
+import { getBackendBaseUrl, persistBackendBaseUrl, persistSessionAuthToken } from '@/lib/settings-storage';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
     const [backendUrl, setBackendUrl] = useState('');
     const apiKeyInputRef = useRef<HTMLInputElement>(null);
 
-    const readBackendUrl = () => localStorage.getItem('agentnexus_backend_url') || '';
-    const persistBackendUrl = (url: string) => localStorage.setItem('agentnexus_backend_url', url);
-
     useEffect(() => {
-        const storedEndpoint = readBackendUrl();
-        if (storedEndpoint) setBackendUrl(storedEndpoint);
+        setBackendUrl(getBackendBaseUrl(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'));
         if (apiKeyInputRef.current) {
             apiKeyInputRef.current.value = '';
         }
     }, []);
 
     const handleSave = () => {
-        persistBackendUrl(backendUrl);
-        alert('Settings saved. API keys are kept in memory only.');
+        persistBackendBaseUrl(backendUrl);
+        persistSessionAuthToken(apiKeyInputRef.current?.value ?? '');
+        alert('Settings saved. Leave API key blank to keep the current session token.');
     };
 
     return (
@@ -51,7 +49,7 @@ export default function SettingsPage() {
                                 className="w-full p-2 border rounded bg-background"
                             />
                             <p className="mt-1 text-sm text-muted-foreground">
-                                API keys are not stored in browser localStorage. Re-enter them after a full page reload.
+                                Leave blank to keep the current session token. API keys are not stored in localStorage.
                             </p>
                         </div>
                     </div>
