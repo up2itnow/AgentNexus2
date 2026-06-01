@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Save, Settings } from 'lucide-react';
+import { getBackendBaseUrl, persistBackendBaseUrl, persistSessionAuthToken } from '@/lib/settings-storage';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -11,12 +12,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [saved, setSaved] = useState(false);
   const apiKeyInputRef = useRef<HTMLInputElement>(null);
 
-  const readBackendUrl = () => localStorage.getItem('backend_base_url') || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8200';
-  const persistBackendUrl = (url: string) => localStorage.setItem('backend_base_url', url);
-
   useEffect(() => {
     if (isOpen) {
-      setBackendUrl(readBackendUrl());
+      setBackendUrl(getBackendBaseUrl(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'));
       if (apiKeyInputRef.current) {
         apiKeyInputRef.current.value = '';
       }
@@ -25,7 +23,8 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   }, [isOpen]);
 
   const handleSave = () => {
-    persistBackendUrl(backendUrl);
+    persistBackendBaseUrl(backendUrl);
+    persistSessionAuthToken(apiKeyInputRef.current?.value ?? '');
 
     setSaved(true);
     setTimeout(() => {
@@ -63,7 +62,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               type="text"
               value={backendUrl}
               onChange={(e) => setBackendUrl(e.target.value)}
-              placeholder="http://localhost:8200"
+              placeholder="http://localhost:3001"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             <p className="text-xs text-muted-foreground">
@@ -83,7 +82,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             <p className="text-xs text-muted-foreground">
-              Your authentication token is kept only for this session and is not saved in browser storage.
+              Leave blank to keep the current session token. Tokens are stored only in this browser session.
             </p>
           </div>
         </div>
