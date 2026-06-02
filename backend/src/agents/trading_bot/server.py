@@ -10,7 +10,7 @@ import logging
 import os
 import signal
 import sys
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 # Add the parent directory to the path for imports
 sys.path.insert(0, '/app')

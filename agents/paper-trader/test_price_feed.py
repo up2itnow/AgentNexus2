@@ -2,7 +2,7 @@
 import os
 os.environ.setdefault("PRICE_FEED_PROVIDER", "coingecko")
 
-from price_feed import get_price, get_prices
+from price_feed import get_price
 
 
 def test_coingecko_btc():
