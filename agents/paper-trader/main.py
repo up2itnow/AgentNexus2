@@ -24,7 +24,7 @@ import hashlib
 from datetime import datetime
 from typing import Any, Optional
 
-from price_feed import get_price, get_prices
+from price_feed import get_price
 
 
 class PaperTrader:
@@ -45,8 +45,8 @@ class PaperTrader:
         Live mode: real-time price from configured price feed (default: CoinGecko, free)
         """
         if self.mode == 'paper':
-            # Deterministic price based on symbol hash — stable for demos/tests
-            seed = int(hashlib.md5(symbol.encode()).hexdigest()[:8], 16)
+            # Deterministic price based on symbol hash, stable for demos/tests.
+            seed = int(hashlib.sha256(symbol.encode()).hexdigest()[:8], 16)
             base_price = (seed % 10000) / 100  # $0.01 - $99.99
             return max(0.01, base_price)
         else:

@@ -16,6 +16,7 @@ import urllib.request
 import urllib.error
 import json
 import logging
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +52,12 @@ _cache_ttl = 15  # seconds
 
 
 def _fetch(url: str, headers: dict = None) -> dict:
+    scheme = urlparse(url).scheme
+    if scheme not in {"http", "https"}:
+        raise ValueError(f"Unsupported price feed URL scheme: {scheme or 'missing'}")
+
     req = urllib.request.Request(url, headers=headers or {"User-Agent": "AgentNexus2/1.0"})
-    with urllib.request.urlopen(req, timeout=10) as r:
+    with urllib.request.urlopen(req, timeout=10) as r:  # nosec B310
         return json.loads(r.read())
 
 
