@@ -4,6 +4,22 @@ import {
   persistBackendBaseUrl,
   persistSessionAuthToken,
 } from './settings-storage';
+import http from 'node:http';
+import api from './api';
+
+function listen(server) {
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      resolve(server.address());
+    });
+  });
+}
+
+function close(server) {
+  return new Promise((resolve, reject) => {
+    server.close((error) => (error ? reject(error) : resolve()));
+  });
+}
 
 describe('settings storage', () => {
   beforeEach(() => {
@@ -46,5 +62,35 @@ describe('settings storage', () => {
     persistSessionAuthToken('');
 
     expect(getSessionAuthToken()).toBe('token-123');
+  });
+
+  it('forwards the session token to the configured backend URL on API requests', async () => {
+    let receivedRequest;
+    const server = http.createServer((req, res) => {
+      res.setHeader('Access-Control-Allow-Origin', 'http://localhost');
+      res.setHeader('Access-Control-Allow-Headers', 'authorization,content-type');
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+
+      receivedRequest = req;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end('[]');
+    });
+
+    const address = await listen(server);
+    persistBackendBaseUrl(`http://127.0.0.1:${address.port}`);
+    persistSessionAuthToken(' protected-token ');
+
+    try {
+      await api.get('/agents');
+    } finally {
+      await close(server);
+    }
+
+    expect(receivedRequest.url).toBe('/api/agents');
+    expect(receivedRequest.headers.authorization).toBe('Bearer protected-token');
   });
 });
