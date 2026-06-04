@@ -2,25 +2,23 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
+import { getApiBaseUrl, saveApiBaseUrl, setSessionAuthToken } from '@/lib/apiSettings';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
     const [backendUrl, setBackendUrl] = useState('');
     const apiKeyInputRef = useRef<HTMLInputElement>(null);
 
-    const readBackendUrl = () => localStorage.getItem('agentnexus_backend_url') || '';
-    const persistBackendUrl = (url: string) => localStorage.setItem('agentnexus_backend_url', url);
-
     useEffect(() => {
-        const storedEndpoint = readBackendUrl();
-        if (storedEndpoint) setBackendUrl(storedEndpoint);
+        setBackendUrl(getApiBaseUrl());
         if (apiKeyInputRef.current) {
             apiKeyInputRef.current.value = '';
         }
     }, []);
 
     const handleSave = () => {
-        persistBackendUrl(backendUrl);
+        saveApiBaseUrl(backendUrl);
+        setSessionAuthToken(apiKeyInputRef.current?.value || '');
         alert('Settings saved. API keys are kept in memory only.');
     };
 

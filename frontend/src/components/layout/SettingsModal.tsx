@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Save, Settings } from 'lucide-react';
+import { getApiBaseUrl, saveApiBaseUrl, setSessionAuthToken } from '@/lib/apiSettings';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -11,12 +13,9 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [saved, setSaved] = useState(false);
   const apiKeyInputRef = useRef<HTMLInputElement>(null);
 
-  const readBackendUrl = () => localStorage.getItem('backend_base_url') || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8200';
-  const persistBackendUrl = (url: string) => localStorage.setItem('backend_base_url', url);
-
   useEffect(() => {
     if (isOpen) {
-      setBackendUrl(readBackendUrl());
+      setBackendUrl(getApiBaseUrl());
       if (apiKeyInputRef.current) {
         apiKeyInputRef.current.value = '';
       }
@@ -25,21 +24,21 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   }, [isOpen]);
 
   const handleSave = () => {
-    persistBackendUrl(backendUrl);
+    saveApiBaseUrl(backendUrl);
+    setSessionAuthToken(apiKeyInputRef.current?.value || '');
 
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
       onClose();
-      window.location.reload(); // Reload to apply changes to API client
     }, 1000);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-xl border border-border bg-background p-6 shadow-lg">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl border border-border bg-background p-6 shadow-lg">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Settings className="h-5 w-5 text-primary" />
@@ -110,6 +109,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -6,17 +6,11 @@
 
 import axios, { AxiosError } from 'axios';
 import type { Agent, AgentFilters, AgentListResponse } from '@/types/agent';
+import { getApiBaseUrl, getSessionAuthToken } from '@/lib/apiSettings';
 
 // Create axios instance
-const getBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('api_url') || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-  }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-};
-
 const api = axios.create({
-  baseURL: `${getBaseUrl()}/api`,
+  baseURL: `${getApiBaseUrl()}/api`,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -25,18 +19,15 @@ const api = axios.create({
 
 // Update baseURL before each request to ensure it captures any changes
 api.interceptors.request.use((config) => {
-  config.baseURL = `${getBaseUrl()}/api`;
+  config.baseURL = `${getApiBaseUrl()}/api`;
   return config;
 });
 
 // Request interceptor for auth tokens
 api.interceptors.request.use((config) => {
-  // Add auth token from localStorage if available
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+  const token = getSessionAuthToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
