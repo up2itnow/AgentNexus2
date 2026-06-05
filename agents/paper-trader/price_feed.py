@@ -14,6 +14,7 @@ import os
 import time
 import urllib.request
 import urllib.error
+from urllib.parse import urlparse
 import json
 import logging
 
@@ -51,8 +52,13 @@ _cache_ttl = 15  # seconds
 
 
 def _fetch(url: str, headers: dict = None) -> dict:
+    parsed_url = urlparse(url)
+    if parsed_url.scheme not in {"http", "https"}:
+        raise ValueError("Price feed URLs must use http or https")
+
     req = urllib.request.Request(url, headers=headers or {"User-Agent": "AgentNexus2/1.0"})
-    with urllib.request.urlopen(req, timeout=10) as r:
+    # The scheme allowlist above blocks file:// and custom protocol fetches.
+    with urllib.request.urlopen(req, timeout=10) as r:  # nosec B310
         return json.loads(r.read())
 
 
