@@ -2,25 +2,25 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
+import { getBackendBaseUrl, persistBackendBaseUrl, setSessionAuthToken } from '@/lib/api-config';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
     const [backendUrl, setBackendUrl] = useState('');
+    const [mounted, setMounted] = useState(false);
     const apiKeyInputRef = useRef<HTMLInputElement>(null);
 
-    const readBackendUrl = () => localStorage.getItem('agentnexus_backend_url') || '';
-    const persistBackendUrl = (url: string) => localStorage.setItem('agentnexus_backend_url', url);
-
     useEffect(() => {
-        const storedEndpoint = readBackendUrl();
-        if (storedEndpoint) setBackendUrl(storedEndpoint);
+        setMounted(true);
+        setBackendUrl(getBackendBaseUrl());
         if (apiKeyInputRef.current) {
             apiKeyInputRef.current.value = '';
         }
     }, []);
 
     const handleSave = () => {
-        persistBackendUrl(backendUrl);
+        persistBackendBaseUrl(backendUrl);
+        setSessionAuthToken(apiKeyInputRef.current?.value || '');
         alert('Settings saved. API keys are kept in memory only.');
     };
 
@@ -51,7 +51,7 @@ export default function SettingsPage() {
                                 className="w-full p-2 border rounded bg-background"
                             />
                             <p className="mt-1 text-sm text-muted-foreground">
-                                API keys are not stored in browser localStorage. Re-enter them after a full page reload.
+                                Enter a token to update this tab session. API keys are kept only in memory and must be re-entered after a full page reload.
                             </p>
                         </div>
                     </div>
@@ -62,19 +62,19 @@ export default function SettingsPage() {
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={() => setTheme('light')}
-                            className={`px-4 py-2 rounded ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
+                            className={`px-4 py-2 rounded ${mounted && theme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
                         >
                             Light
                         </button>
                         <button
                             onClick={() => setTheme('dark')}
-                            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
+                            className={`px-4 py-2 rounded ${mounted && theme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
                         >
                             Dark
                         </button>
                         <button
                             onClick={() => setTheme('system')}
-                            className={`px-4 py-2 rounded ${theme === 'system' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
+                            className={`px-4 py-2 rounded ${mounted && theme === 'system' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
                         >
                             System
                         </button>
