@@ -1,6 +1,7 @@
 const DEFAULT_API_BASE_URL = 'http://localhost:3001';
 const API_BASE_URL_KEYS = ['api_url', 'backend_base_url', 'agentnexus_backend_url'] as const;
 const AUTH_TOKEN_KEY = 'auth_token';
+let sessionAuthToken: string | null = null;
 
 export function getApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
@@ -27,19 +28,22 @@ export function persistApiBaseUrl(url: string): void {
 }
 
 export function getAuthToken(): string | null {
+  if (sessionAuthToken) {
+    return sessionAuthToken;
+  }
+
   if (typeof window === 'undefined') return null;
 
-  return (
-    window.sessionStorage.getItem(AUTH_TOKEN_KEY) ||
-    window.localStorage.getItem(AUTH_TOKEN_KEY)
-  );
+  return window.localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
 export function persistSessionAuthToken(token: string): void {
-  if (typeof window === 'undefined') return;
-
   const value = token.trim();
   if (value) {
-    window.sessionStorage.setItem(AUTH_TOKEN_KEY, value);
+    sessionAuthToken = value;
   }
+}
+
+export function clearSessionAuthToken(): void {
+  sessionAuthToken = null;
 }

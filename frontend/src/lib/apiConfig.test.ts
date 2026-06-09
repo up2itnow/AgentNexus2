@@ -1,6 +1,7 @@
 /// <reference types="jest" />
 
 import {
+  clearSessionAuthToken,
   getApiBaseUrl,
   getAuthToken,
   persistApiBaseUrl,
@@ -10,7 +11,7 @@ import {
 describe('apiConfig', () => {
   beforeEach(() => {
     window.localStorage.clear();
-    window.sessionStorage.clear();
+    clearSessionAuthToken();
   });
 
   it('reads backend URLs saved under legacy settings keys', () => {
@@ -32,12 +33,11 @@ describe('apiConfig', () => {
     expect(window.localStorage.getItem('agentnexus_backend_url')).toBe('https://api.example.com');
   });
 
-  it('keeps auth tokens in session storage and falls back to legacy local storage', () => {
+  it('keeps auth tokens in memory and falls back to legacy local storage', () => {
     window.localStorage.setItem('auth_token', 'legacy-token');
     expect(getAuthToken()).toBe('legacy-token');
 
     persistSessionAuthToken(' session-token ');
-    expect(window.sessionStorage.getItem('auth_token')).toBe('session-token');
     expect(getAuthToken()).toBe('session-token');
   });
 
