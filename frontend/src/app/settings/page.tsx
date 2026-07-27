@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
-import { getApiBaseUrl, persistApiBaseUrl, persistSessionAuthToken } from '@/lib/apiConfig';
+import {
+    clearSessionAuthToken,
+    getApiBaseUrl,
+    persistApiBaseUrl,
+    persistSessionAuthToken,
+} from '@/lib/apiConfig';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
@@ -21,6 +26,14 @@ export default function SettingsPage() {
         persistApiBaseUrl(backendUrl);
         persistSessionAuthToken(apiKeyInputRef.current?.value ?? '');
         alert('Settings saved. API keys are kept only for this browser session.');
+    };
+
+    const handleClearToken = () => {
+        clearSessionAuthToken();
+        if (apiKeyInputRef.current) {
+            apiKeyInputRef.current.value = '';
+        }
+        alert('Session API key cleared.');
     };
 
     return (
@@ -52,6 +65,13 @@ export default function SettingsPage() {
                             <p className="mt-1 text-sm text-muted-foreground">
                                 API keys are not stored in browser localStorage. Leave blank to keep the current session token.
                             </p>
+                            <button
+                                type="button"
+                                onClick={handleClearToken}
+                                className="mt-2 text-sm text-destructive hover:underline"
+                            >
+                                Clear session API key
+                            </button>
                         </div>
                     </div>
                 </div>
