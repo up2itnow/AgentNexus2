@@ -28,22 +28,34 @@ export function persistApiBaseUrl(url: string): void {
 }
 
 export function getAuthToken(): string | null {
-  if (sessionAuthToken) {
+  if (sessionAuthToken !== null) {
     return sessionAuthToken;
   }
 
   if (typeof window === 'undefined') return null;
 
-  return window.localStorage.getItem(AUTH_TOKEN_KEY);
+  const legacyToken = window.localStorage.getItem(AUTH_TOKEN_KEY)?.trim() || null;
+  if (legacyToken) {
+    sessionAuthToken = legacyToken;
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
+  }
+
+  return legacyToken;
 }
 
 export function persistSessionAuthToken(token: string): void {
+  if (typeof window === 'undefined') return;
+
   const value = token.trim();
   if (value) {
     sessionAuthToken = value;
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
   }
 }
 
 export function clearSessionAuthToken(): void {
   sessionAuthToken = null;
+  if (typeof window !== 'undefined') {
+    window.localStorage.removeItem(AUTH_TOKEN_KEY);
+  }
 }
