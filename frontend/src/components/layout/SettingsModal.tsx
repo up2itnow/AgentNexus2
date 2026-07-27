@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Save, Settings } from 'lucide-react';
-import { getApiBaseUrl, persistApiBaseUrl, persistSessionAuthToken } from '@/lib/apiConfig';
+import {
+  clearSessionAuthToken,
+  getApiBaseUrl,
+  persistApiBaseUrl,
+  persistSessionAuthToken,
+} from '@/lib/apiConfig';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -30,8 +35,15 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     setTimeout(() => {
       setSaved(false);
       onClose();
-      window.location.reload(); // Reload to apply changes to API client
     }, 1000);
+  };
+
+  const handleClearToken = () => {
+    clearSessionAuthToken();
+    if (apiKeyInputRef.current) {
+      apiKeyInputRef.current.value = '';
+    }
+    setSaved(true);
   };
 
   if (!isOpen) return null;
@@ -84,6 +96,13 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <p className="text-xs text-muted-foreground">
               Your authentication token is kept only for this browser session. Leave blank to keep the current session token.
             </p>
+            <button
+              type="button"
+              onClick={handleClearToken}
+              className="text-xs text-destructive hover:underline"
+            >
+              Clear session API key
+            </button>
           </div>
         </div>
 
