@@ -2,17 +2,20 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
+import {
+    clearSessionAuthToken,
+    getApiBaseUrl,
+    persistApiBaseUrl,
+    persistSessionAuthToken,
+} from '@/lib/apiConfig';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
     const [backendUrl, setBackendUrl] = useState('');
     const apiKeyInputRef = useRef<HTMLInputElement>(null);
 
-    const readBackendUrl = () => localStorage.getItem('agentnexus_backend_url') || '';
-    const persistBackendUrl = (url: string) => localStorage.setItem('agentnexus_backend_url', url);
-
     useEffect(() => {
-        const storedEndpoint = readBackendUrl();
+        const storedEndpoint = getApiBaseUrl();
         if (storedEndpoint) setBackendUrl(storedEndpoint);
         if (apiKeyInputRef.current) {
             apiKeyInputRef.current.value = '';
@@ -20,8 +23,17 @@ export default function SettingsPage() {
     }, []);
 
     const handleSave = () => {
-        persistBackendUrl(backendUrl);
-        alert('Settings saved. API keys are kept in memory only.');
+        persistApiBaseUrl(backendUrl);
+        persistSessionAuthToken(apiKeyInputRef.current?.value ?? '');
+        alert('Settings saved. API keys are kept only for this browser session.');
+    };
+
+    const handleClearToken = () => {
+        clearSessionAuthToken();
+        if (apiKeyInputRef.current) {
+            apiKeyInputRef.current.value = '';
+        }
+        alert('Session API key cleared.');
     };
 
     return (
@@ -51,8 +63,15 @@ export default function SettingsPage() {
                                 className="w-full p-2 border rounded bg-background"
                             />
                             <p className="mt-1 text-sm text-muted-foreground">
-                                API keys are not stored in browser localStorage. Re-enter them after a full page reload.
+                                API keys are not stored in browser localStorage. Leave blank to keep the current session token.
                             </p>
+                            <button
+                                type="button"
+                                onClick={handleClearToken}
+                                className="mt-2 text-sm text-destructive hover:underline"
+                            >
+                                Clear session API key
+                            </button>
                         </div>
                     </div>
                 </div>
