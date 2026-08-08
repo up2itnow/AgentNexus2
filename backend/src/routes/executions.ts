@@ -169,10 +169,12 @@ router.get('/:id/logs', authenticate, async (req: Request, res: Response) => {
       });
     }
 
-    // Verify ownership
-    if (execution.userId !== req.user!.id) { // Assuming userId is available on execution, need to check schema or include it
-      // Wait, the previous select didn't include userId. I need to add it.
-      // Actually, let's just fetch it.
+    // Verify ownership — never return another user's execution logs.
+    if (execution.userId !== req.user!.id) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'You do not have access to this execution',
+      });
     }
 
     return res.json({
