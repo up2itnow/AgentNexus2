@@ -13,6 +13,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { base, baseSepolia } from 'viem/chains';
 import axios from 'axios';
 import { CCTP_CONFIG } from '../config/cctp';
+import { assertCctpCreditRequest } from '../utils/cctpMessage';
 
 // Minimal ABI for MessageTransmitter
 const MESSAGE_TRANSMITTER_ABI = [
@@ -97,10 +98,29 @@ export class CctpRelayerService {
 
         if (logs.length === 0) throw new Error('No MessageSent event found in transaction');
         const log = logs[0] as any; // Cast to avoid TS issues
-        const messageBytes = log.args.message;
+        const messageBytes = log.args.message as `0x${string}`;
         const messageHash = keccak256(messageBytes);
 
         console.log(`[CCTP Relayer] Found message hash: ${messageHash}`);
+
+        // Bind credit amount/recipient to attested burn message BEFORE mint/credit.
+        // Client-supplied amount was previously trusted, enabling arbitrary credit inflation
+        // (especially on the already-minted path). Also bind on-chain referenceId to
+        // messageHash so the same burn cannot be credited under many fresh referenceIds.
+        const receiverAddress = process.env.CCTP_BASE_RECEIVER_CONTRACT;
+        if (!receiverAddress) throw new Error('CCTP_BASE_RECEIVER_CONTRACT not configured');
+
+        const decoded = assertCctpCreditRequest({
+            messageBytes,
+            claimedAmount: amount,
+            receiverAddress,
+        });
+
+        if (referenceId && referenceId.toLowerCase() !== messageHash.toLowerCase()) {
+            console.warn(
+                `[CCTP Relayer] Ignoring client referenceId ${referenceId}; using messageHash for on-chain idempotency`
+            );
+        }
 
         // 3. Poll Iris for Attestation
         const attestation = await this.pollIrisAttestation(messageHash);
@@ -134,17 +154,13 @@ export class CctpRelayerService {
 
         } catch (e: any) {
             if (e.message?.includes('Nonce') || e.message?.includes('executed')) {
-                console.log('[CCTP Relayer] Message likely already minted, proceeding to credit');
+                console.log('[CCTP Relayer] Message likely already minted, proceeding to credit with attested amount');
             } else {
                 throw e;
             }
         }
 
-        // 5. Credit Receiver
-        // Call creditFromCctp on AgentNexusCctpReceiver
-        const receiverAddress = process.env.CCTP_BASE_RECEIVER_CONTRACT;
-        if (!receiverAddress) throw new Error('CCTP_BASE_RECEIVER_CONTRACT not configured');
-
+        // 5. Credit Receiver using attested burn amount + messageHash idempotency key
         const creditTx = await walletClient.sendTransaction({
             chain: destChain,
             to: receiverAddress as `0x${string}`,
@@ -152,9 +168,9 @@ export class CctpRelayerService {
                 abi: RECEIVER_ABI,
                 functionName: 'creditFromCctp',
                 args: [
-                    referenceId as `0x${string}`, // Must match type bytes32
+                    messageHash,
                     beneficiary as `0x${string}`,
-                    BigInt(amount)
+                    decoded.amount
                 ]
             })
         });
