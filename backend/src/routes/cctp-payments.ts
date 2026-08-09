@@ -20,9 +20,9 @@ const relayerService = new CctpRelayerService();
  * Body:
  * - burnTxHash: string (Source chain burn tx hash)
  * - sourceChain: string (CAIP-2 ID of source chain)
- * - referenceId: string (x402 payment reference ID)
+ * - referenceId: string (advisory; on-chain credit uses keccak256(messageBytes))
  * - beneficiary: string (Address of the user/agent)
- * - amount: string (Amount burned in smallest unit)
+ * - amount: string (Must equal attested burn amount in smallest unit)
  */
 router.post('/submit', async (req: Request, res: Response) => {
     try {
